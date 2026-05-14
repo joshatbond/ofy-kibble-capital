@@ -28,6 +28,16 @@ Production builds run **Convex deploy** and the **Vite** app in one step (see [`
 
 Netlify picks **Bun** automatically when [`bun.lock`](bun.lock) is present.
 
+### Live dev deploy from `main` (branch deploy)
+
+Use this when **Production branch** is **`production`**: each push to **`main`** can produce a **long-lived branch deploy** (stable dev URL), separate from production.
+
+1. Netlify → **Site configuration → Build & deploy → Continuous deployment → Branches and deploy contexts**.
+2. Under **Branch deploys**, choose an option that includes **`main`** (for example **“All branches”** or **“Let me add individual branches”** and add `main`). [Branch deploy docs](https://docs.netlify.com/build/configure-builds/overview/#git-workflow-for-branch-deploy-controls)
+3. After the first successful build, Netlify shows the deploy URL (commonly `https://main--<your-site-name>.netlify.app` or your team’s naming pattern).
+
+**Convex:** the same build command runs for branch deploys. In **Environment variables**, add a **second** `CONVEX_DEPLOY_KEY` (and any other secrets) scoped to **Branch deploys** / **Deploy previews** only, using your **dev** Convex deployment’s deploy key, while keeping the **Production**-scoped key pointed at **prod** Convex. [Environment scopes](https://docs.netlify.com/build/environment-variables/overview/#scopes)
+
 ## Branches and production releases
 
 - **`main`** — day-to-day integration; treat as the dev line (merge PRs here, break things if needed).
@@ -36,7 +46,7 @@ Netlify picks **Bun** automatically when [`bun.lock`](bun.lock) is present.
 ### Netlify
 
 1. **Site configuration → Build & deploy → Continuous deployment → Production branch** → set to **`production`** (not `main`).
-2. Optional: enable **Deploy previews** for pull requests or for **`main`** so you get preview URLs without updating production.
+2. Follow **[Live dev deploy from `main`](#live-dev-deploy-from-main-branch-deploy)** so `main` gets its own branch-deploy URL.
 
 ### Promoting work from `main` to `production`
 

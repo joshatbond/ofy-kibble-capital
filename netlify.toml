@@ -1,4 +1,8 @@
 # TanStack Start on Netlify — https://docs.netlify.com/build/frameworks/framework-setup-guides/tanstack-start/
+#
+# When the site's production branch is `production`, pushes to `main` use the
+# branch-deploy context. Enable branch deploys in the Netlify UI and set a
+# dev-scoped CONVEX_DEPLOY_KEY for that context (see README).
 [build]
   command = "bunx convex deploy --cmd 'bun run build'"
   publish = "dist/client"
