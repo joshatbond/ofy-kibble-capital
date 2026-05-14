@@ -12,8 +12,6 @@ export default [
     rules: {
       // Disable import ordering - handled by Prettier plugin
       'import/order': 'off',
-      '@typescript-eslint/consistent-type-imports': 'off',
-      '@typescript-eslint/array-type': ['error', { default: 'array-simple' }],
     },
   },
 ]

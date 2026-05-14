@@ -33,3 +33,6 @@ yarn.lock
 /playwright/.cache/
 
 app.config.timestamp_*.js
+
+# Local Netlify folder
+.netlify

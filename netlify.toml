@@ -1,0 +1,7 @@
+# TanStack Start on Netlify — https://docs.netlify.com/build/frameworks/framework-setup-guides/tanstack-start/
+[build]
+  command = "bunx convex deploy --cmd 'bun run build'"
+  publish = "dist/client"
+
+[build.environment]
+  NODE_VERSION = "22"
