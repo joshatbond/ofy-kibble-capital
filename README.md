@@ -2,6 +2,8 @@
 
 Student financial literacy ecosystem — Convex backend with [TanStack Start](https://tanstack.com/start) and React.
 
+**Greenfield plan:** [`docs/greenfield_stack_and_architecture.plan.md`](docs/greenfield_stack_and_architecture.plan.md)
+
 ## Package manager
 
 This repository uses **[Bun](https://bun.sh)** for installs and scripts. Do not commit `package-lock.json`; use `bun.lock` only.
