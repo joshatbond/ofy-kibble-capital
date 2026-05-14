@@ -1,8 +1,9 @@
-import { createRouter } from '@tanstack/react-router'
-import { QueryClient } from '@tanstack/react-query'
-import { routerWithQueryClient } from '@tanstack/react-router-with-query'
 import { ConvexQueryClient } from '@convex-dev/react-query'
+import { QueryClient } from '@tanstack/react-query'
+import { createRouter } from '@tanstack/react-router'
+import { routerWithQueryClient } from '@tanstack/react-router-with-query'
 import { ConvexProvider } from 'convex/react'
+
 import { routeTree } from './routeTree.gen'
 
 export function getRouter() {
@@ -30,7 +31,7 @@ export function getRouter() {
       context: { queryClient },
       scrollRestoration: true,
       defaultPreloadStaleTime: 0, // Let React Query handle all caching
-      defaultErrorComponent: (err) => <p>{err.error.stack}</p>,
+      defaultErrorComponent: err => <p>{err.error.stack}</p>,
       defaultNotFoundComponent: () => <p>not found</p>,
       Wrap: ({ children }) => (
         <ConvexProvider client={convexQueryClient.convexClient}>
@@ -38,7 +39,7 @@ export function getRouter() {
         </ConvexProvider>
       ),
     }),
-    queryClient,
+    queryClient
   )
 
   return router

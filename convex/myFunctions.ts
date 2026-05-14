@@ -1,6 +1,7 @@
 import { v } from 'convex/values'
-import { action, mutation, query } from './_generated/server'
+
 import { api } from './_generated/api'
+import { action, mutation, query } from './_generated/server'
 
 // Write your Convex functions in any file inside this directory (`convex`).
 // See https://docs.convex.dev/functions for more.
@@ -23,7 +24,7 @@ export const listNumbers = query({
       .take(args.count)
     return {
       viewer: (await ctx.auth.getUserIdentity())?.name ?? null,
-      numbers: numbers.reverse().map((number) => number.value),
+      numbers: numbers.reverse().map(number => number.value),
     }
   },
 })

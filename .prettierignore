@@ -1,6 +1,5 @@
 .nitro/
 .output/
-.prettierrc
 .tanstack/
 **/api
 **/build

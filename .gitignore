@@ -1,5 +1,8 @@
 node_modules
 
+# MCP secrets (copy from .cursor/mcp.example.json)
+.cursor/mcp.json
+
 # Prefer Bun for this repo
 package-lock.json
 pnpm-lock.yaml
