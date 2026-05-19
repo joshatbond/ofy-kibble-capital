@@ -4,13 +4,20 @@ overview: Scaffold a single TanStack Start + React app backed by Convex, with Ta
 todos:
   - id: scaffold
     content: Create repo from `npm create convex@latest -- -t tanstack-start`; verify dev server + Convex sync
-    status: pending
-  - id: ui_stack
-    content: Add Tailwind v4 + shadcn (Base UI); map Google Stitch v1 templates → route layouts and shells; PRD tokens (Kibble #e31837, PawKet #2d5bff, etc.) as @theme/CSS variables
-    status: pending
+    status: completed
   - id: tooling
-    content: Vendor Prettier/ESLint from user-provided absolute path; add lint/format/typecheck scripts
-    status: pending
+    content: ESLint + Prettier (TanStack-style import order); lint/format/typecheck scripts; Vite/Netlify dev fix
+    status: completed
+  - id: ui_stack
+    content: >-
+      Tailwind v4 + shadcn (theme-builder preset); Kibble/PawKet oklch semantic tokens + Stitch T0–T100 ramps
+      (`bun run theme:tones`). Remaining: core shadcn primitives, Stitch screens → composed shells.
+    status: in_progress
+  - id: routes_shells
+    content: >-
+      `/kibble` and `/pawket` theme layouts + preview routes (done). Remaining: `/admin`, dual PWA manifests,
+      nav shells, role-based redirects.
+    status: in_progress
   - id: auth_tenants
     content: Integrate Convex Auth; register @djpanda/convex-tenants + @djpanda/convex-authz; invitation-only onboarding (mirror ms-engage-v2 convex); teacher/student roles; no public signup
     status: pending
@@ -19,9 +26,6 @@ todos:
     status: pending
   - id: schema_v1
     content: Author initial convex/schema.ts for paystubs, accounts/ledger, vaults, store POS, absences with indexes
-    status: pending
-  - id: routes_shells
-    content: Implement /kibble, /pawket, /admin route layouts with PWA manifests, nav shells, and role-based redirects
     status: pending
   - id: vertical_slices
     content: Implement earnings, savings, and economy loops as thin end-to-end slices before deep UI polish
