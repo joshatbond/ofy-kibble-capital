@@ -1,48 +1,51 @@
 /**
  * PawKet Exchange — Vibrant Scholar
- * Source: design/stitch/student-payroll-tracker/vibrant-scholar/DESIGN.md
+ * Source: design/stitch/student-payroll-tracker/vibrant-scholar
+ * Generated — bun run theme:tones
  */
+@import './vibrant-scholar-tones.css';
+
 [data-theme='pawket'] {
   color-scheme: light;
 
   --font-sans: 'Rubik Variable', Rubik, sans-serif;
   --font-heading: 'Montserrat Variable', Montserrat, sans-serif;
 
-  --background: #fcf9f8;
-  --foreground: #1c1b1b;
-  --card: #ffffff;
-  --card-foreground: #1c1b1b;
-  --popover: #ffffff;
-  --popover-foreground: #1c1b1b;
-  --primary: #2d5bff;
-  --primary-foreground: #ffffff;
-  --secondary: #25fea8;
-  --secondary-foreground: #007147;
-  --muted: #f0eded;
-  --muted-foreground: #434656;
-  --accent: #fff066;
-  --accent-foreground: #1c1b1b;
-  --destructive: #ba1a1a;
-  --destructive-foreground: #ffffff;
-  --border: #1a1a1a;
-  --input: #1a1a1a;
-  --ring: #2d5bff;
-  --chart-1: #2d5bff;
-  --chart-2: #25fea8;
-  --chart-3: #bbae28;
-  --chart-4: #686000;
-  --chart-5: #747688;
+  --background: oklch(0.984 0.003 39.5);
+  --foreground: oklch(0.223 0.002 17.3);
+  --card: oklch(1.000 0.000 0);
+  --card-foreground: oklch(0.223 0.002 17.3);
+  --popover: oklch(1.000 0.000 0);
+  --popover-foreground: oklch(0.223 0.002 17.3);
+  --primary: oklch(0.551 0.247 265.9);
+  --primary-foreground: oklch(1.000 0.000 0);
+  --secondary: oklch(0.882 0.196 159.2);
+  --secondary-foreground: oklch(0.484 0.111 159.1);
+  --muted: oklch(0.948 0.003 17.2);
+  --muted-foreground: oklch(0.398 0.027 276.8);
+  --accent: oklch(0.942 0.157 103.1);
+  --accent-foreground: oklch(0.223 0.002 17.3);
+  --destructive: oklch(0.506 0.193 27.7);
+  --destructive-foreground: oklch(1.000 0.000 0);
+  --border: oklch(0.218 0.000 0);
+  --input: oklch(0.218 0.000 0);
+  --ring: oklch(0.551 0.247 265.9);
+  --chart-1: oklch(0.551 0.247 265.9);
+  --chart-2: oklch(0.882 0.196 159.2);
+  --chart-3: oklch(0.740 0.145 103.5);
+  --chart-4: oklch(0.481 0.102 103.9);
+  --chart-5: oklch(0.570 0.028 280.5);
+  --sidebar: oklch(0.966 0.003 39.5);
+  --sidebar-foreground: oklch(0.223 0.002 17.3);
+  --sidebar-primary: oklch(0.551 0.247 265.9);
+  --sidebar-primary-foreground: oklch(1.000 0.000 0);
+  --sidebar-accent: oklch(0.948 0.003 17.2);
+  --sidebar-accent-foreground: oklch(0.223 0.002 17.3);
+  --sidebar-border: oklch(0.218 0.000 0);
+  --sidebar-ring: oklch(0.551 0.247 265.9);
   --radius: 1rem;
-  --sidebar: #f6f3f2;
-  --sidebar-foreground: #1c1b1b;
-  --sidebar-primary: #2d5bff;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #f0eded;
-  --sidebar-accent-foreground: #1c1b1b;
-  --sidebar-border: #1a1a1a;
-  --sidebar-ring: #2d5bff;
 
-  --ink: #1a1a1a;
+  --ink: oklch(0.218 0.000 0);
   --shadow-brutal: 4px 4px 0 0 var(--ink);
   --shadow-brutal-lg: 8px 8px 0 0 var(--ink);
 }

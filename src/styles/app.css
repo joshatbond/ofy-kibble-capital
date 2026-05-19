@@ -5,6 +5,7 @@
 @import '@fontsource-variable/montserrat';
 @import '@fontsource-variable/work-sans';
 @import '@fontsource-variable/rubik';
+@import './themes/tonal-palette-theme.css';
 @import './themes/kinetic-ledger.css';
 @import './themes/vibrant-scholar.css';
 
@@ -106,7 +107,7 @@
   --sidebar-accent-foreground: oklch(0.218 0.008 223.9);
   --sidebar-border: oklch(0.925 0.005 214.3);
   --sidebar-ring: oklch(0.723 0.014 214.4);
-  --ink: #1a1a1a;
+  --ink: oklch(0.218 0 0);
   --shadow-brutal: 4px 4px 0 0 var(--ink);
   --shadow-brutal-lg: 8px 8px 0 0 var(--ink);
 }

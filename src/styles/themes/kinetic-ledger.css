@@ -1,48 +1,51 @@
 /**
  * Kibble Capital — Kinetic Ledger
- * Source: design/stitch/student-payroll-tracker/kinetic-ledger/DESIGN.md
+ * Source: design/stitch/student-payroll-tracker/kinetic-ledger
+ * Generated — bun run theme:tones
  */
+@import './kinetic-ledger-tones.css';
+
 [data-theme='kibble'] {
   color-scheme: light;
 
   --font-sans: 'Work Sans Variable', 'Work Sans', sans-serif;
   --font-heading: 'Montserrat Variable', Montserrat, sans-serif;
 
-  --background: #f9f9f9;
-  --foreground: #1a1c1c;
-  --card: #ffffff;
-  --card-foreground: #1a1c1c;
-  --popover: #ffffff;
-  --popover-foreground: #1a1c1c;
-  --primary: #e31837;
-  --primary-foreground: #ffffff;
-  --secondary: #e2dfde;
-  --secondary-foreground: #636262;
-  --muted: #eeeeee;
-  --muted-foreground: #5d3f3e;
-  --accent: #00808c;
-  --accent-foreground: #f2fdff;
-  --destructive: #ba1a1a;
-  --destructive-foreground: #ffffff;
-  --border: #1a1a1a;
-  --input: #1a1a1a;
-  --ring: #e31837;
-  --chart-1: #e31837;
-  --chart-2: #00808c;
-  --chart-3: #5f5e5e;
-  --chart-4: #ffb3b1;
-  --chart-5: #e6bdbb;
+  --background: oklch(0.982 0.000 0);
+  --foreground: oklch(0.224 0.003 196.9);
+  --card: oklch(1.000 0.000 0);
+  --card-foreground: oklch(0.224 0.003 196.9);
+  --popover: oklch(1.000 0.000 0);
+  --popover-foreground: oklch(0.224 0.003 196.9);
+  --primary: oklch(0.585 0.226 22.2);
+  --primary-foreground: oklch(1.000 0.000 0);
+  --secondary: oklch(0.906 0.004 39.5);
+  --secondary-foreground: oklch(0.497 0.001 17.2);
+  --muted: oklch(0.949 0.000 0);
+  --muted-foreground: oklch(0.401 0.042 21.3);
+  --accent: oklch(0.548 0.094 206.3);
+  --accent-foreground: oklch(0.986 0.012 209.8);
+  --destructive: oklch(0.506 0.193 27.7);
+  --destructive-foreground: oklch(1.000 0.000 0);
+  --border: oklch(0.218 0.000 0);
+  --input: oklch(0.218 0.000 0);
+  --ring: oklch(0.585 0.226 22.2);
+  --chart-1: oklch(0.585 0.226 22.2);
+  --chart-2: oklch(0.548 0.094 206.3);
+  --chart-3: oklch(0.483 0.001 17.2);
+  --chart-4: oklch(0.838 0.089 20.8);
+  --chart-5: oklch(0.834 0.047 21.4);
+  --sidebar: oklch(0.964 0.001 286.4);
+  --sidebar-foreground: oklch(0.224 0.003 196.9);
+  --sidebar-primary: oklch(0.585 0.226 22.2);
+  --sidebar-primary-foreground: oklch(1.000 0.000 0);
+  --sidebar-accent: oklch(0.949 0.000 0);
+  --sidebar-accent-foreground: oklch(0.224 0.003 196.9);
+  --sidebar-border: oklch(0.218 0.000 0);
+  --sidebar-ring: oklch(0.585 0.226 22.2);
   --radius: 0.5rem;
-  --sidebar: #f3f3f4;
-  --sidebar-foreground: #1a1c1c;
-  --sidebar-primary: #e31837;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #eeeeee;
-  --sidebar-accent-foreground: #1a1c1c;
-  --sidebar-border: #1a1a1a;
-  --sidebar-ring: #e31837;
 
-  --ink: #1a1a1a;
+  --ink: oklch(0.218 0.000 0);
   --shadow-brutal: 4px 4px 0 0 var(--ink);
   --shadow-brutal-lg: 8px 8px 0 0 var(--ink);
 }
