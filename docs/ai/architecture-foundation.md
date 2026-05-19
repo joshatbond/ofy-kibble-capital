@@ -38,6 +38,7 @@ Keep route components thin; put reusable logic in typed helpers or Convex functi
 - Convex CLI: `bunx convex dev` / `bunx convex deploy`
 - Quality gate: `bun run check` (Prettier + ESLint with fix)
 - Production build: `bun run build` (`vite build` + `tsc --noEmit`)
+- Git: develop on **`main`**; ship only via intentional updates to **`production`** — [`git-workflow.md`](git-workflow.md)
 
 ## Coding constraints
 

@@ -44,6 +44,11 @@ Dual PWA manifests (scoped `start_url` / `theme_color` per app) on one origin �
 - Production build: `bun run build`
 - Typecheck: `bun run typecheck`
 
+## Git branches
+
+- **`main`** — primary development; not production.
+- **`production`** — intentional releases only (stub commit/tag on promote). See [`docs/ai/git-workflow.md`](ai/git-workflow.md).
+
 ## Canonical guidance
 
 - Architecture constraints: [`docs/ai/architecture-foundation.md`](ai/architecture-foundation.md) and [`AGENTS.md`](../AGENTS.md)

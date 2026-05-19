@@ -15,14 +15,15 @@ This repo uses a thin [`AGENTS.md`](../../AGENTS.md) plus detailed docs in `docs
 ## Bootstrap order
 
 1. Read [`README.md`](../../README.md) and [`../Architecture.md`](../Architecture.md) for repo basics.
-2. Read [`AGENTS.md`](../../AGENTS.md) for pointers only.
-3. Follow [`architecture-foundation.md`](architecture-foundation.md) for constraints.
-4. For product scope and routes, read [`../greenfield_stack_and_architecture.plan.md`](../greenfield_stack_and_architecture.plan.md).
-5. For React UI in routes or components, read [`react.md`](react.md).
-6. For TanStack Start/Router work, load skills from [`tanstack-intent-skills.md`](tanstack-intent-skills.md).
-7. For Convex work, read [`convex.md`](convex.md) then `convex/_generated/ai/guidelines.md`.
-8. For auth or invitations, read [`auth.md`](auth.md) and ms-engage-v2 `convex/` before implementing.
-9. Use Cursor/Claude Convex plugin rules and `.agents/skills/convex*` when present.
+2. For branches/releases: [`git-workflow.md`](git-workflow.md) — **`main` is dev only**; never push `production` unless the user asks to ship.
+3. Read [`AGENTS.md`](../../AGENTS.md) for pointers only.
+4. Follow [`architecture-foundation.md`](architecture-foundation.md) for constraints.
+5. For product scope and routes, read [`../greenfield_stack_and_architecture.plan.md`](../greenfield_stack_and_architecture.plan.md).
+6. For React UI in routes or components, read [`react.md`](react.md).
+7. For TanStack Start/Router work, load skills from [`tanstack-intent-skills.md`](tanstack-intent-skills.md).
+8. For Convex work, read [`convex.md`](convex.md) then `convex/_generated/ai/guidelines.md`.
+9. For auth or invitations, read [`auth.md`](auth.md) and ms-engage-v2 `convex/` before implementing.
+10. Use Cursor/Claude Convex plugin rules and `.agents/skills/convex*` when present.
 
 ## Drift prevention
 

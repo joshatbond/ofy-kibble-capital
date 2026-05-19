@@ -21,7 +21,7 @@ Examples:
 - `test`: test additions or updates
 - `build`: tooling/build/dependency changes
 - `ci`: CI workflow updates
-- `chore`: maintenance tasks that do not fit other types
+- `chore`: maintenance tasks that do not fit other types (including `chore(release): …` stub commits on `production`)
 
 ## Scope guidance
 

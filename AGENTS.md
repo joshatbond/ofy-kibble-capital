@@ -17,6 +17,7 @@ Student financial literacy ecosystem: **Kibble Capital** (accounting-style PWA),
 - Use semantic commits — [`docs/ai/commit-conventions.md`](docs/ai/commit-conventions.md).
 - Never add tool attribution to commit messages (`Made with: Cursor`, `Co-Authored-By: <tool>`, etc.).
 - Do not `git commit` or `git push` unless the user explicitly asks.
+- **`main` is development only** — never treat it as production; see [`docs/ai/git-workflow.md`](docs/ai/git-workflow.md) before pushing to `production` or tagging a release.
 
 ## Source of truth (when docs overlap)
 
@@ -45,4 +46,4 @@ When working on Convex code, **always read
 | Commits                    | [`docs/ai/commit-conventions.md`](docs/ai/commit-conventions.md)                                   |
 | TanStack Intent skills     | [`docs/ai/tanstack-intent-skills.md`](docs/ai/tanstack-intent-skills.md)                           |
 | Skill bootstrap order      | [`docs/ai/skill-bootstrap.md`](docs/ai/skill-bootstrap.md)                                         |
-| Deploy & branches          | [`README.md`](README.md)                                                                           |
+| Git branches & releases    | [`docs/ai/git-workflow.md`](docs/ai/git-workflow.md)                                               |
