@@ -1,5 +1,5 @@
-import type { AppThemeId } from '~/lib/themes'
 import { cn } from '~/lib/class-name-merge'
+import type { AppThemeId } from '~/lib/themes'
 
 type AppThemeProps = {
   theme: AppThemeId
