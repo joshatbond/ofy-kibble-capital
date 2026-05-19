@@ -1,4 +1,4 @@
-import { Bell, Rocket, Shield, TrendingUp } from 'lucide-react'
+import { Rocket, Shield, TrendingUp } from 'lucide-react'
 
 import { BrandLogo } from '~/components/brand/brand-logo'
 import { cn } from '~/lib/class-name-merge'

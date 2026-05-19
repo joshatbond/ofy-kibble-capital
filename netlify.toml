@@ -4,7 +4,7 @@
 # branch-deploy context. Enable branch deploys in the Netlify UI and set a
 # dev-scoped CONVEX_DEPLOY_KEY for that context (see README).
 [build]
-  command = "bunx convex deploy --cmd 'bun run build'"
+  command = "bunx convex deploy --cmd-url-env-var-name VITE_CONVEX_URL --cmd 'bun run build'"
   publish = "dist/client"
 
 [build.environment]
