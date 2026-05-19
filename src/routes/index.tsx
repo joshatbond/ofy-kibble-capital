@@ -43,13 +43,11 @@ function Home() {
 
         <p>
           Numbers:{' '}
-
           {numbers.length === 0 ? 'Click the button!' : numbers.join(', ')}
         </p>
 
         <p>
           Edit{' '}
-
           <code className="rounded-md bg-slate-200 px-1 py-0.5 font-mono text-sm font-bold dark:bg-slate-800">
             convex/myFunctions.ts
           </code>{' '}
@@ -58,7 +56,6 @@ function Home() {
 
         <p>
           Edit{' '}
-
           <code className="rounded-md bg-slate-200 px-1 py-0.5 font-mono text-sm font-bold dark:bg-slate-800">
             src/routes/index.tsx
           </code>{' '}
@@ -66,15 +63,20 @@ function Home() {
         </p>
 
         <p>
-          Open{' '}
-
+          Theme previews:{' '}
           <Link
-            to="/anotherPage"
-            className="text-blue-600 underline hover:no-underline"
+            to="/kibble"
+            className="text-primary font-medium underline hover:no-underline"
           >
-            another page
-          </Link>{' '}
-          to send an action.
+            Kibble Capital
+          </Link>
+          {' · '}
+          <Link
+            to="/pawket"
+            className="text-primary font-medium underline hover:no-underline"
+          >
+            PawKet Exchange
+          </Link>
         </p>
 
         <div className="flex flex-col">

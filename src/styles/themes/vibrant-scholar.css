@@ -1,0 +1,55 @@
+/**
+ * PawKet Exchange — Vibrant Scholar
+ * Source: design/stitch/student-payroll-tracker/vibrant-scholar/DESIGN.md
+ */
+[data-theme='pawket'] {
+  color-scheme: light;
+
+  --font-sans: 'Rubik Variable', Rubik, sans-serif;
+  --font-heading: 'Montserrat Variable', Montserrat, sans-serif;
+
+  --background: #fcf9f8;
+  --foreground: #1c1b1b;
+  --card: #ffffff;
+  --card-foreground: #1c1b1b;
+  --popover: #ffffff;
+  --popover-foreground: #1c1b1b;
+  --primary: #2d5bff;
+  --primary-foreground: #ffffff;
+  --secondary: #25fea8;
+  --secondary-foreground: #007147;
+  --muted: #f0eded;
+  --muted-foreground: #434656;
+  --accent: #fff066;
+  --accent-foreground: #1c1b1b;
+  --destructive: #ba1a1a;
+  --destructive-foreground: #ffffff;
+  --border: #1a1a1a;
+  --input: #1a1a1a;
+  --ring: #2d5bff;
+  --chart-1: #2d5bff;
+  --chart-2: #25fea8;
+  --chart-3: #bbae28;
+  --chart-4: #686000;
+  --chart-5: #747688;
+  --radius: 1rem;
+  --sidebar: #f6f3f2;
+  --sidebar-foreground: #1c1b1b;
+  --sidebar-primary: #2d5bff;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f0eded;
+  --sidebar-accent-foreground: #1c1b1b;
+  --sidebar-border: #1a1a1a;
+  --sidebar-ring: #2d5bff;
+
+  --ink: #1a1a1a;
+  --shadow-brutal: 4px 4px 0 0 var(--ink);
+  --shadow-brutal-lg: 8px 8px 0 0 var(--ink);
+}
+
+[data-theme='pawket'] .font-heading,
+[data-theme='pawket'] h1,
+[data-theme='pawket'] h2,
+[data-theme='pawket'] h3 {
+  font-family: var(--font-heading);
+}

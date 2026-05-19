@@ -9,12 +9,20 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as AnotherPageRouteImport } from './routes/anotherPage'
+import { Route as PawketRouteRouteImport } from './routes/pawket/route'
+import { Route as KibbleRouteRouteImport } from './routes/kibble/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PawketIndexRouteImport } from './routes/pawket/index'
+import { Route as KibbleIndexRouteImport } from './routes/kibble/index'
 
-const AnotherPageRoute = AnotherPageRouteImport.update({
-  id: '/anotherPage',
-  path: '/anotherPage',
+const PawketRouteRoute = PawketRouteRouteImport.update({
+  id: '/pawket',
+  path: '/pawket',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KibbleRouteRoute = KibbleRouteRouteImport.update({
+  id: '/kibble',
+  path: '/kibble',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -22,40 +30,65 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PawketIndexRoute = PawketIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PawketRouteRoute,
+} as any)
+const KibbleIndexRoute = KibbleIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => KibbleRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/anotherPage': typeof AnotherPageRoute
+  '/kibble': typeof KibbleRouteRouteWithChildren
+  '/pawket': typeof PawketRouteRouteWithChildren
+  '/kibble/': typeof KibbleIndexRoute
+  '/pawket/': typeof PawketIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/anotherPage': typeof AnotherPageRoute
+  '/kibble': typeof KibbleIndexRoute
+  '/pawket': typeof PawketIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/anotherPage': typeof AnotherPageRoute
+  '/kibble': typeof KibbleRouteRouteWithChildren
+  '/pawket': typeof PawketRouteRouteWithChildren
+  '/kibble/': typeof KibbleIndexRoute
+  '/pawket/': typeof PawketIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/anotherPage'
+  fullPaths: '/' | '/kibble' | '/pawket' | '/kibble/' | '/pawket/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/anotherPage'
-  id: '__root__' | '/' | '/anotherPage'
+  to: '/' | '/kibble' | '/pawket'
+  id: '__root__' | '/' | '/kibble' | '/pawket' | '/kibble/' | '/pawket/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AnotherPageRoute: typeof AnotherPageRoute
+  KibbleRouteRoute: typeof KibbleRouteRouteWithChildren
+  PawketRouteRoute: typeof PawketRouteRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/anotherPage': {
-      id: '/anotherPage'
-      path: '/anotherPage'
-      fullPath: '/anotherPage'
-      preLoaderRoute: typeof AnotherPageRouteImport
+    '/pawket': {
+      id: '/pawket'
+      path: '/pawket'
+      fullPath: '/pawket'
+      preLoaderRoute: typeof PawketRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kibble': {
+      id: '/kibble'
+      path: '/kibble'
+      fullPath: '/kibble'
+      preLoaderRoute: typeof KibbleRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -65,12 +98,51 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/pawket/': {
+      id: '/pawket/'
+      path: '/'
+      fullPath: '/pawket/'
+      preLoaderRoute: typeof PawketIndexRouteImport
+      parentRoute: typeof PawketRouteRoute
+    }
+    '/kibble/': {
+      id: '/kibble/'
+      path: '/'
+      fullPath: '/kibble/'
+      preLoaderRoute: typeof KibbleIndexRouteImport
+      parentRoute: typeof KibbleRouteRoute
+    }
   }
 }
 
+interface KibbleRouteRouteChildren {
+  KibbleIndexRoute: typeof KibbleIndexRoute
+}
+
+const KibbleRouteRouteChildren: KibbleRouteRouteChildren = {
+  KibbleIndexRoute: KibbleIndexRoute,
+}
+
+const KibbleRouteRouteWithChildren = KibbleRouteRoute._addFileChildren(
+  KibbleRouteRouteChildren,
+)
+
+interface PawketRouteRouteChildren {
+  PawketIndexRoute: typeof PawketIndexRoute
+}
+
+const PawketRouteRouteChildren: PawketRouteRouteChildren = {
+  PawketIndexRoute: PawketIndexRoute,
+}
+
+const PawketRouteRouteWithChildren = PawketRouteRoute._addFileChildren(
+  PawketRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AnotherPageRoute: AnotherPageRoute,
+  KibbleRouteRoute: KibbleRouteRouteWithChildren,
+  PawketRouteRoute: PawketRouteRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
