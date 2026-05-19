@@ -18,7 +18,11 @@ export const Route = createFileRoute('/kibble/')({
 
 function KibbleHome() {
   return (
-    <StudentAppShell title="Kibble Capital" subtitle={appThemes.kibble.label}>
+    <StudentAppShell
+      title="Kibble Capital"
+      brand="kibble"
+      subtitle={appThemes.kibble.label}
+    >
       <Card className="border-ink shadow-brutal border-2">
         <CardHeader>
           <CardTitle className="font-heading">Theme preview</CardTitle>
