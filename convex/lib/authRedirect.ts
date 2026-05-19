@@ -3,6 +3,32 @@ const STUDENT_APP_BASE_PATHS = ['/kibble', '/pawket'] as const
 
 const LANDING_SUFFIX = '/landing'
 
+function siteOrigin(siteUrl: string): string {
+  return new URL(siteUrl.includes('://') ? siteUrl : `https://${siteUrl}`)
+    .origin
+}
+
+/** Origins allowed for post-OAuth redirects (`SITE_URL` plus optional `ALLOWED_SITE_URLS`). */
+function allowedSiteOrigins(): string[] {
+  const origins = new Set<string>()
+
+  for (const raw of [process.env.SITE_URL, process.env.ALLOWED_SITE_URLS]) {
+    if (raw === undefined || raw === '') {
+      continue
+    }
+
+    for (const part of raw.split(',')) {
+      const trimmed = part.trim()
+
+      if (trimmed !== '') {
+        origins.add(siteOrigin(trimmed))
+      }
+    }
+  }
+
+  return [...origins]
+}
+
 function normalizeStudentAppPathname(pathname: string): string {
   if (pathname === '/kibble' || pathname === '/pawket') {
     return `${pathname}/`
@@ -52,11 +78,23 @@ export function resolveStudentAppRedirect(
   redirectTo: string | undefined | null
 ): string {
   const path = resolveStudentAppPath(redirectTo)
-  const baseUrl = (process.env.SITE_URL ?? '').replace(/\/$/, '')
+  const allowedOrigins = allowedSiteOrigins()
 
-  if (!baseUrl) {
-    throw new Error('SITE_URL is not configured on the Convex deployment')
+  if (allowedOrigins.length === 0) {
+    throw new Error(
+      'SITE_URL is not configured on the Convex deployment (set SITE_URL and optionally ALLOWED_SITE_URLS)'
+    )
   }
+
+  if (redirectTo?.startsWith('http')) {
+    const requestOrigin = new URL(redirectTo).origin
+
+    if (allowedOrigins.includes(requestOrigin)) {
+      return `${requestOrigin}${path}`
+    }
+  }
+
+  const baseUrl = (process.env.SITE_URL ?? allowedOrigins[0]).replace(/\/$/, '')
 
   return `${baseUrl}${path}`
 }

@@ -65,12 +65,21 @@ export function resolvePostAuthRedirect(
   return returnTo
 }
 
-/** OAuth `redirectTo` — prefer a validated deep link, else app home. */
+/**
+ * OAuth `redirectTo` — absolute URL on the current site so Convex Auth returns
+ * here after Google sign-in (not to `SITE_URL` on the deployment alone).
+ */
 export function resolveStudentSignInRedirect(
   app: StudentApp,
   returnTo?: string
 ): string {
-  return resolvePostAuthRedirect(app, returnTo)
+  const path = resolvePostAuthRedirect(app, returnTo)
+
+  if (typeof window === 'undefined') {
+    return path
+  }
+
+  return new URL(path, window.location.origin).href
 }
 
 /** `returnTo` stored when bouncing unauthenticated users to a landing page. */

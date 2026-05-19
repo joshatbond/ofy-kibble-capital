@@ -54,6 +54,48 @@ Do **not** port ms-engage’s domain-specific `afterUserCreatedOrUpdated` allowl
 
 Marketing sign-in uses `StudentSignInButton` with `app="kibble"` or `app="pawket"`. Public landings live at `/kibble/landing` and `/pawket/landing`; protected app homes are `/kibble` and `/pawket`. OAuth `redirectTo` keeps users on the surface they signed in from.
 
+### Multi-host redirects (local / Netlify / production)
+
+Post-OAuth URLs are built in `convex/lib/authRedirect.ts`. The client sends an **absolute** `redirectTo` (`window.location.origin` + path). The server keeps that origin only if it is allowlisted on that Convex deployment.
+
+This project uses **two Convex deployments** (Development + Production), not three. Map frontends like this:
+
+| Frontend                                   | Convex deployment | Netlify / local                              |
+| ------------------------------------------ | ----------------- | -------------------------------------------- |
+| `http://localhost:3000`                    | **Development**   | `bun run dev` → `.env.local`                 |
+| `https://main--kibble-capital.netlify.app` | **Development**   | Branch deploy key on `main`                  |
+| `https://bark.ofys.org`                    | **Production**    | Production deploy key on `production` branch |
+
+**Development** environment variables (Convex dashboard → your project → **Development** → Settings → Environment variables):
+
+| Variable             | Value                                      |
+| -------------------- | ------------------------------------------ |
+| `SITE_URL`           | `http://localhost:3000`                    |
+| `ALLOWED_SITE_URLS`  | `https://main--kibble-capital.netlify.app` |
+| `AUTH_GOOGLE_ID`     | (same OAuth client as prod)                |
+| `AUTH_GOOGLE_SECRET` | (same OAuth client as prod)                |
+
+**Production** environment variables (**Production** tab, not Development):
+
+| Variable             | Value                   |
+| -------------------- | ----------------------- |
+| `SITE_URL`           | `https://bark.ofys.org` |
+| `AUTH_GOOGLE_ID`     |                         |
+| `AUTH_GOOGLE_SECRET` |                         |
+
+Do **not** set `ALLOWED_SITE_URLS` on Production unless you add more hosts later.
+
+After changing env vars, run `bunx convex deploy` (production) or let the next Netlify/`convex dev` push pick up Development.
+
+**Google Cloud Console** (OAuth client):
+
+- **Authorized JavaScript origins:** all three app URLs above.
+- **Authorized redirect URIs:** both Convex callback URLs (not the Netlify URL):
+  - `https://<your-dev-deployment>.convex.site/api/auth/callback/google`
+  - `https://<your-prod-deployment>.convex.site/api/auth/callback/google`
+
+Find the exact host under Convex dashboard → each deployment → Settings (HTTP Actions URL / deployment URL ends in `.convex.site`).
+
 ## Related docs
 
 - [`convex.md`](convex.md) — general Convex rules
