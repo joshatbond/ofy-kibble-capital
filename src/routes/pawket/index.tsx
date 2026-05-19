@@ -1,17 +1,28 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { PawketLandingPage } from '~/components/pawket/landing/pawket-landing-page'
+import { RequireStudentAuth } from '~/components/auth/require-student-auth'
+import { StudentAppShell } from '~/components/shell/student-app-shell'
 
 export const Route = createFileRoute('/pawket/')({
   head: () => ({
-    meta: [
-      { title: 'PawKet Exchange — Master Your Money Like a Pro' },
-      {
-        name: 'description',
-        content:
-          'The fun, game-inspired way for students to save, spend, and learn financial skills.',
-      },
-    ],
+    meta: [{ title: 'PawKet Exchange' }],
   }),
-  component: PawketLandingPage,
+  component: PawketAppPage,
 })
+
+function PawketAppPage() {
+  return (
+    <RequireStudentAuth app="pawket">
+      <StudentAppShell
+        app="pawket"
+        title="PawKet Exchange"
+        subtitle="Student wallet and rewards (stub)."
+      >
+        <p className="text-muted-foreground text-base leading-relaxed">
+          Protected app routes will live here — balances, goals, and PawKet
+          rewards.
+        </p>
+      </StudentAppShell>
+    </RequireStudentAuth>
+  )
+}

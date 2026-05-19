@@ -6,18 +6,19 @@ import {
   Wallet,
 } from 'lucide-react'
 
+import { StudentSignInButton } from '~/components/auth/student-sign-in-button'
 import { BrandLogo } from '~/components/brand/brand-logo'
 import { PawketBrutalButton } from '~/components/pawket/landing/pawket-brutal-button'
 import { PawketBrutalFrame } from '~/components/pawket/landing/pawket-brutal-frame'
 import { cn } from '~/lib/class-name-merge'
 
-export function KibbleLandingPage() {
+export function KibbleLandingPage(props: { returnTo?: string }) {
   return (
     <div className="bg-background text-foreground min-h-dvh min-w-0">
-      <LandingHeader />
+      <LandingHeader returnTo={props.returnTo} />
 
       <main className="mx-auto flex max-w-[1200px] min-w-0 flex-col gap-0 px-4 pt-18 pb-0 md:px-12 md:pt-28">
-        <LandingHero />
+        <LandingHero returnTo={props.returnTo} />
 
         <LandingFeatures />
 
@@ -29,27 +30,31 @@ export function KibbleLandingPage() {
   )
 }
 
-function LandingHeader() {
+function LandingHeader(props: { returnTo?: string }) {
   return (
     <header className="bg-background border-ink shadow-brutal fixed top-0 z-50 w-full border-b-2">
       <div className="flex h-16 w-full items-center justify-between gap-4 px-4 md:px-12">
         <BrandLogo brand="kibble" className="h-10 md:h-11" />
 
         <div className="group flex items-center gap-2">
-          <PawketBrutalButton className="bg-primary text-primary-foreground inline-flex items-center gap-2">
+          <StudentSignInButton
+            app="kibble"
+            returnTo={props.returnTo}
+            className="bg-primary text-primary-foreground inline-flex items-center gap-2"
+          >
             Sign In
             <ArrowRight
               className="size-4 transition-transform group-hover:translate-x-1"
               aria-hidden
             />
-          </PawketBrutalButton>
+          </StudentSignInButton>
         </div>
       </div>
     </header>
   )
 }
 
-function LandingHero() {
+function LandingHero(props: { returnTo?: string }) {
   return (
     <section
       id="top"
@@ -76,10 +81,14 @@ function LandingHero() {
         </p>
 
         <div className="flex w-full max-w-md flex-col gap-3 md:flex-row md:justify-center">
-          <PawketBrutalButton className="bg-primary text-primary-foreground inline-flex items-center justify-center gap-2">
+          <StudentSignInButton
+            app="kibble"
+            returnTo={props.returnTo}
+            className="bg-primary text-primary-foreground inline-flex items-center justify-center gap-2"
+          >
             Sign In with School ID
             <ArrowRight className="size-4" aria-hidden />
-          </PawketBrutalButton>
+          </StudentSignInButton>
 
           <PawketBrutalButton variant="outline" className="bg-card">
             Learn More
@@ -155,7 +164,7 @@ function LandingFeatures() {
   )
 }
 
-type FeatureCardProps = {
+function FeatureCard(props: {
   icon: React.ReactNode
   title: string
   description: string
@@ -165,9 +174,7 @@ type FeatureCardProps = {
   actionLabel?: string
   actionClassName?: string
   footer?: React.ReactNode
-}
-
-function FeatureCard(props: FeatureCardProps) {
+}) {
   return (
     <PawketBrutalFrame
       large

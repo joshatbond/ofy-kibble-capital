@@ -1,5 +1,6 @@
 import { Rocket, Shield, TrendingUp } from 'lucide-react'
 
+import { StudentSignInButton } from '~/components/auth/student-sign-in-button'
 import { BrandLogo } from '~/components/brand/brand-logo'
 import { cn } from '~/lib/class-name-merge'
 
@@ -7,10 +8,10 @@ import { PawketBrutalButton } from './pawket-brutal-button'
 import { PawketBrutalFrame } from './pawket-brutal-frame'
 import { PawketIconTile } from './pawket-icon-tile'
 
-export function PawketLandingPage() {
+export function PawketLandingPage(props: { returnTo?: string }) {
   return (
     <div className="bg-background text-foreground min-h-dvh min-w-0">
-      <LandingHeader />
+      <LandingHeader returnTo={props.returnTo} />
 
       <main className="grid w-full min-w-0 grid-cols-[1rem_minmax(0,1fr)_1rem] gap-y-16 py-10 pt-18 md:mx-auto md:flex md:max-w-[1200px] md:flex-col md:gap-20 md:px-12 md:pt-28">
         <LandingHero />
@@ -25,13 +26,15 @@ export function PawketLandingPage() {
   )
 }
 
-function LandingHeader() {
+function LandingHeader(props: { returnTo?: string }) {
   return (
     <header className="bg-background border-ink shadow-brutal fixed top-0 z-50 w-full border-b-2">
       <div className="flex w-full items-center justify-between px-4 py-3 md:px-12">
         <BrandLogo brand="pawket" className="h-11 md:h-12" />
 
-        <PawketBrutalButton>Sign In Now</PawketBrutalButton>
+        <StudentSignInButton app="pawket" returnTo={props.returnTo}>
+          Sign In Now
+        </StudentSignInButton>
       </div>
     </header>
   )

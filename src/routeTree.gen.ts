@@ -14,6 +14,8 @@ import { Route as KibbleRouteRouteImport } from './routes/kibble/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PawketIndexRouteImport } from './routes/pawket/index'
 import { Route as KibbleIndexRouteImport } from './routes/kibble/index'
+import { Route as PawketLandingRouteImport } from './routes/pawket/landing'
+import { Route as KibbleLandingRouteImport } from './routes/kibble/landing'
 
 const PawketRouteRoute = PawketRouteRouteImport.update({
   id: '/pawket',
@@ -40,16 +42,30 @@ const KibbleIndexRoute = KibbleIndexRouteImport.update({
   path: '/',
   getParentRoute: () => KibbleRouteRoute,
 } as any)
+const PawketLandingRoute = PawketLandingRouteImport.update({
+  id: '/landing',
+  path: '/landing',
+  getParentRoute: () => PawketRouteRoute,
+} as any)
+const KibbleLandingRoute = KibbleLandingRouteImport.update({
+  id: '/landing',
+  path: '/landing',
+  getParentRoute: () => KibbleRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/kibble': typeof KibbleRouteRouteWithChildren
   '/pawket': typeof PawketRouteRouteWithChildren
+  '/kibble/landing': typeof KibbleLandingRoute
+  '/pawket/landing': typeof PawketLandingRoute
   '/kibble/': typeof KibbleIndexRoute
   '/pawket/': typeof PawketIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/kibble/landing': typeof KibbleLandingRoute
+  '/pawket/landing': typeof PawketLandingRoute
   '/kibble': typeof KibbleIndexRoute
   '/pawket': typeof PawketIndexRoute
 }
@@ -58,15 +74,32 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/kibble': typeof KibbleRouteRouteWithChildren
   '/pawket': typeof PawketRouteRouteWithChildren
+  '/kibble/landing': typeof KibbleLandingRoute
+  '/pawket/landing': typeof PawketLandingRoute
   '/kibble/': typeof KibbleIndexRoute
   '/pawket/': typeof PawketIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/kibble' | '/pawket' | '/kibble/' | '/pawket/'
+  fullPaths:
+    | '/'
+    | '/kibble'
+    | '/pawket'
+    | '/kibble/landing'
+    | '/pawket/landing'
+    | '/kibble/'
+    | '/pawket/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/kibble' | '/pawket'
-  id: '__root__' | '/' | '/kibble' | '/pawket' | '/kibble/' | '/pawket/'
+  to: '/' | '/kibble/landing' | '/pawket/landing' | '/kibble' | '/pawket'
+  id:
+    | '__root__'
+    | '/'
+    | '/kibble'
+    | '/pawket'
+    | '/kibble/landing'
+    | '/pawket/landing'
+    | '/kibble/'
+    | '/pawket/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -112,14 +145,30 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KibbleIndexRouteImport
       parentRoute: typeof KibbleRouteRoute
     }
+    '/pawket/landing': {
+      id: '/pawket/landing'
+      path: '/landing'
+      fullPath: '/pawket/landing'
+      preLoaderRoute: typeof PawketLandingRouteImport
+      parentRoute: typeof PawketRouteRoute
+    }
+    '/kibble/landing': {
+      id: '/kibble/landing'
+      path: '/landing'
+      fullPath: '/kibble/landing'
+      preLoaderRoute: typeof KibbleLandingRouteImport
+      parentRoute: typeof KibbleRouteRoute
+    }
   }
 }
 
 interface KibbleRouteRouteChildren {
+  KibbleLandingRoute: typeof KibbleLandingRoute
   KibbleIndexRoute: typeof KibbleIndexRoute
 }
 
 const KibbleRouteRouteChildren: KibbleRouteRouteChildren = {
+  KibbleLandingRoute: KibbleLandingRoute,
   KibbleIndexRoute: KibbleIndexRoute,
 }
 
@@ -128,10 +177,12 @@ const KibbleRouteRouteWithChildren = KibbleRouteRoute._addFileChildren(
 )
 
 interface PawketRouteRouteChildren {
+  PawketLandingRoute: typeof PawketLandingRoute
   PawketIndexRoute: typeof PawketIndexRoute
 }
 
 const PawketRouteRouteChildren: PawketRouteRouteChildren = {
+  PawketLandingRoute: PawketLandingRoute,
   PawketIndexRoute: PawketIndexRoute,
 }
 
