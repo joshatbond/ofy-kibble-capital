@@ -1,17 +1,62 @@
 // @ts-check
+
 import convexPlugin from '@convex-dev/eslint-plugin'
 import { tanstackConfig } from '@tanstack/eslint-config'
+import reactPlugin from 'eslint-plugin-react'
 
 export default [
+  {
+    ignores: [
+      '.output/**',
+      '.tanstack/**',
+      '.turbo/**',
+      'convex/_generated/**',
+    ],
+  },
+  {
+    files: ['**/*.{jsx,tsx}'],
+    plugins: {
+      react: reactPlugin,
+    },
+    rules: {
+      'react/jsx-newline': ['error', { prevent: false }],
+    },
+  },
   ...tanstackConfig,
   ...convexPlugin.configs.recommended,
   {
-    ignores: ['convex/_generated/**'],
-  },
-  {
+    files: ['**/*.{js,jsx,ts,tsx}'],
     rules: {
-      // Disable import ordering - handled by Prettier plugin
-      'import/order': 'off',
+      // Align with Prettier-era grouping: packages → ~/ alias → relative parents → siblings,
+      // with blank lines between groups (TanStack omits `newlines-between` by default).
+      'import/order': [
+        'error',
+        {
+          groups: [
+            'builtin',
+            'external',
+            'internal',
+            'parent',
+            'sibling',
+            'index',
+            'object',
+            'type',
+          ],
+          pathGroups: [
+            {
+              pattern: '~/**',
+              group: 'internal',
+              position: 'after',
+            },
+          ],
+          pathGroupsExcludedImportTypes: ['builtin'],
+          'newlines-between': 'always',
+          alphabetize: {
+            order: 'asc',
+            caseInsensitive: true,
+          },
+        },
+      ],
     },
   },
 ]

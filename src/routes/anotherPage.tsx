@@ -21,9 +21,12 @@ function AnotherPage() {
       <h1 className="text-center text-4xl font-bold">
         Convex + Tanstack Start
       </h1>
+
       <div className="mx-auto flex max-w-lg flex-col gap-8">
         <p>Numbers: {data.numbers.join(', ')}</p>
+
         <p>Click the button below to add a random number to the database.</p>
+
         <p>
           <button
             className="bg-dark dark:bg-light text-light dark:text-dark rounded-md border-2 px-4 py-2 text-sm"
@@ -36,6 +39,7 @@ function AnotherPage() {
             Call action to add a random number
           </button>
         </p>
+
         <Link to="/" className="text-blue-600 underline hover:no-underline">
           Back
         </Link>

@@ -21,12 +21,15 @@ function Home() {
       <h1 className="text-center text-4xl font-bold">
         Convex + Tanstack Start
       </h1>
+
       <div className="mx-auto flex max-w-lg flex-col gap-8">
         <p>Welcome {viewer ?? 'Anonymous'}!</p>
+
         <p>
           Click the button below and open this page in another window - this
           data is persisted in the Convex cloud database!
         </p>
+
         <p>
           <button
             className="bg-dark dark:bg-light text-light dark:text-dark rounded-md border-2 px-4 py-2 text-sm"
@@ -37,26 +40,34 @@ function Home() {
             Add a random number
           </button>
         </p>
+
         <p>
           Numbers:{' '}
+
           {numbers.length === 0 ? 'Click the button!' : numbers.join(', ')}
         </p>
+
         <p>
           Edit{' '}
+
           <code className="rounded-md bg-slate-200 px-1 py-0.5 font-mono text-sm font-bold dark:bg-slate-800">
             convex/myFunctions.ts
           </code>{' '}
           to change your backend
         </p>
+
         <p>
           Edit{' '}
+
           <code className="rounded-md bg-slate-200 px-1 py-0.5 font-mono text-sm font-bold dark:bg-slate-800">
             src/routes/index.tsx
           </code>{' '}
           to change your frontend
         </p>
+
         <p>
           Open{' '}
+
           <Link
             to="/anotherPage"
             className="text-blue-600 underline hover:no-underline"
@@ -65,8 +76,10 @@ function Home() {
           </Link>{' '}
           to send an action.
         </p>
+
         <div className="flex flex-col">
           <p className="text-lg font-bold">Useful resources:</p>
+
           <div className="flex gap-2">
             <div className="flex w-1/2 flex-col gap-2">
               <ResourceCard
@@ -74,6 +87,7 @@ function Home() {
                 description="Read comprehensive documentation for all Convex features."
                 href="https://docs.convex.dev/home"
               />
+
               <ResourceCard
                 title="Stack articles"
                 description="Learn about best practices, use cases, and more from a growing
@@ -81,12 +95,14 @@ function Home() {
                 href="https://www.typescriptlang.org/docs/handbook/2/basic-types.html"
               />
             </div>
+
             <div className="flex w-1/2 flex-col gap-2">
               <ResourceCard
                 title="Templates"
                 description="Browse our collection of templates to get started quickly."
                 href="https://www.convex.dev/templates"
               />
+
               <ResourceCard
                 title="Discord"
                 description="Join our developer community to ask questions, trade tips & tricks,
@@ -115,6 +131,7 @@ function ResourceCard({
       <a href={href} className="text-sm underline hover:no-underline">
         {title}
       </a>
+
       <p className="text-xs">{description}</p>
     </div>
   )

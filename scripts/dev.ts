@@ -1,7 +1,8 @@
-import { spawn, spawnSync } from 'bun'
 import { existsSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+
+import { spawn, spawnSync } from 'bun'
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..')
 
