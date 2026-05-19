@@ -2,7 +2,7 @@
 
 Student financial literacy ecosystem — Convex backend with [TanStack Start](https://tanstack.com/start) and React.
 
-**Greenfield plan:** [`docs/greenfield_stack_and_architecture.plan.md`](docs/greenfield_stack_and_architecture.plan.md)
+**Docs:** [`docs/Architecture.md`](docs/Architecture.md) (overview) · [`docs/greenfield_stack_and_architecture.plan.md`](docs/greenfield_stack_and_architecture.plan.md) (product plan) · [`AGENTS.md`](AGENTS.md) (AI contributor index)
 
 ## Package manager
 
