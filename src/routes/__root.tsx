@@ -1,4 +1,3 @@
-import type { QueryClient } from '@tanstack/react-query'
 import {
   HeadContent,
   Outlet,
@@ -8,6 +7,8 @@ import {
 import * as React from 'react'
 
 import appCss from '~/styles/app.css?url'
+
+import type { QueryClient } from '@tanstack/react-query'
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient
@@ -66,8 +67,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <head>
         <HeadContent />
       </head>
+
       <body>
         {children}
+
         <Scripts />
       </body>
     </html>

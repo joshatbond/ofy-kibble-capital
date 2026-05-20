@@ -8,7 +8,13 @@
  * @module
  */
 
+import type * as auth from "../auth.js";
+import type * as http from "../http.js";
+import type * as lib_authRedirect from "../lib/authRedirect.js";
+import type * as lib_studentApp from "../lib/studentApp.js";
 import type * as myFunctions from "../myFunctions.js";
+import type * as studentAuth from "../studentAuth.js";
+import type * as users from "../users.js";
 
 import type {
   ApiFromModules,
@@ -17,7 +23,13 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  auth: typeof auth;
+  http: typeof http;
+  "lib/authRedirect": typeof lib_authRedirect;
+  "lib/studentApp": typeof lib_studentApp;
   myFunctions: typeof myFunctions;
+  studentAuth: typeof studentAuth;
+  users: typeof users;
 }>;
 
 /**
