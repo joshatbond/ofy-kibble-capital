@@ -1,9 +1,19 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 
 import { RequireStudentAuth } from '~/components/auth/require-student-auth'
 import { StudentAppShell } from '~/components/shell/student-app-shell'
+import { studentAppLandingPath } from '~/lib/auth-redirect'
+import { hasConvexAuthToken } from '~/lib/convex-auth-storage'
 
 export const Route = createFileRoute('/kibble/')({
+  beforeLoad: () => {
+    if (!hasConvexAuthToken()) {
+      throw redirect({
+        to: studentAppLandingPath('kibble'),
+        replace: true,
+      })
+    }
+  },
   head: () => ({
     meta: [{ title: 'Kibble Capital' }],
   }),

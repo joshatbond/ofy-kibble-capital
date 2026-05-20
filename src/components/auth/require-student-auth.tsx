@@ -1,7 +1,8 @@
 import { useConvexAuth } from '@convex-dev/auth/react'
-import { useLocation, useNavigate, useSearch } from '@tanstack/react-router'
-import { useEffect, useRef } from 'react'
+import { useLocation, useNavigate } from '@tanstack/react-router'
+import { useEffect } from 'react'
 
+import { StudentSessionLoading } from '~/components/auth/student-session-loading'
 import { useCurrentStudentApp } from '~/hooks/use-current-student-app'
 import {
   protectedRouteReturnTo,
@@ -9,146 +10,77 @@ import {
 } from '~/lib/auth-redirect'
 import type { StudentApp } from '~/lib/auth-redirect'
 
+/**
+ * Thin runtime guard for protected app pages.
+ *
+ * The route's `beforeLoad` already gated entry on a stored auth token, so on
+ * mount we can assume the user is authenticated for *some* app. This guard
+ * only handles two runtime conditions:
+ *
+ * 1. Session was bound to a different app — redirect to that app's landing.
+ * 2. Token disappeared mid-session (refresh failed, sign-out from another tab,
+ *    server invalidation) — redirect to this app's landing.
+ *
+ * While either redirect is in flight, render the branded session loader.
+ */
 export function RequireStudentAuth(props: {
   app: StudentApp
   children: React.ReactNode
 }) {
-  const { isLoading, isAuthenticated } = useConvexAuth()
+  const { isLoading: authLoading, isAuthenticated } = useConvexAuth()
   const { studentApp: sessionApp, isLoading: sessionAppLoading } =
     useCurrentStudentApp()
   const location = useLocation()
-  const search = useSearch({ strict: false })
   const navigate = useNavigate()
-  const completingOAuth = isOAuthCallbackInProgress(search)
-  const signInRedirectStarted = useRef(false)
-  const wrongAppRedirectStarted = useRef(false)
-  const unboundSessionRedirectStarted = useRef(false)
-  const hasAppAccess = isAuthenticated && sessionApp === props.app
+
+  const sessionStillLoading = authLoading || sessionAppLoading
+
+  const signedOutMidSession = !sessionStillLoading && !isAuthenticated
+
+  const wrongAppRedirectTarget: StudentApp | null =
+    !sessionStillLoading &&
+    isAuthenticated &&
+    sessionApp !== null &&
+    sessionApp !== undefined &&
+    sessionApp !== props.app
+      ? sessionApp
+      : null
 
   useEffect(() => {
-    if (isLoading || completingOAuth || isAuthenticated) {
-      signInRedirectStarted.current = false
+    if (signedOutMidSession) {
+      void navigate({
+        to: studentAppLandingPath(props.app),
+        search: {
+          returnTo: protectedRouteReturnTo(props.app, location.pathname),
+        },
+        replace: true,
+      })
       return
     }
 
-    const landingPath = studentAppLandingPath(props.app)
-
-    if (location.pathname === landingPath) {
-      return
+    if (wrongAppRedirectTarget !== null) {
+      void navigate({
+        to: studentAppLandingPath(wrongAppRedirectTarget),
+        replace: true,
+      })
     }
-
-    if (signInRedirectStarted.current) {
-      return
-    }
-
-    signInRedirectStarted.current = true
-
-    void navigate({
-      to: landingPath,
-      search: {
-        returnTo: protectedRouteReturnTo(props.app, location.pathname),
-      },
-      replace: true,
-    })
   }, [
-    completingOAuth,
-    isAuthenticated,
-    isLoading,
     location.pathname,
     navigate,
     props.app,
+    signedOutMidSession,
+    wrongAppRedirectTarget,
   ])
 
-  useEffect(() => {
-    if (isLoading || sessionAppLoading || completingOAuth || !isAuthenticated) {
-      wrongAppRedirectStarted.current = false
-      return
-    }
-
-    if (
-      sessionApp === null ||
-      sessionApp === undefined ||
-      sessionApp === props.app
-    ) {
-      return
-    }
-
-    if (wrongAppRedirectStarted.current) {
-      return
-    }
-
-    wrongAppRedirectStarted.current = true
-
-    void navigate({
-      to: studentAppLandingPath(sessionApp),
-      replace: true,
-    })
-  }, [
-    completingOAuth,
-    isAuthenticated,
-    isLoading,
-    navigate,
-    sessionApp,
-    sessionAppLoading,
-  ])
-
-  useEffect(() => {
-    if (isLoading || sessionAppLoading || completingOAuth || !isAuthenticated) {
-      unboundSessionRedirectStarted.current = false
-      return
-    }
-
-    if (sessionApp !== null) {
-      return
-    }
-
-    if (unboundSessionRedirectStarted.current) {
-      return
-    }
-
-    unboundSessionRedirectStarted.current = true
-
-    void navigate({
-      to: studentAppLandingPath(props.app),
-      replace: true,
-    })
-  }, [
-    completingOAuth,
-    isAuthenticated,
-    isLoading,
-    navigate,
-    props.app,
-    sessionApp,
-    sessionAppLoading,
-  ])
-
-  if (isLoading || completingOAuth || sessionAppLoading) {
+  if (
+    sessionStillLoading ||
+    signedOutMidSession ||
+    wrongAppRedirectTarget !== null
+  ) {
     return (
-      <div className="text-muted-foreground flex min-h-[40vh] items-center justify-center p-8 text-center text-sm font-medium">
-        Checking your session…
-      </div>
-    )
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <div className="text-muted-foreground flex min-h-[40vh] items-center justify-center p-8 text-center text-sm font-medium">
-        Redirecting to sign in…
-      </div>
-    )
-  }
-
-  if (!hasAppAccess) {
-    return (
-      <div className="text-muted-foreground flex min-h-[40vh] items-center justify-center p-8 text-center text-sm font-medium">
-        Redirecting…
-      </div>
+      <StudentSessionLoading app={props.app} label="Checking your session…" />
     )
   }
 
   return props.children
-}
-
-function isOAuthCallbackInProgress(search: Record<string, unknown>): boolean {
-  return typeof search.code === 'string' && search.code.length > 0
 }

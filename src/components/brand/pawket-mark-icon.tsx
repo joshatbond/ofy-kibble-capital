@@ -1,0 +1,112 @@
+import { cn } from '~/lib/class-name-merge'
+
+type PawketMarkIconProps = {
+  className?: string
+  /** Extra classes for the `<g>` wrapping the cup outline + teal accent. */
+  cupClassName?: string
+  /** Extra classes for the `<g>` wrapping the navy paw + gold pads. */
+  pawClassName?: string
+}
+
+/**
+ * Vectorised PawKet Exchange brand mark (icon only — no wordmark).
+ *
+ * Paths come from `src/assets/pawket_exchange.svg`. The mark is split into
+ * stable hook classes so loaders can target individual parts:
+ *
+ * - `.pawket-cup-outline` — navy cup silhouette
+ * - `.pawket-cup-liquid`  — teal accent across the cup's base
+ * - `.pawket-paw-outer`   — navy outer paw silhouette
+ * - `.pawket-paw-pad`     — gold central pad
+ * - `.pawket-paw-toe`     — four gold toe pads (also keyed `-1` … `-4`)
+ */
+export function PawketMarkIcon(props: PawketMarkIconProps) {
+  return (
+    <svg
+      viewBox="0 0 356 343"
+      role="img"
+      aria-label="PawKet Exchange"
+      className={cn('block h-full w-full overflow-visible', props.className)}
+    >
+      <g transform="translate(-0.1308028,-0.28308317)">
+        <g className={cn('pawket-cup', props.cupClassName)}>
+          <path
+            className="pawket-cup-outline"
+            fill="var(--logo-navy-deep, #162f54)"
+            d="M 0.1308028,0.98102108 0.87902822,186.1783 c 0,0 16.03612278,156.52507 175.96637178,156.52507 159.93025,0 178.1574,-153.96801 178.1574,-153.96801 L 356.30685,0.3924084 C 312.80297,-1.9584322 290.33975,34.122523 292.47508,58.599659 l -1.04642,124.001061 c 0,0 -11.16146,98.91152 -110.39757,100.45656 C 81.794975,284.60232 64.093377,183.12394 64.093377,183.12394 L 64.354983,47.612223 C 52.971834,10.076881 32.085092,-0.7709457 0.1308028,0.98102108 Z"
+          />
+
+          <path
+            className="pawket-cup-liquid"
+            fill="var(--logo-teal, #0c8683)"
+            d="M 76.061721,218.19222 C 114.602,325.1987 239.69999,357.03352 317.43101,258.97635 l 0.0346,-0.0737 c -80.34048,73.88875 -153.25652,70.10293 -217.38978,-7.00188 0,0 -7.766282,-8.12943 -11.768639,-13.74752 -4.002357,-5.61809 -12.2455,-19.961 -12.2455,-19.961 z"
+          />
+        </g>
+
+        <g className={cn('pawket-paw', props.pawClassName)}>
+          <path
+            className="pawket-paw-outer"
+            fill="var(--logo-navy-deep, #162f54)"
+            d="m 111.96721,189.40247 c 0,0 -19.243292,29.02163 10.46422,54.41397 27.71036,14.31715 53.89076,-2.61606 53.89076,-2.61606 0,0 39.56171,18.54049 59.64608,0 28.19415,-25.60384 9.4178,-53.89076 9.4178,-53.89076 0,0 41.79918,-10.30044 29.29983,-57.81484 -6.2208,-20.0458 -35.05515,-13.8651 -35.05515,-13.8651 0,0 3.47746,-35.505725 -24.06772,-42.903317 -26.23715,-3.211902 -37.67121,22.498083 -37.67121,22.498083 0,0 -8.28131,-28.027416 -40.28726,-21.451661 -24.41939,10.761445 -20.92845,42.380115 -20.92845,42.380115 0,0 -21.52938,-11.56957 -36.101579,15.69633 -12.479354,40.08458 31.392679,57.55324 31.392679,57.55324 z"
+          />
+
+          <path
+            className="pawket-paw-pad"
+            fill="var(--logo-gold, #e2c475)"
+            d="m 123.23449,225.94761 c 18.56363,23.29274 33.6771,5.33345 55.64418,3.80141 21.04731,1.3368 39.64208,20.56696 56.58643,-5.87319 10.91754,-27.06186 -8.38841,-35.84077 -19.58981,-46.47703 -7.31675,-10.63626 -14.12448,-31.87996 -35.87276,-31.82921 -21.74828,0.0507 -27.67978,15.14407 -36.27065,26.83467 -12.84548,11.50562 -34.92311,28.09611 -20.49739,53.54335 z"
+          />
+
+          {/*
+            Each toe ellipse already has its own SVG `transform`. To animate
+            them with CSS we wrap each in a `<g>` that carries an extra class,
+            so the CSS transform on the ellipse doesn't collide with the SVG
+            transform attribute.
+          */}
+          <g className="pawket-paw-toe pawket-paw-toe-1">
+            <ellipse
+              fill="var(--logo-gold, #e2c475)"
+              cx="287.80859"
+              cy="-6.9735951"
+              rx="18.199135"
+              ry="25.433399"
+              transform="matrix(0.8660254,0.5,0.5,-0.8660254,0,0)"
+            />
+          </g>
+
+          <g className="pawket-paw-toe pawket-paw-toe-2">
+            <ellipse
+              fill="var(--logo-gold, #e2c475)"
+              cx="-224.5912"
+              cy="71.190674"
+              rx="19.43565"
+              ry="27.788076"
+              transform="matrix(-0.98194705,-0.18915599,-0.18915599,0.98194705,0,0)"
+            />
+          </g>
+
+          <g className="pawket-paw-toe pawket-paw-toe-3">
+            <ellipse
+              fill="var(--logo-gold, #e2c475)"
+              cx="126.22299"
+              cy="138.02303"
+              rx="19.43565"
+              ry="27.788076"
+              transform="rotate(-10.903533)"
+            />
+          </g>
+
+          <g className="pawket-paw-toe pawket-paw-toe-4">
+            <ellipse
+              fill="var(--logo-gold, #e2c475)"
+              cx="21.26627"
+              cy="186.25539"
+              rx="18.199135"
+              ry="25.433399"
+              transform="rotate(-30)"
+            />
+          </g>
+        </g>
+      </g>
+    </svg>
+  )
+}

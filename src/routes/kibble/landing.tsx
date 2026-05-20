@@ -1,11 +1,27 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 
-import { RedirectAuthenticatedFromLanding } from '~/components/auth/redirect-authenticated-from-landing'
 import { KibbleLandingPage } from '~/components/kibble/landing/kibble-landing-page'
-import { parseStudentLandingSearch } from '~/lib/auth-redirect'
+import {
+  parseStudentLandingSearch,
+  studentAppHomePath,
+} from '~/lib/auth-redirect'
+import { hasConvexAuthToken } from '~/lib/convex-auth-storage'
 
 export const Route = createFileRoute('/kibble/landing')({
   validateSearch: parseStudentLandingSearch,
+  beforeLoad: ({ search }) => {
+    // Sign-out lands here with `?signedOut=true` while Convex Auth is still
+    // tearing down the local token. Skip the redirect in that window so the
+    // landing renders immediately instead of bouncing us back to the app.
+    if (search.signedOut) return
+
+    if (hasConvexAuthToken()) {
+      throw redirect({
+        to: studentAppHomePath('kibble'),
+        replace: true,
+      })
+    }
+  },
   head: () => ({
     meta: [
       { title: 'Kibble Capital — Your Professional Earnings Start Here' },
@@ -22,9 +38,5 @@ export const Route = createFileRoute('/kibble/landing')({
 function KibbleLandingRoute() {
   const search = Route.useSearch()
 
-  return (
-    <RedirectAuthenticatedFromLanding app="kibble">
-      <KibbleLandingPage returnTo={search.returnTo} />
-    </RedirectAuthenticatedFromLanding>
-  )
+  return <KibbleLandingPage returnTo={search.returnTo} />
 }

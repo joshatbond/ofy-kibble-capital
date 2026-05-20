@@ -1,6 +1,14 @@
 const OAUTH_VERIFIER_KEY = '__convexAuthOAuthVerifier'
 const PENDING_OAUTH_REDIRECT_KEY = '__ofy.pendingOAuthRedirectTo'
 
+/**
+ * Storage key Convex Auth uses for its access token. Mirrors
+ * `JWT_STORAGE_KEY` in `@convex-dev/auth/dist/react/client.js`.
+ * Namespace matches the default in `ConvexAuthProvider` (the deployment URL,
+ * with non-alphanumeric chars stripped), which is what we configure today.
+ */
+const CONVEX_AUTH_JWT_KEY = '__convexAuthJWT'
+
 function convexAuthStorageNamespace(): string {
   return (import.meta.env.VITE_CONVEX_URL ?? '').replace(/[^a-zA-Z0-9]/g, '')
 }
@@ -24,7 +32,10 @@ export function writeConvexOAuthVerifierId(verifierId: string): void {
     return
   }
 
-  window.localStorage.setItem(convexAuthStorageKey(OAUTH_VERIFIER_KEY), verifierId)
+  window.localStorage.setItem(
+    convexAuthStorageKey(OAUTH_VERIFIER_KEY),
+    verifierId
+  )
 }
 
 export function clearConvexOAuthVerifierId(): void {
@@ -57,4 +68,22 @@ export function clearPendingOAuthRedirectTo(): void {
   }
 
   window.sessionStorage.removeItem(PENDING_OAUTH_REDIRECT_KEY)
+}
+
+/**
+ * Synchronous "do we have a session?" check, suitable for use inside
+ * `beforeLoad`. Reads the JWT directly from the same storage key Convex Auth
+ * writes to — the token may be expired (the Convex client will catch that and
+ * sign-out automatically), but presence is a reliable "is this a returning
+ * user?" signal for routing decisions.
+ */
+export function hasConvexAuthToken(): boolean {
+  if (typeof window === 'undefined') {
+    return false
+  }
+
+  return (
+    window.localStorage.getItem(convexAuthStorageKey(CONVEX_AUTH_JWT_KEY)) !==
+    null
+  )
 }

@@ -1,11 +1,24 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 
-import { RedirectAuthenticatedFromLanding } from '~/components/auth/redirect-authenticated-from-landing'
 import { PawketLandingPage } from '~/components/pawket/landing/pawket-landing-page'
-import { parseStudentLandingSearch } from '~/lib/auth-redirect'
+import {
+  parseStudentLandingSearch,
+  studentAppHomePath,
+} from '~/lib/auth-redirect'
+import { hasConvexAuthToken } from '~/lib/convex-auth-storage'
 
 export const Route = createFileRoute('/pawket/landing')({
   validateSearch: parseStudentLandingSearch,
+  beforeLoad: ({ search }) => {
+    if (search.signedOut) return
+
+    if (hasConvexAuthToken()) {
+      throw redirect({
+        to: studentAppHomePath('pawket'),
+        replace: true,
+      })
+    }
+  },
   head: () => ({
     meta: [
       { title: 'PawKet Exchange — Master Your Money Like a Pro' },
@@ -22,9 +35,5 @@ export const Route = createFileRoute('/pawket/landing')({
 function PawketLandingRoute() {
   const search = Route.useSearch()
 
-  return (
-    <RedirectAuthenticatedFromLanding app="pawket">
-      <PawketLandingPage returnTo={search.returnTo} />
-    </RedirectAuthenticatedFromLanding>
-  )
+  return <PawketLandingPage returnTo={search.returnTo} />
 }

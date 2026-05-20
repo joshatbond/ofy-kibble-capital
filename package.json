@@ -57,7 +57,8 @@
     "prettier-plugin-tailwindcss": "^0.7.2",
     "tailwindcss": "^4.2.2",
     "typescript": "^6.0.3",
-    "vite": "^8.0.9"
+    "vite": "^8.0.9",
+    "vite-plugin-svgr": "^5.2.0"
   },
   "overrides": {
     "brace-expansion": "^5.0.6"
@@ -80,6 +81,14 @@
     "tailwindFunctions": [
       "clsx",
       "cx"
+    ],
+    "overrides": [
+      {
+        "files": "*.svg",
+        "options": {
+          "parser": "html"
+        }
+      }
     ]
   }
 }

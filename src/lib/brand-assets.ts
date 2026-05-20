@@ -1,10 +1,17 @@
+import KibbleCapitalLogo from '~/assets/kibble_capital.svg?react'
+import PawketExchangeLogo from '~/assets/pawket_exchange.svg?react'
+
+import type { FC, SVGProps } from 'react'
+
+export type BrandLogoComponent = FC<SVGProps<SVGSVGElement>>
+
 export const brandLogos = {
   kibble: {
-    src: '/brand/kibble-capital.png',
+    Component: KibbleCapitalLogo,
     alt: 'Kibble Capital',
   },
   pawket: {
-    src: '/brand/pawket-exchange.png',
+    Component: PawketExchangeLogo,
     alt: 'PawKet Exchange',
   },
 } as const
