@@ -1,5 +1,5 @@
-import KibbleCapitalLogo from '~/assets/kibble_capital.svg?react'
-import PawketExchangeLogo from '~/assets/pawket_exchange.svg?react'
+import { KibbleCapitalLogo } from '~/components/brand/kibble-capital-logo'
+import { PawketExchangeLogo } from '~/components/brand/pawket-exchange-logo'
 
 import type { FC, SVGProps } from 'react'
 

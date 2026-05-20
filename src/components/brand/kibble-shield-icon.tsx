@@ -26,7 +26,7 @@ export function KibbleShieldIcon(props: KibbleShieldIconProps) {
       className={cn('block h-full w-full overflow-visible', props.className)}
     >
       <g
-        className="stroke-ink [stroke-width:30] [paint-order:fill_markers_stroke] [stroke-linecap:round] [stroke-linejoin:round]"
+        className="stroke-ink stroke-30 [paint-order:fill_markers_stroke] [stroke-linecap:round] [stroke-linejoin:round]"
         transform="translate(0.60967472,1.209271)"
       >
         <path
