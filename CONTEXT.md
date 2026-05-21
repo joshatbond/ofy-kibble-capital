@@ -472,6 +472,40 @@ _Avoid_: Admin app (ambiguous with system administration)
 Which student PWA the user authenticated from (**Kibble Capital** or **PawKet Exchange** marketing/install path). After OAuth, **Students** land on that app’s signed-in home. Unknown surface after **Invitation** accept defaults to **Kibble Capital**.
 _Avoid_: Last-used app (deferred), deep link (implementation)
 
+## Engineering
+
+Planned tooling and verification that sit outside the domain glossary but shape how we build UI and money logic.
+
+### UI build policy
+
+How styling and layout progress across implementation slices — see [docs/scope/README.md](docs/scope/README.md#ui-build-policy).
+
+**Design system (slice 1):** Tokens, shadcn, `AppTheme`, SSR marketing landings, loaders, **Storybook** bootstrap. Required **before slice 3** (banking shell and later feature routes depend on composable UI).
+
+**Functional feature UI (slices 2–10):** Real data and flows with **wireframe fidelity** — tokens and primitives, readable lists/forms, correct **Cents** display. **Not** deferred to “unstyled pages”; **Stitch polish**, guided tours, and marketing-quality layout passes wait for **slice 11**.
+
+**Polish (slice 11):** Stitch-aligned screens, tours, accessibility pass, optional visual-regression on golden Storybook stories.
+
+_Avoid_: Feature slices that invent one-off CSS outside the design system; treating slice 11 as the first slice that may use Tailwind
+
+### Component catalog (Storybook)
+
+A **Storybook** workshop for React UI — not shipped yet. Use it to render components in isolation, force props and states (loading, empty, error, wizard steps), and preview **Kibble Capital** vs **PawKet Exchange** styling under `AppTheme` without signing in or routing through the full app.
+
+**Why Storybook (not a big component test suite):** Layout, loaders, landings, and theme tokens are easier to review and iterate in a catalog than with React Testing Library or route-level clicks. **Money and rules** (**Paycheck pipeline**, **Withholding line**, **Cents**, ADR-0001 bracket fixtures) belong in unit/integration tests, not stories.
+
+**When to add it:** Bootstrap in [slice 1 — Foundation](docs/scope/01-foundation.md) (before slice 3). Add stories when reusable components land in slices 2–10. Slice 11 expands composed feature stories and may add optional CI snapshots.
+
+**Optional later:** Visual-regression snapshots on a small golden story set in CI (Chromatic, Playwright, etc.) — only if manual Storybook review stops catching unintended drift.
+
+**Out of scope for the catalog:** Proving payroll math; wiring every Convex query (use fixtures or thin mocks only where a story needs data).
+
+_Avoid_: Treating Storybook as a substitute for paystub or pipeline tests; deferring Storybook to slice 11 while building styled landings in slice 1 without a catalog
+
+### Testing (money and rules)
+
+Automated tests target **public interfaces** for domain logic — e.g. **Paycheck pipeline** with fixed **Cents** inputs (slice 4), California payroll bracket fixtures (ADR-0001, slice 6), auth redirect allowlists. React component unit tests are low priority; see **Component catalog** for UI craft.
+
 ## Flagged ambiguities
 
 _(none)_

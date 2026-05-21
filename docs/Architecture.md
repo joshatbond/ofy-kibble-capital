@@ -43,6 +43,7 @@ Dual PWA manifests (scoped `start_url` / `theme_color` per app) on one origin �
 - Format + lint fix: `bun run format` or `bun run check`
 - Production build: `bun run build`
 - Typecheck: `bun run typecheck`
+- Component catalog (planned): Storybook — slice 1 bootstrap, expand through 2–11; see [UI build policy](scope/README.md#ui-build-policy) and [`CONTEXT.md`](../CONTEXT.md) (**UI build policy**, **Component catalog**)
 
 ## Git branches
 

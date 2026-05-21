@@ -18,6 +18,7 @@ Convex backend and TanStack app skeleton with multi-tenant classroom model, regi
 - **Settings stack** tables: region defaults → school site → `classSettings` snapshot at classroom create
 - Route shells: `/kibble`, `/pawket`, `/admin` (client-first); SSR only marketing landings
 - Dual PWA manifests per app
+- **Storybook** bootstrap (Vite + React): Tailwind/`app.css`, `AppTheme` decorators (`kibble`, `pawket`), `bun run storybook`; initial stories for shadcn primitives + branded loaders — see [UI build policy](./README.md#ui-build-policy) in scope README
 
 ## Acceptance criteria
 
@@ -25,6 +26,7 @@ Convex backend and TanStack app skeleton with multi-tenant classroom model, regi
 - [ ] **Teacher** sign-in lands on **Teacher admin**; student lands per **Sign-in surface** / invite default **Kibble**
 - [ ] Classroom org created only via operator seed in v1
 - [ ] `classSettings` holds: **Hourly rate**, **Standard day hours**, **Pay schedule**, **Savings APY**, 401(k) %, medical $, **Overtime multiplier**, **Payday notice** lead (1–3 days), **Currency label**, vault cap (default 5), etc.
+- [ ] Storybook runs locally with Kibble and PawKet theme decorators and stories for shared primitives + both loaders
 
 ## Domain refs
 

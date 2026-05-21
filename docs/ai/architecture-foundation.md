@@ -11,6 +11,7 @@ Baseline architecture and contributor constraints for **ofy-kibble-capital**.
 - Deploy: Netlify — `@netlify/vite-plugin-tanstack-start` loaded only on `vite build` (dynamic import in `vite.config.ts`)
 - Auth (planned): Convex Auth + `@djpanda/convex-tenants` + `@djpanda/convex-authz`, invitation-only — see [`auth.md`](auth.md)
 - Design (planned): shadcn (Base UI), PRD tokens, Google Stitch → shared `src/components/ui/`
+- UI fidelity across slices: [`../scope/README.md`](../scope/README.md#ui-build-policy) — Storybook in slice 1; slices 2–10 functional wireframe UI (not unstyled); Stitch polish in slice 11
 
 ## Layering (target)
 

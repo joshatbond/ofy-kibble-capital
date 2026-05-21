@@ -11,7 +11,8 @@ todos:
   - id: ui_stack
     content: >-
       Tailwind v4 + shadcn (theme-builder preset); Kibble/PawKet oklch semantic tokens + Stitch T0–T100 ramps
-      (`bun run theme:tones`). Remaining: core shadcn primitives, Stitch screens → composed shells.
+      (`bun run theme:tones`). Storybook bootstrap (slice 1, before slice 3). Remaining: core shadcn primitives,
+      Stitch screens → composed shells; feature slices 2–10 wireframe UI, polish in slice 11.
     status: in_progress
   - id: routes_shells
     content: >-
@@ -160,7 +161,7 @@ Design **flat, relational** tables with indexes (Convex rules: avoid deep nestin
 3. **Earnings loop (minimal)**: teacher logs hours → `paystub` generated from settings → student sees paystub in `/kibble`.
 4. **Savings loop (minimal)**: “transfer net to bank” mutation creates checking balance + optional vault allocation in `/pawket`.
 5. **Economy loop (minimal)**: teacher creates store item → POS debit against student checking.
-6. **Polish**: Stitch-aligned screens where templates exist; notifications list, charts (pick one chart lib later), PWA offline behavior scoped to safe read-only views if feasible.
+6. **Polish**: Stitch-aligned screens where templates exist; expand **Storybook** and close layout debt from slices 2–10 (bootstrap is slice 1 — see [`docs/scope/README.md`](scope/README.md#ui-build-policy)); notifications list, charts (pick one chart lib later), PWA offline behavior scoped to safe read-only views if feasible.
 
 ## Files and folders to expect at repo root (new)
 

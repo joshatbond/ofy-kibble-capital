@@ -16,6 +16,14 @@ Stitch-aligned UI, reliability polish, monthly interest job, and **student guide
 - Semantic tokens / theme tones (`bun run theme:tones`)
 - shadcn primitives + composed screens
 
+### Component catalog (Storybook) — expand
+
+Storybook **bootstrap** is slice 1 ([`01-foundation.md`](./01-foundation.md)); see [UI build policy](./README.md#ui-build-policy). This slice expands the catalog and aligns routes with Stitch — not the first time UI may be styled.
+
+- [ ] Stories for feature-composed UI built in slices 2–10 (paystub rows, vault wizard, POS cart, admin roster) where not already added
+- [ ] Reconcile wireframe routes from 2–10 with Stitch templates (layout/visual debt)
+- [ ] Optional: CI visual-regression on a small golden story set
+
 ### Student guided tour (required)
 
 Product-led **guided tour** (step overlay or coach marks — pick library e.g. driver.js, react-joyride, or custom) — **separate tour per installed PWA**, no cross-app links (v1).
