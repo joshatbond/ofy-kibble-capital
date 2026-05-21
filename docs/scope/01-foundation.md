@@ -1,0 +1,37 @@
+# Slice 1 — Foundation
+
+## Goal
+
+Convex backend and TanStack app skeleton with multi-tenant classroom model, region/site catalog, and auth wiring ready for invitation-only onboarding.
+
+## Dependencies
+
+- Greenfield scaffold (TanStack Start + Convex) — largely done per plan.
+- Reference: **ms-engage-v2** `convex/` for tenants + authz shape (`docs/ai/auth.md`).
+
+## Deliverables
+
+- `@djpanda/convex-tenants` + `@djpanda/convex-authz` in `convex/convex.config.ts`
+- `convex/tenants.ts`, `convex/authz.ts`, `convex/invitations.ts`, `convex/http.ts` (mirror reference patterns)
+- Operator tables: **Region**, **School site** (**Site slug**), link **Classroom** org to **Site slug**
+- Seed script: regions/sites (`ofysb-mv`, `ofysb-sb1`, `ofysb-sb2`) + your v1 classroom org
+- **Settings stack** tables: region defaults → school site → `classSettings` snapshot at classroom create
+- Route shells: `/kibble`, `/pawket`, `/admin` (client-first); SSR only marketing landings
+- Dual PWA manifests per app
+
+## Acceptance criteria
+
+- [ ] Teacher role vs student role enforced on routes (students cannot hit `/admin`)
+- [ ] **Teacher** sign-in lands on **Teacher admin**; student lands per **Sign-in surface** / invite default **Kibble**
+- [ ] Classroom org created only via operator seed in v1
+- [ ] `classSettings` holds: **Hourly rate**, **Standard day hours**, **Pay schedule**, **Savings APY**, 401(k) %, medical $, **Overtime multiplier**, **Payday notice** lead (1–3 days), **Currency label**, vault cap (default 5), etc.
+
+## Domain refs
+
+- **Organization**, **Classroom**, **Region**, **School site**, **Site slug**, **Settings stack**, **Effective settings**
+- ADRs: none specific; see architecture-foundation + auth docs
+
+## Out of scope
+
+- Pay run, ledger, store, PTO
+- Resend / PWA push

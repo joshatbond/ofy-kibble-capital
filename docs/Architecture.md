@@ -54,3 +54,6 @@ Dual PWA manifests (scoped `start_url` / `theme_color` per app) on one origin â€
 - Architecture constraints: [`docs/ai/architecture-foundation.md`](ai/architecture-foundation.md) and [`AGENTS.md`](../AGENTS.md)
 - Convex: [`docs/ai/convex.md`](ai/convex.md) and `convex/_generated/ai/guidelines.md`
 - Full product/technical plan: [`docs/greenfield_stack_and_architecture.plan.md`](greenfield_stack_and_architecture.plan.md)
+- Domain glossary: [`CONTEXT.md`](../CONTEXT.md)
+- Architecture decisions: [`docs/adr/`](adr/)
+- Implementation slices: [`docs/scope/`](scope/)
