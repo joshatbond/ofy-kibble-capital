@@ -19,18 +19,14 @@ function convexAuthStorageKey(key: string): string {
 
 /** OAuth PKCE verifier id stored by Convex Auth between sign-in redirect and callback. */
 export function readConvexOAuthVerifierId(): string | null {
-  if (typeof window === 'undefined') {
-    return null
-  }
+  if (typeof window === 'undefined') return null
 
   return window.localStorage.getItem(convexAuthStorageKey(OAUTH_VERIFIER_KEY))
 }
 
 /** Match Convex Auth client storage so apply can read the verifier after callback. */
 export function writeConvexOAuthVerifierId(verifierId: string): void {
-  if (typeof window === 'undefined') {
-    return
-  }
+  if (typeof window === 'undefined') return
 
   window.localStorage.setItem(
     convexAuthStorageKey(OAUTH_VERIFIER_KEY),
@@ -39,33 +35,25 @@ export function writeConvexOAuthVerifierId(verifierId: string): void {
 }
 
 export function clearConvexOAuthVerifierId(): void {
-  if (typeof window === 'undefined') {
-    return
-  }
+  if (typeof window === 'undefined') return
 
   window.localStorage.removeItem(convexAuthStorageKey(OAUTH_VERIFIER_KEY))
 }
 
 export function readPendingOAuthRedirectTo(): string | null {
-  if (typeof window === 'undefined') {
-    return null
-  }
+  if (typeof window === 'undefined') return null
 
   return window.sessionStorage.getItem(PENDING_OAUTH_REDIRECT_KEY)
 }
 
 export function writePendingOAuthRedirectTo(redirectTo: string): void {
-  if (typeof window === 'undefined') {
-    return
-  }
+  if (typeof window === 'undefined') return
 
   window.sessionStorage.setItem(PENDING_OAUTH_REDIRECT_KEY, redirectTo)
 }
 
 export function clearPendingOAuthRedirectTo(): void {
-  if (typeof window === 'undefined') {
-    return
-  }
+  if (typeof window === 'undefined') return
 
   window.sessionStorage.removeItem(PENDING_OAUTH_REDIRECT_KEY)
 }
@@ -78,9 +66,7 @@ export function clearPendingOAuthRedirectTo(): void {
  * user?" signal for routing decisions.
  */
 export function hasConvexAuthToken(): boolean {
-  if (typeof window === 'undefined') {
-    return false
-  }
+  if (typeof window === 'undefined') return false
 
   return (
     window.localStorage.getItem(convexAuthStorageKey(CONVEX_AUTH_JWT_KEY)) !==
