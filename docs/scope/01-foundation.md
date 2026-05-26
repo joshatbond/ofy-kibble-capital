@@ -25,7 +25,7 @@ Convex backend and TanStack app skeleton with multi-tenant classroom model, regi
 - [ ] Teacher role vs student role enforced on routes (students cannot hit `/admin`)
 - [ ] **Teacher** sign-in lands on **Teacher admin**; student lands per **Sign-in surface** / invite default **Kibble**
 - [ ] Classroom org created only via operator seed in v1
-- [ ] `classSettings` holds: **Hourly rate**, **Standard day hours**, **Pay schedule**, **Savings APY**, 401(k) %, medical $, **Overtime multiplier**, **Payday notice** lead (1–3 days), **Currency label**, vault cap (default 5), etc.
+- [ ] `classSettings` holds: **Hourly rate**, **Standard day hours**, **Pay schedule**, **Savings APY**, 401(k) %, medical $, **Overtime multiplier**, **Payday notice** lead (1–7 calendar days), **Currency label**, vault cap (default 5), etc.
 - [ ] Storybook runs locally with Kibble and PawKet theme decorators and stories for shared primitives + both loaders
 
 ## Domain refs

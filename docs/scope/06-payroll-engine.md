@@ -16,7 +16,7 @@ End-to-end **Pay run**: import attendance → gross → pre-tax → CA/federal *
 
 - **Pay period** generator: calendar-aligned windows (weekly Mon–Sun, bi-weekly ×2, semi-monthly 1–15 / 16–EOM, monthly prior month)
 - **First pay date** default: July 1 + period length + 1 week; **Pay schedule change** + **Transition pay period** per ADR-0004
-- **Payday automation** 8:30 AM **Product timezone**; **Payday notice** 1–3 days configurable
+- **Payday automation** 8:30 AM **Product timezone**; **Payday notice** 1–7 calendar days configurable
 - **Manual pay run** same guards as automation
 - One successful **Pay run** per **Pay period** (idempotent)
 - Holidays: still run; **Postpone pay run** manual

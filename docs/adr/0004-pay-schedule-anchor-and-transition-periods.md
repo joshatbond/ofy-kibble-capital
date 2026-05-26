@@ -10,4 +10,4 @@ When teachers change pay schedule type, we do not flip mid-cycle blindly: the ol
 
 **Considered options:** Rolling periods since last pay run (rejected — poor fit with postpone and calendar teaching language); immediate cutover on settings save (rejected — overlap/gap risk).
 
-**Consequences:** Pay period generation is a small state machine per classroom; schedule edits need UX explaining the transition period; attendance import queries must accept variable period bounds. **Pay run time** defaults to 8:30 AM `America/Los_Angeles`; **Payday notice** lead is 1–3 days per classroom (see glossary).
+**Consequences:** Pay period generation is a small state machine per classroom; schedule edits need UX explaining the transition period; attendance import queries must accept variable period bounds. **Pay run time** defaults to 8:30 AM `America/Los_Angeles`; **Payday notice** lead is 1–7 calendar days per classroom (see glossary).

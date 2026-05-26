@@ -9,6 +9,11 @@ import {
   V1_REGION,
   V1_SCHOOL_SITES,
 } from './catalogSeedData'
+import { ensureClassSettingsSnapshot } from './effectiveSettings'
+import {
+  ensureRegionSettings,
+  ensureSchoolSiteSettings,
+} from './settingsCatalogSeed'
 import { regionSlugFromSiteSlug } from './siteSlug'
 
 import type { Id } from '../_generated/dataModel'
@@ -78,6 +83,11 @@ export async function ensureDevClassroom(
     .unique()
 
   if (existing) {
+    await ensureClassSettingsSnapshot(ctx, {
+      organizationId: existing.organizationId,
+      classroomId: existing._id,
+      siteSlug: existing.siteSlug,
+    })
     return {
       organizationId: existing.organizationId,
       classroomId: existing._id,
@@ -124,6 +134,12 @@ export async function ensureDevClassroom(
     orgSlug: V1_DEV_CLASSROOM.orgSlug,
   })
 
+  await ensureClassSettingsSnapshot(ctx, {
+    organizationId,
+    classroomId,
+    siteSlug: V1_DEV_CLASSROOM.siteSlug,
+  })
+
   return { organizationId, classroomId }
 }
 
@@ -131,6 +147,7 @@ export async function seedV1CatalogData(ctx: MutationCtx) {
   const operatorUserId = await ensureSeedOperatorUser(ctx)
 
   const regionId = await ensureRegion(ctx, V1_REGION.slug, V1_REGION.name)
+  await ensureRegionSettings(ctx, regionId)
 
   const schoolSiteIds: Record<string, Id<'schoolSites'>> = {}
   for (const site of V1_SCHOOL_SITES) {
@@ -140,12 +157,14 @@ export async function seedV1CatalogData(ctx: MutationCtx) {
         `Site slug "${site.siteSlug}" does not belong to region "${V1_REGION.slug}".`
       )
     }
-    schoolSiteIds[site.siteSlug] = await ensureSchoolSite(
+    const schoolSiteId = await ensureSchoolSite(
       ctx,
       site.siteSlug,
       site.name,
       regionId
     )
+    schoolSiteIds[site.siteSlug] = schoolSiteId
+    await ensureSchoolSiteSettings(ctx, schoolSiteId, site.siteSlug, regionId)
   }
 
   const classroom = await ensureDevClassroom(ctx, operatorUserId)

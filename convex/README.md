@@ -33,3 +33,16 @@ This is **idempotent**: safe to run again; it skips rows that already exist.
 | Classroom org | `dev-classroom-ofysb-mv` on site `ofysb-mv` (tenants component + `classrooms` link) |
 
 Classroom organizations are **not** teacher self-serve in v1. Teachers join via invitation (Slice 2). Operators may use `organizations.createOrganization` only when `users.canCreateOrganization` is set; routine dev setup uses the internal seed above.
+
+The seed also writes **settings stack** defaults (`regionSettings`, `schoolSiteSettings`) and a **classSettings** snapshot for the dev classroom.
+
+### Effective settings (dev)
+
+After seeding, inspect merged settings for the dev classroom org (use the `organizationId` from seed output):
+
+```bash
+bunx convex run settings:effectiveSettingsForOrganizationInternal \
+  --args '{"organizationId": "<org id>"}'
+```
+
+Or call `settings:effectiveSettingsForOrganization` from the Convex dashboard / client.

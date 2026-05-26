@@ -315,10 +315,11 @@ _Avoid_: Transfer (alone), allocation (automation)
 
 **Vault funding mode**:
 How a **Vault** is funded, chosen in **Vault setup**:
+
 - **On deposit** — “Save from every direct deposit”: allocate from each paycheck’s **Savings** slice after **Pay split** (see **On deposit allocation**).
 - **Scheduled** — “Set up recurring transfers” from **Savings** into the **Vault** on a student-defined recurring schedule.
 - **Manual** — “One-time transfer” now, then add manually later; no automatic funding.
-_Avoid_: Auto-fund (generic)
+  _Avoid_: Auto-fund (generic)
 
 **On deposit allocation**:
 Per **Vault** with **On deposit** mode: share of **Net pay** (percent or fixed **Cents**) taken as the **first cut** when a deposit hits — before **Pay split** — regardless of eventual **Checking** vs **Savings** split. Sum of all **On deposit** rules cannot exceed 100% of that deposit (validation at **Vault setup**).
@@ -370,11 +371,12 @@ _Avoid_: After school, tutoring
 
 **Pay period**:
 The calendar window of work (attendance, hours) that a single classroom payday covers — **calendar-aligned**, not rolling since last **Pay run**. Boundaries by **Pay schedule** type:
+
 - **Weekly:** prior Monday–Sunday (the week before payday week).
 - **Bi-weekly:** prior two full Monday–Sunday weeks.
 - **Semi-monthly:** prior calendar half-month — either 1st–15th or 16th–last day of month (pay dates typically the 15th and last day of month).
 - **Monthly:** prior calendar month (1st through last day).
-_Avoid_: Pay cycle (acceptable alias), pay date (that's an instant)
+  _Avoid_: Pay cycle (acceptable alias), pay date (that's an instant)
 
 **Pay schedule**:
 Per-**Classroom** configuration for when **Payday automation** runs. v1 choices: weekly on a **Weekday**; bi-weekly on a **Weekday**; semi-monthly on two **Days of month**; monthly on one **Day of month**. **Bi-weekly** phase is anchored by **First pay date**.
@@ -425,7 +427,7 @@ A **Teacher**-initiated **Pay run** for the current **Pay period** with the same
 _Avoid_: Force pay, override (implies skipping guards)
 
 **Payday notice**:
-The alert to **Co-teachers** that a **Payday automation** will execute soon, delivered via **PWA notification** (when opted in) and **Email alert** (Resend). Lead time is **Teacher**-configurable per **Classroom** (1–3 days before run, in **Product timezone**). The editable window is fixes in the **Attendance platform** (re-import before run), pending **PTO request** decisions, and **skip or postpone** for that **Pay period** — not **Effective settings** (those apply when the **Pay run** executes) and not per-student exclusion (unenrolled **Students** are removed instead).
+The alert to **Co-teachers** that a **Payday automation** will execute soon, delivered via **PWA notification** (when opted in) and **Email alert** (Resend). Lead time is **Teacher**-configurable per **Classroom** (1–7 **calendar** days before run, in **Product timezone** — not weekdays-only). The editable window is fixes in the **Attendance platform** (re-import before run), pending **PTO request** decisions, and **skip or postpone** for that **Pay period** — not **Effective settings** (those apply when the **Pay run** executes) and not per-student exclusion (unenrolled **Students** are removed instead).
 _Avoid_: Reminder, notification (too generic)
 
 **PWA notification**:

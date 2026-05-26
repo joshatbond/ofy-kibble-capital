@@ -2,6 +2,7 @@ import { authTables } from '@convex-dev/auth/server'
 import { defineSchema, defineTable } from 'convex/server'
 import { v } from 'convex/values'
 
+import { settingsTableFields } from './lib/settingsValues'
 import { siteSlugValidator } from './lib/siteSlug'
 import { studentAppValidator } from './lib/studentApp'
 import { userFields } from './lib/userFields'
@@ -34,6 +35,20 @@ export default defineSchema({
     .index('by_organizationId', ['organizationId'])
     .index('by_siteSlug', ['siteSlug'])
     .index('by_orgSlug', ['orgSlug']),
+  regionSettings: defineTable({
+    regionId: v.id('regions'),
+    ...settingsTableFields,
+  }).index('by_regionId', ['regionId']),
+  schoolSiteSettings: defineTable({
+    schoolSiteId: v.id('schoolSites'),
+    ...settingsTableFields,
+  }).index('by_schoolSiteId', ['schoolSiteId']),
+  /** Snapshot of effective settings at classroom create (editable by teachers later). */
+  classSettings: defineTable({
+    organizationId: v.string(),
+    classroomId: v.id('classrooms'),
+    ...settingsTableFields,
+  }).index('by_organizationId', ['organizationId']),
   authSessions: defineTable({
     userId: v.id('users'),
     expirationTime: v.number(),
