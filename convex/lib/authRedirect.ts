@@ -1,5 +1,8 @@
-/** Post-OAuth paths allowed for student surfaces (must match client `~/lib/auth-redirect`). */
-const STUDENT_APP_BASE_PATHS = ['/kibble', '/pawket'] as const
+/**
+ * Post-OAuth paths allowed (must match client `~/lib/auth-redirect` and
+ * `~/lib/admin-auth-redirect`).
+ */
+const ALLOWED_APP_BASE_PATHS = ['/kibble', '/pawket', '/admin'] as const
 
 const LANDING_SUFFIX = '/landing'
 
@@ -9,7 +12,7 @@ function siteOrigin(siteUrl: string): string {
 }
 
 /** Origins allowed for post-OAuth redirects (`SITE_URL` plus optional `ALLOWED_SITE_URLS`). */
-function allowedSiteOrigins(): string[] {
+function allowedSiteOrigins(): Array<string> {
   const origins = new Set<string>()
 
   for (const raw of [process.env.SITE_URL, process.env.ALLOWED_SITE_URLS]) {
@@ -29,14 +32,18 @@ function allowedSiteOrigins(): string[] {
   return [...origins]
 }
 
-function normalizeStudentAppPathname(pathname: string): string {
-  if (pathname === '/kibble' || pathname === '/pawket') {
+function normalizeAppPathname(pathname: string): string {
+  if (
+    pathname === '/kibble' ||
+    pathname === '/pawket' ||
+    pathname === '/admin'
+  ) {
     return `${pathname}/`
   }
 
   if (pathname.endsWith(LANDING_SUFFIX)) {
     const base = pathname.slice(0, -LANDING_SUFFIX.length)
-    if (base === '/kibble' || base === '/pawket') {
+    if (base === '/kibble' || base === '/pawket' || base === '/admin') {
       return `${base}/`
     }
   }
@@ -44,14 +51,14 @@ function normalizeStudentAppPathname(pathname: string): string {
   return pathname
 }
 
-function resolveStudentAppPath(redirectTo: string | undefined | null): string {
+function resolveAppPath(redirectTo: string | undefined | null): string {
   const safe = redirectTo ?? '/kibble/'
 
   const path = safe.startsWith('http')
     ? new URL(safe).pathname
     : (safe.split('?')[0] ?? safe)
 
-  const allowed = STUDENT_APP_BASE_PATHS.some(
+  const allowed = ALLOWED_APP_BASE_PATHS.some(
     base => path === base || path.startsWith(`${base}/`)
   )
 
@@ -59,7 +66,7 @@ function resolveStudentAppPath(redirectTo: string | undefined | null): string {
     return '/kibble/'
   }
 
-  const normalized = normalizeStudentAppPathname(path)
+  const normalized = normalizeAppPathname(path)
 
   if (safe.startsWith('http')) {
     const url = new URL(safe)
@@ -74,10 +81,10 @@ function resolveStudentAppPath(redirectTo: string | undefined | null): string {
  * Convex Auth `callbacks.redirect` must return an absolute URL (see
  * `setURLSearchParam` in @convex-dev/auth). Relative paths crash OAuth callback.
  */
-export function resolveStudentAppRedirect(
+export function resolvePostAuthRedirect(
   redirectTo: string | undefined | null
 ): string {
-  const path = resolveStudentAppPath(redirectTo)
+  const path = resolveAppPath(redirectTo)
   const allowedOrigins = allowedSiteOrigins()
 
   if (allowedOrigins.length === 0) {
@@ -98,3 +105,6 @@ export function resolveStudentAppRedirect(
 
   return `${baseUrl}${path}`
 }
+
+/** @deprecated Use {@link resolvePostAuthRedirect}. */
+export const resolveStudentAppRedirect = resolvePostAuthRedirect

@@ -19,3 +19,10 @@ export const APP_ROLES = {
 export type AppRole = keyof typeof APP_ROLES
 
 export type ClassroomMemberRole = 'owner' | 'admin' | 'member' | AppRole
+
+/** Roles that may use **Teacher admin** (`/admin`). */
+export const TEACHER_MEMBER_ROLES = ['owner', 'admin', 'teacher'] as const
+
+export function isTeacherMemberRole(role: string): boolean {
+  return (TEACHER_MEMBER_ROLES as ReadonlyArray<string>).includes(role)
+}

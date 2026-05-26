@@ -11,13 +11,17 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PawketRouteRouteImport } from './routes/pawket/route'
 import { Route as KibbleRouteRouteImport } from './routes/kibble/route'
+import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PawketIndexRouteImport } from './routes/pawket/index'
 import { Route as KibbleIndexRouteImport } from './routes/kibble/index'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as PawketLoadingRouteImport } from './routes/pawket/loading'
 import { Route as PawketLandingRouteImport } from './routes/pawket/landing'
 import { Route as KibbleLoadingRouteImport } from './routes/kibble/loading'
 import { Route as KibbleLandingRouteImport } from './routes/kibble/landing'
+import { Route as AdminLoadingRouteImport } from './routes/admin/loading'
+import { Route as AdminLandingRouteImport } from './routes/admin/landing'
 
 const PawketRouteRoute = PawketRouteRouteImport.update({
   id: '/pawket',
@@ -27,6 +31,11 @@ const PawketRouteRoute = PawketRouteRouteImport.update({
 const KibbleRouteRoute = KibbleRouteRouteImport.update({
   id: '/kibble',
   path: '/kibble',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRouteRoute = AdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -43,6 +52,11 @@ const KibbleIndexRoute = KibbleIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => KibbleRouteRoute,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRouteRoute,
 } as any)
 const PawketLoadingRoute = PawketLoadingRouteImport.update({
   id: '/loading',
@@ -64,36 +78,57 @@ const KibbleLandingRoute = KibbleLandingRouteImport.update({
   path: '/landing',
   getParentRoute: () => KibbleRouteRoute,
 } as any)
+const AdminLoadingRoute = AdminLoadingRouteImport.update({
+  id: '/loading',
+  path: '/loading',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminLandingRoute = AdminLandingRouteImport.update({
+  id: '/landing',
+  path: '/landing',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteRouteWithChildren
   '/kibble': typeof KibbleRouteRouteWithChildren
   '/pawket': typeof PawketRouteRouteWithChildren
+  '/admin/landing': typeof AdminLandingRoute
+  '/admin/loading': typeof AdminLoadingRoute
   '/kibble/landing': typeof KibbleLandingRoute
   '/kibble/loading': typeof KibbleLoadingRoute
   '/pawket/landing': typeof PawketLandingRoute
   '/pawket/loading': typeof PawketLoadingRoute
+  '/admin/': typeof AdminIndexRoute
   '/kibble/': typeof KibbleIndexRoute
   '/pawket/': typeof PawketIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin/landing': typeof AdminLandingRoute
+  '/admin/loading': typeof AdminLoadingRoute
   '/kibble/landing': typeof KibbleLandingRoute
   '/kibble/loading': typeof KibbleLoadingRoute
   '/pawket/landing': typeof PawketLandingRoute
   '/pawket/loading': typeof PawketLoadingRoute
+  '/admin': typeof AdminIndexRoute
   '/kibble': typeof KibbleIndexRoute
   '/pawket': typeof PawketIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteRouteWithChildren
   '/kibble': typeof KibbleRouteRouteWithChildren
   '/pawket': typeof PawketRouteRouteWithChildren
+  '/admin/landing': typeof AdminLandingRoute
+  '/admin/loading': typeof AdminLoadingRoute
   '/kibble/landing': typeof KibbleLandingRoute
   '/kibble/loading': typeof KibbleLoadingRoute
   '/pawket/landing': typeof PawketLandingRoute
   '/pawket/loading': typeof PawketLoadingRoute
+  '/admin/': typeof AdminIndexRoute
   '/kibble/': typeof KibbleIndexRoute
   '/pawket/': typeof PawketIndexRoute
 }
@@ -101,38 +136,50 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/kibble'
     | '/pawket'
+    | '/admin/landing'
+    | '/admin/loading'
     | '/kibble/landing'
     | '/kibble/loading'
     | '/pawket/landing'
     | '/pawket/loading'
+    | '/admin/'
     | '/kibble/'
     | '/pawket/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin/landing'
+    | '/admin/loading'
     | '/kibble/landing'
     | '/kibble/loading'
     | '/pawket/landing'
     | '/pawket/loading'
+    | '/admin'
     | '/kibble'
     | '/pawket'
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/kibble'
     | '/pawket'
+    | '/admin/landing'
+    | '/admin/loading'
     | '/kibble/landing'
     | '/kibble/loading'
     | '/pawket/landing'
     | '/pawket/loading'
+    | '/admin/'
     | '/kibble/'
     | '/pawket/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRouteRoute: typeof AdminRouteRouteWithChildren
   KibbleRouteRoute: typeof KibbleRouteRouteWithChildren
   PawketRouteRoute: typeof PawketRouteRouteWithChildren
 }
@@ -151,6 +198,13 @@ declare module '@tanstack/react-router' {
       path: '/kibble'
       fullPath: '/kibble'
       preLoaderRoute: typeof KibbleRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -173,6 +227,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/kibble/'
       preLoaderRoute: typeof KibbleIndexRouteImport
       parentRoute: typeof KibbleRouteRoute
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
     }
     '/pawket/loading': {
       id: '/pawket/loading'
@@ -202,8 +263,38 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KibbleLandingRouteImport
       parentRoute: typeof KibbleRouteRoute
     }
+    '/admin/loading': {
+      id: '/admin/loading'
+      path: '/loading'
+      fullPath: '/admin/loading'
+      preLoaderRoute: typeof AdminLoadingRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/landing': {
+      id: '/admin/landing'
+      path: '/landing'
+      fullPath: '/admin/landing'
+      preLoaderRoute: typeof AdminLandingRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
   }
 }
+
+interface AdminRouteRouteChildren {
+  AdminLandingRoute: typeof AdminLandingRoute
+  AdminLoadingRoute: typeof AdminLoadingRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminLandingRoute: AdminLandingRoute,
+  AdminLoadingRoute: AdminLoadingRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
+  AdminRouteRouteChildren,
+)
 
 interface KibbleRouteRouteChildren {
   KibbleLandingRoute: typeof KibbleLandingRoute
@@ -239,6 +330,7 @@ const PawketRouteRouteWithChildren = PawketRouteRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRouteRoute: AdminRouteRouteWithChildren,
   KibbleRouteRoute: KibbleRouteRouteWithChildren,
   PawketRouteRoute: PawketRouteRouteWithChildren,
 }

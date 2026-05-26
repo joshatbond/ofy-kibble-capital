@@ -1,13 +1,13 @@
 import Google from '@auth/core/providers/google'
 import { convexAuth } from '@convex-dev/auth/server'
 
-import { resolveStudentAppRedirect } from './lib/authRedirect'
+import { resolvePostAuthRedirect } from './lib/authRedirect'
 
 export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
   providers: [Google],
   callbacks: {
     async redirect({ redirectTo }) {
-      return Promise.resolve(resolveStudentAppRedirect(redirectTo))
+      return Promise.resolve(resolvePostAuthRedirect(redirectTo))
     },
   },
   jwt: {
