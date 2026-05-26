@@ -1,3 +1,4 @@
+import { brutalBorder, brutalBorderLg } from '~/lib/brutal-chrome'
 import { cn } from '~/lib/class-name-merge'
 
 type PawketBrutalFrameProps = {
@@ -12,8 +13,7 @@ export function PawketBrutalFrame(props: PawketBrutalFrameProps) {
     <div
       id={props.id}
       className={cn(
-        'border-ink border-2',
-        props.large ? 'shadow-brutal-lg' : 'shadow-brutal',
+        props.large ? brutalBorderLg : brutalBorder,
         props.className
       )}
     >

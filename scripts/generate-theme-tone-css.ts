@@ -11,11 +11,13 @@ import {
 } from '../src/lib/theme-semantics'
 import {
   kineticLedgerTones,
-  type ThemeTones,
   toneStepToSuffix,
   vibrantScholarTones,
 } from '../src/lib/theme-tones'
+
 import { cssVarBlock, hexToOklch } from './lib/hex-to-oklch'
+
+import type { ThemeTones } from '../src/lib/theme-tones'
 
 const repoRoot = join(import.meta.dirname, '..')
 const themesDir = join(repoRoot, 'src', 'styles', 'themes')
@@ -51,7 +53,7 @@ function generateToneBlock(
   label: string,
   tones: ThemeTones
 ): string {
-  const lines: string[] = [
+  const lines: Array<string> = [
     `/** ${label} tonal steps (generated — bun run theme:tones) */`,
     `[data-theme='${dataTheme}'] {`,
   ]
@@ -114,7 +116,7 @@ ${cssVarBlock(semanticVars).join('\n')}
 }
 
 function generateTailwindThemeBridge(): string {
-  const lines: string[] = [
+  const lines: Array<string> = [
     '/** Tailwind color utilities for Stitch tonal steps (generated) */',
     '@theme inline {',
   ]

@@ -19,21 +19,22 @@ Student savings behavior: **Pay split** wizard in Kibble, vault setup in PawKet,
 
 ### PawKet — Vault setup wizard
 
-1. **Common vault goal** presets (product defaults) or custom + icon/emoji  
-2. Optional **Savings goal** (**Cents**); uncapped if omitted  
-3. **Vault funding mode**: **On deposit** | **Scheduled** | **Manual**  
-   - **On deposit**: % or fixed **Cents** of **Net pay**, first cut; sum ≤ 100% across on-deposit vaults  
-   - **Scheduled**: weekly | bi-weekly | monthly from unallocated **Savings**  
-   - **Manual**: one-time + **Manual vault transfer** later  
+1. **Common vault goal** presets (product defaults) or custom + icon/emoji
+2. Optional **Savings goal** (**Cents**); uncapped if omitted
+3. **Vault funding mode**: **On deposit** | **Scheduled** | **Manual**
+   - **On deposit**: % or fixed **Cents** of **Net pay**, first cut; sum ≤ 100% across on-deposit vaults
+   - **Scheduled**: weekly | bi-weekly | monthly from unallocated **Savings**
+   - **Manual**: one-time + **Manual vault transfer** later
+
 - Vault cap per classroom (default 5)
 - **Goal reached** → **Complete**: stop auto funding; manual in/out still allowed
 - **Close vault** → liquidate to unallocated **Savings**, archive
 
 ### Paycheck pipeline (shared lib)
 
-1. Credit **Net pay**  
-2. **On deposit** vault allocations (first cut from full net)  
-3. **Pay split** on remainder → **Savings** / **Checking**  
+1. Credit **Net pay**
+2. **On deposit** vault allocations (first cut from full net)
+3. **Pay split** on remainder → **Savings** / **Checking**
 4. Record ledger lines
 
 ## Acceptance criteria

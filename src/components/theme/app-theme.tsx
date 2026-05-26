@@ -13,7 +13,7 @@ export function AppTheme(props: AppThemeProps) {
       data-theme={props.theme}
       className={cn(
         'bg-background text-foreground min-h-dvh font-sans',
-        props.className,
+        props.className
       )}
     >
       {props.children}

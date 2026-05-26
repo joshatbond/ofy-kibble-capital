@@ -8,9 +8,11 @@ export default [
   {
     ignores: [
       '.output/**',
+      '.storybook/**',
       '.tanstack/**',
       '.turbo/**',
       'convex/_generated/**',
+      'storybook-static/**',
     ],
   },
   {

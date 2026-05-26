@@ -79,7 +79,9 @@ export function PawketLoadingScreen(props: {
         {props.showWordmark !== false ? (
           <div className="font-heading text-xl font-extrabold tracking-tight uppercase">
             <span className="text-(--logo-teal)">Paw</span>
+
             <span className="text-(--logo-navy-deep)">Ket</span>
+
             <span className="text-(--logo-navy-deep)"> Exchange</span>
           </div>
         ) : null}
