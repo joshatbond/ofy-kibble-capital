@@ -46,7 +46,7 @@ Do **not** port ms-engage’s domain-specific `afterUserCreatedOrUpdated` allowl
 - [x] Google OAuth in `convex/auth.ts` (`AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET` on deployment)
 - [x] `ConvexAuthProvider` in `src/router.tsx`
 - [x] Post-OAuth redirect: `signIn('google', { redirectTo: '/kibble' | '/pawket' })` + `callbacks.redirect` in `convex/auth.ts` / `convex/lib/authRedirect.ts`
-- [ ] Register tenants + authz components in `convex/convex.config.ts`
+- [x] Register tenants + authz components in `convex/convex.config.ts`
 - [ ] Invitation mutations/queries and `/invite/$invitationId` (or equivalent)
 - [ ] `getAuthUserId` (and authz) on all public functions that touch user or classroom data
 

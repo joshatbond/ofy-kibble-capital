@@ -20,6 +20,8 @@
     "@auth/core": "0.37.0",
     "@convex-dev/auth": "^0.0.92",
     "@convex-dev/react-query": "^0.1.0",
+    "@djpanda/convex-authz": "^0.1.7",
+    "@djpanda/convex-tenants": "^0.1.6",
     "@fontsource-variable/geist": "^5.2.9",
     "@fontsource-variable/montserrat": "^5.2.8",
     "@fontsource-variable/rubik": "^5.2.8",

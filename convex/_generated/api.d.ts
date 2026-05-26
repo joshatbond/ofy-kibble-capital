@@ -9,11 +9,15 @@
  */
 
 import type * as auth from "../auth.js";
+import type * as authz from "../authz.js";
 import type * as http from "../http.js";
 import type * as lib_authRedirect from "../lib/authRedirect.js";
+import type * as lib_makeTenantsAPI from "../lib/makeTenantsAPI.js";
+import type * as lib_roles from "../lib/roles.js";
 import type * as lib_studentApp from "../lib/studentApp.js";
 import type * as myFunctions from "../myFunctions.js";
 import type * as studentAuth from "../studentAuth.js";
+import type * as tenants from "../tenants.js";
 import type * as users from "../users.js";
 
 import type {
@@ -24,11 +28,15 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
+  authz: typeof authz;
   http: typeof http;
   "lib/authRedirect": typeof lib_authRedirect;
+  "lib/makeTenantsAPI": typeof lib_makeTenantsAPI;
+  "lib/roles": typeof lib_roles;
   "lib/studentApp": typeof lib_studentApp;
   myFunctions: typeof myFunctions;
   studentAuth: typeof studentAuth;
+  tenants: typeof tenants;
   users: typeof users;
 }>;
 
@@ -58,4 +66,7 @@ export declare const internal: FilterApi<
   FunctionReference<any, "internal">
 >;
 
-export declare const components: {};
+export declare const components: {
+  tenants: import("@djpanda/convex-tenants/_generated/component.js").ComponentApi<"tenants">;
+  authz: import("@djpanda/convex-authz/_generated/component.js").ComponentApi<"authz">;
+};
