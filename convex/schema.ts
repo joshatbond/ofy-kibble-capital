@@ -2,10 +2,38 @@ import { authTables } from '@convex-dev/auth/server'
 import { defineSchema, defineTable } from 'convex/server'
 import { v } from 'convex/values'
 
+import { siteSlugValidator } from './lib/siteSlug'
 import { studentAppValidator } from './lib/studentApp'
+import { userFields } from './lib/userFields'
 
 export default defineSchema({
   ...authTables,
+  users: defineTable(userFields)
+    .index('email', ['email'])
+    .index('phone', ['phone'])
+    .index('is_active', ['inactiveDate']),
+  regions: defineTable({
+    /** Short code, e.g. `ofysb`. */
+    slug: v.string(),
+    name: v.string(),
+  }).index('by_slug', ['slug']),
+  schoolSites: defineTable({
+    siteSlug: siteSlugValidator,
+    regionId: v.id('regions'),
+    name: v.string(),
+  })
+    .index('by_siteSlug', ['siteSlug'])
+    .index('by_regionId', ['regionId']),
+  /** Links a tenants classroom organization to operator catalog site slug. */
+  classrooms: defineTable({
+    organizationId: v.string(),
+    siteSlug: siteSlugValidator,
+    name: v.string(),
+    orgSlug: v.string(),
+  })
+    .index('by_organizationId', ['organizationId'])
+    .index('by_siteSlug', ['siteSlug'])
+    .index('by_orgSlug', ['orgSlug']),
   authSessions: defineTable({
     userId: v.id('users'),
     expirationTime: v.number(),
