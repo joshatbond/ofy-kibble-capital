@@ -4,6 +4,8 @@ import convexPlugin from '@convex-dev/eslint-plugin'
 import { tanstackConfig } from '@tanstack/eslint-config'
 import reactPlugin from 'eslint-plugin-react'
 
+import moduleOrderingPlugin from './eslint/plugins/module-ordering-plugin.mjs'
+
 export default [
   {
     ignores: [
@@ -28,7 +30,11 @@ export default [
   ...convexPlugin.configs.recommended,
   {
     files: ['**/*.{js,jsx,ts,tsx}'],
+    plugins: {
+      'module-ordering': moduleOrderingPlugin,
+    },
     rules: {
+      'module-ordering/module-ordering': 'warn',
       // Align with Prettier-era grouping: packages → ~/ alias → relative parents → siblings,
       // with blank lines between groups (TanStack omits `newlines-between` by default).
       'import/order': [

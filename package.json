@@ -12,6 +12,7 @@
     "lint": "eslint",
     "format": "prettier --write . && eslint --fix",
     "check": "prettier --write . && eslint --fix",
+    "test:eslint-plugin": "node --test eslint/plugins/module-ordering-plugin.test.mjs",
     "typecheck": "tsc --noEmit",
     "theme:tones": "bun scripts/generate-theme-tone-css.ts",
     "storybook": "storybook dev -p 6006",
@@ -65,14 +66,13 @@
     "eslint-plugin-react": "^7.37.5",
     "netlify-cli": "^26.0.1",
     "prettier": "^3.8.3",
-    "prettier-plugin-tailwindcss": "^0.7.2",
+    "prettier-plugin-tailwindcss": "^0.8.0",
     "storybook": "8.6.18",
     "tailwindcss": "^4.2.2",
     "typescript": "^6.0.3",
     "vite": "^8.0.9"
   },
   "overrides": {
-    "brace-expansion": "^5.0.6",
     "@storybook/csf-plugin": "8.6.18",
     "@storybook/builder-vite": "8.6.18"
   },

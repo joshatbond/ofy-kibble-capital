@@ -32,7 +32,6 @@ export const ToolbarPreview: Story = {
         <span>
           Change <strong>Theme</strong> in the toolbar to update&nbsp;
         </span>
-        
         <code className="text-foreground">data-theme</code>.
       </p>
 
