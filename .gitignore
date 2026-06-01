@@ -3,6 +3,9 @@ node_modules
 # MCP secrets (copy from .cursor/mcp.example.json)
 .cursor/mcp.json
 
+# Claude Code skill symlinks → .agents/skills (see docs/ai/skill-bootstrap.md)
+.claude/skills/
+
 # Prefer Bun for this repo
 package-lock.json
 pnpm-lock.yaml
