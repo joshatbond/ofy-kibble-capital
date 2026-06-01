@@ -13,7 +13,7 @@ export function PawketLandingPage(props: { returnTo?: string }) {
     <div className="bg-background text-foreground min-h-dvh min-w-0">
       <LandingHeader returnTo={props.returnTo} />
 
-      <main className="grid w-full min-w-0 grid-cols-[1rem_minmax(0,1fr)_1rem] gap-y-16 py-10 pt-18 md:mx-auto md:flex md:max-w-[1200px] md:flex-col md:gap-20 md:px-12 md:pt-28">
+      <main className="grid w-full min-w-0 grid-cols-[1rem_minmax(0,1fr)_1rem] gap-y-16 py-10 pt-24 md:mx-auto md:flex md:max-w-[1200px] md:flex-col md:gap-20 md:px-12 md:pt-28">
         <LandingHero />
 
         <LandingFeatures />
