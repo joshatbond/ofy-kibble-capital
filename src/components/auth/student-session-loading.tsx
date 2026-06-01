@@ -2,14 +2,6 @@ import { KibbleLoadingScreen } from '~/components/loading/kibble-loader'
 import { PawketLoadingScreen } from '~/components/loading/pawket-loader'
 import type { StudentApp } from '~/lib/auth-redirect'
 
-type StudentSessionLoadingProps = {
-  app: StudentApp
-  label: string
-  isReady?: boolean
-  onComplete?: () => void
-}
-
-/** Branded loading UI while student auth/session resolves. */
 export function StudentSessionLoading(props: StudentSessionLoadingProps) {
   if (props.app === 'kibble') {
     return (
@@ -28,4 +20,10 @@ export function StudentSessionLoading(props: StudentSessionLoadingProps) {
       onComplete={props.onComplete}
     />
   )
+}
+type StudentSessionLoadingProps = {
+  app: StudentApp
+  label: string
+  isReady?: boolean
+  onComplete?: () => void
 }

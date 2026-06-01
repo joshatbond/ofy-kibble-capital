@@ -1,33 +1,20 @@
 import { pathnameOfRedirect } from '~/lib/auth-redirect'
 
 export const ADMIN_BASE_PATH = '/admin'
-
-/** Public sign-in entry for teachers. */
 export function adminLandingPath(): string {
   return `${ADMIN_BASE_PATH}/landing`
 }
-
-/** OAuth bridge before the protected admin home. */
 export function adminLoadingPath(): string {
   return `${ADMIN_BASE_PATH}/loading`
 }
-
-/** Protected teacher admin home (trailing slash matches TanStack index routes). */
 export function adminHomePath(): string {
   return `${ADMIN_BASE_PATH}/`
 }
-
 export function isAdminPath(pathname: string): boolean {
   return (
     pathname === ADMIN_BASE_PATH || pathname.startsWith(`${ADMIN_BASE_PATH}/`)
   )
 }
-
-function isAdminLandingPath(pathname: string): boolean {
-  return pathname === adminLandingPath()
-}
-
-/** Where OAuth / sign-in should send teachers after auth completes. */
 export function resolveTeacherPostAuthRedirect(returnTo?: string): string {
   if (returnTo === undefined || !isAdminPath(pathnameOfRedirect(returnTo))) {
     return adminHomePath()
@@ -45,11 +32,6 @@ export function resolveTeacherPostAuthRedirect(returnTo?: string): string {
 
   return returnTo
 }
-
-/**
- * OAuth `redirectTo` — absolute URL of `/admin/loading?returnTo=<final>`.
- * Same bridge pattern as student surfaces (`~/lib/auth-redirect`).
- */
 export function resolveTeacherSignInRedirect(returnTo?: string): string {
   const finalDest = resolveTeacherPostAuthRedirect(returnTo)
   const loadingPath = adminLoadingPath()
@@ -66,18 +48,9 @@ export function resolveTeacherSignInRedirect(returnTo?: string): string {
 
   return new URL(path, window.location.origin).href
 }
-
 export function protectedAdminRouteReturnTo(pathname: string): string {
   return resolveTeacherPostAuthRedirect(pathname)
 }
-
-export type AdminLandingSearch = {
-  returnTo?: string
-  signedOut?: boolean
-  /** Signed in but no teacher org membership — do not bounce to `/admin/`. */
-  accessDenied?: boolean
-}
-
 export function parseAdminLandingSearch(
   search: Record<string, unknown>
 ): AdminLandingSearch {
@@ -100,12 +73,6 @@ export function parseAdminLandingSearch(
 
   return result
 }
-
-export type AdminLoadingSearch = {
-  returnTo?: string
-  code?: string
-}
-
 export function parseAdminLoadingSearch(
   search: Record<string, unknown>
 ): AdminLoadingSearch {
@@ -123,4 +90,17 @@ export function parseAdminLoadingSearch(
   }
 
   return result
+}
+export type AdminLandingSearch = {
+  returnTo?: string
+  signedOut?: boolean
+  /** Signed in but no teacher org membership — do not bounce to `/admin/`. */
+  accessDenied?: boolean
+}
+export type AdminLoadingSearch = {
+  returnTo?: string
+  code?: string
+}
+function isAdminLandingPath(pathname: string): boolean {
+  return pathname === adminLandingPath()
 }

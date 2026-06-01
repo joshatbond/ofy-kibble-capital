@@ -1,13 +1,6 @@
 import { brutalBorder, brutalBorderLg } from '~/lib/brutal-chrome'
 import { cn } from '~/lib/class-name-merge'
 
-type PawketBrutalFrameProps = {
-  children: React.ReactNode
-  className?: string
-  id?: string
-  large?: boolean
-}
-
 export function PawketBrutalFrame(props: PawketBrutalFrameProps) {
   return (
     <div
@@ -20,4 +13,10 @@ export function PawketBrutalFrame(props: PawketBrutalFrameProps) {
       {props.children}
     </div>
   )
+}
+type PawketBrutalFrameProps = {
+  children: React.ReactNode
+  className?: string
+  id?: string
+  large?: boolean
 }

@@ -32,7 +32,6 @@ const invitationResultValidator = v.object({
   inviteeIdentifier: v.string(),
   expiresAt: v.number(),
 })
-
 const rosterRowValidator = v.object({
   rosterStudentId: v.id('rosterStudents'),
   email: v.string(),
@@ -51,8 +50,10 @@ const rosterRowValidator = v.object({
   invitationIsExpired: v.boolean(),
   userId: v.optional(v.id('users')),
 })
-
-/** Invite a **Student** by `@ofy.org` email — provisions roster + bank accounts. */
+const acceptResultValidator = v.object({
+  role: v.string(),
+  redirectPath: v.string(),
+})
 export const inviteStudent = mutation({
   args: {
     organizationId: v.string(),
@@ -114,8 +115,6 @@ export const inviteStudent = mutation({
     return result
   },
 })
-
-/** Invite a **Co-teacher** with equal **Teacher** permissions. */
 export const inviteCoTeacher = mutation({
   args: {
     organizationId: v.string(),
@@ -147,8 +146,6 @@ export const inviteCoTeacher = mutation({
     })
   },
 })
-
-/** **Resend invitation** — refreshes the 14-day expiry. */
 export const resendClassroomInvitation = mutation({
   args: {
     organizationId: v.string(),
@@ -199,8 +196,6 @@ export const resendClassroomInvitation = mutation({
     }
   },
 })
-
-/** **Revoke invitation** — cancels the tenants invite and marks roster revoked. */
 export const revokeClassroomInvitation = mutation({
   args: {
     organizationId: v.string(),
@@ -245,8 +240,6 @@ export const revokeClassroomInvitation = mutation({
     return null
   },
 })
-
-/** Issue a new **Pay token** for a roster student (invalidates the previous QR). */
 export const rotatePayToken = mutation({
   args: {
     organizationId: v.string(),
@@ -277,8 +270,6 @@ export const rotatePayToken = mutation({
     return { payToken }
   },
 })
-
-/** Public invitation preview for `/invite/:id` (no auth required). */
 export const getInvitePreview = query({
   args: { invitationId: v.string() },
   returns: v.union(
@@ -319,8 +310,6 @@ export const getInvitePreview = query({
     }
   },
 })
-
-/** Signed-in viewer email for invite accept UI. */
 export const viewerEmail = query({
   args: {},
   returns: v.union(v.string(), v.null()),
@@ -334,17 +323,6 @@ export const viewerEmail = query({
     return user?.email ?? null
   },
 })
-
-const acceptResultValidator = v.object({
-  role: v.string(),
-  redirectPath: v.string(),
-})
-
-/**
- * Accept a classroom invitation after Google sign-in.
- * Enforces invitee email match and invitation state (`@ofy.org` is already
- * guaranteed by Google Workspace internal OAuth on sign-in).
- */
 export const acceptClassroomInvitation = mutation({
   args: { invitationId: v.string() },
   returns: acceptResultValidator,
@@ -399,8 +377,6 @@ export const acceptClassroomInvitation = mutation({
     return postAcceptRedirect(invitation.role)
   },
 })
-
-/** Classroom roster for **Teacher admin** — active students + pending invitations. */
 export const listClassroomRoster = query({
   args: { organizationId: v.string() },
   returns: v.array(rosterRowValidator),
@@ -456,7 +432,6 @@ export const listClassroomRoster = query({
     return rows
   },
 })
-
 async function requireTeacherForOrg(
   ctx: Parameters<typeof authz.require>[0],
   userId: string,

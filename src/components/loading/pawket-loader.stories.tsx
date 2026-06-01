@@ -18,16 +18,11 @@ const meta = {
     appTheme: 'pawket',
   },
 } satisfies Meta<typeof PawketLoader>
-
 export default meta
-
-type Story = StoryObj<typeof meta>
-
 export const InlineMark: Story = {
   name: 'Inline loader',
   render: () => <PawketLoader />,
 }
-
 export const LoadingScreen: Story = {
   name: 'Full loading screen',
   parameters: {
@@ -50,3 +45,4 @@ export const LoadingScreen: Story = {
     )
   },
 }
+type Story = StoryObj<typeof meta>

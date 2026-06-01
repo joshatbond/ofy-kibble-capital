@@ -1,12 +1,6 @@
 import { cn } from '~/lib/class-name-merge'
 import type { AppThemeId } from '~/lib/themes'
 
-type AppThemeProps = {
-  theme: AppThemeId
-  children: React.ReactNode
-  className?: string
-}
-
 export function AppTheme(props: AppThemeProps) {
   return (
     <div
@@ -19,4 +13,9 @@ export function AppTheme(props: AppThemeProps) {
       {props.children}
     </div>
   )
+}
+type AppThemeProps = {
+  theme: AppThemeId
+  children: React.ReactNode
+  className?: string
 }

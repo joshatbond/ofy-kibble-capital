@@ -26,7 +26,16 @@ const cardVariants = cva(
     },
   }
 )
-
+export {
+  Card,
+  CardHeader,
+  CardFooter,
+  CardTitle,
+  CardAction,
+  CardDescription,
+  CardContent,
+  cardVariants,
+}
 function Card({
   className,
   variant = 'default',
@@ -43,7 +52,6 @@ function Card({
     />
   )
 }
-
 function CardHeader({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
@@ -56,7 +64,6 @@ function CardHeader({ className, ...props }: React.ComponentProps<'div'>) {
     />
   )
 }
-
 function CardTitle({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
@@ -69,7 +76,6 @@ function CardTitle({ className, ...props }: React.ComponentProps<'div'>) {
     />
   )
 }
-
 function CardDescription({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
@@ -79,7 +85,6 @@ function CardDescription({ className, ...props }: React.ComponentProps<'div'>) {
     />
   )
 }
-
 function CardAction({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
@@ -92,7 +97,6 @@ function CardAction({ className, ...props }: React.ComponentProps<'div'>) {
     />
   )
 }
-
 function CardContent({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
@@ -102,7 +106,6 @@ function CardContent({ className, ...props }: React.ComponentProps<'div'>) {
     />
   )
 }
-
 function CardFooter({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
@@ -115,15 +118,4 @@ function CardFooter({ className, ...props }: React.ComponentProps<'div'>) {
       {...props}
     />
   )
-}
-
-export {
-  Card,
-  CardHeader,
-  CardFooter,
-  CardTitle,
-  CardAction,
-  CardDescription,
-  CardContent,
-  cardVariants,
 }

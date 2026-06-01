@@ -9,17 +9,12 @@ const meta = {
   tags: ['autodocs'],
   parameters: sharedUiStoryParameters,
 } satisfies Meta<typeof Badge>
-
 export default meta
-
-type Story = StoryObj<typeof meta>
-
 export const Default: Story = {
   args: {
     children: 'Pay period open',
   },
 }
-
 export const Variants: Story = {
   render: () => (
     <div className="flex flex-wrap gap-2">
@@ -35,3 +30,4 @@ export const Variants: Story = {
     </div>
   ),
 }
+type Story = StoryObj<typeof meta>

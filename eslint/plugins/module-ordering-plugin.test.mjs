@@ -39,6 +39,11 @@ export function f() {}
             { messageId: 'wrongOrderBefore' },
             { messageId: 'wrongOrder' },
           ],
+          output: `
+export const X = 1
+export function f() {}
+export type T = { a: string }
+`,
         },
       ],
     })

@@ -2,30 +2,6 @@
  * Tonal palettes from Stitch (T000–T100). Not returned by list_design_systems;
  * copied from the Stitch design-system UI.
  */
-export type ToneStep =
-  | 'default'
-  | '000'
-  | '010'
-  | '020'
-  | '030'
-  | '040'
-  | '050'
-  | '060'
-  | '070'
-  | '080'
-  | '090'
-  | '095'
-  | '100'
-
-export type ToneScale = Record<ToneStep, string>
-
-export type ThemeTones = {
-  primary: ToneScale
-  secondary: ToneScale
-  tertiary: ToneScale
-  neutral: ToneScale
-}
-
 export const kineticLedgerTones = {
   primary: {
     default: '#E31837',
@@ -88,7 +64,6 @@ export const kineticLedgerTones = {
     '100': '#FFFFFF',
   },
 } satisfies ThemeTones
-
 export const vibrantScholarTones = {
   primary: {
     default: '#2D5BFF',
@@ -151,8 +126,27 @@ export const vibrantScholarTones = {
     '100': '#FFFFFF',
   },
 } satisfies ThemeTones
-
-/** Stitch T010 → CSS/Tailwind suffix `10` (e.g. `primary-10`). */
 export function toneStepToSuffix(step: Exclude<ToneStep, 'default'>): string {
   return String(Number.parseInt(step, 10))
+}
+export type ToneStep =
+  | 'default'
+  | '000'
+  | '010'
+  | '020'
+  | '030'
+  | '040'
+  | '050'
+  | '060'
+  | '070'
+  | '080'
+  | '090'
+  | '095'
+  | '100'
+export type ToneScale = Record<ToneStep, string>
+export type ThemeTones = {
+  primary: ToneScale
+  secondary: ToneScale
+  tertiary: ToneScale
+  neutral: ToneScale
 }

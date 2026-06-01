@@ -124,7 +124,7 @@ export function AcceptInvitationPage(props: { invitationId: string }) {
       <Case predicate={showAcceptForm}>
         <InviteAcceptForm
           invitationId={props.invitationId}
-          preview={preview}
+          preview={preview!}
           isAuthenticated={isAuthenticated}
           emailMismatch={emailMismatch}
           viewerEmail={viewerEmail ?? undefined}
@@ -136,11 +136,6 @@ export function AcceptInvitationPage(props: { invitationId: string }) {
     </SwitchOn>
   )
 }
-
-type InvitePreview = NonNullable<
-  FunctionReturnType<typeof api.features.invitations.getInvitePreview>
->
-
 function InviteAcceptForm(props: {
   invitationId: string
   preview: InvitePreview
@@ -210,7 +205,6 @@ function InviteAcceptForm(props: {
     </div>
   )
 }
-
 function InviteStatusCard(props: {
   title: string
   body?: string
@@ -236,3 +230,6 @@ function InviteStatusCard(props: {
     </div>
   )
 }
+type InvitePreview = NonNullable<
+  FunctionReturnType<typeof api.features.invitations.getInvitePreview>
+>

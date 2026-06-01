@@ -9,8 +9,8 @@ import {
   adminLandingPath,
   protectedAdminRouteReturnTo,
 } from '~/lib/admin-auth-redirect'
-import { clearStoredConvexAuthTokens } from '~/lib/convex-auth-storage'
 import { studentAppHomePath, studentAppLandingPath } from '~/lib/auth-redirect'
+import { clearStoredConvexAuthTokens } from '~/lib/convex-auth-storage'
 
 /**
  * Runtime guard for protected **Teacher admin** routes.

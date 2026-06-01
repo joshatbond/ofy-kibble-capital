@@ -126,6 +126,51 @@ function hasSectionLater(body, fromIndex, section) {
   return false
 }
 
+/**
+ * Stable reorder: preserve relative order within each section.
+ *
+ * @param {import('estree').Statement[]} body
+ * @returns {import('estree').Statement[]}
+ */
+function stableReorder(body) {
+  const leadingUnknown = []
+  const imports = []
+  /** @type {Record<string, import('estree').Statement[]>} */
+  const bySection = Object.fromEntries(
+    SECTION_ORDER.map(section => [section, []])
+  )
+
+  for (const statement of body) {
+    const section = sectionForNode(statement)
+    if (section === 'unknown') {
+      leadingUnknown.push(statement)
+      continue
+    }
+    if (section === 'import') {
+      imports.push(statement)
+      continue
+    }
+    bySection[section].push(statement)
+  }
+
+  return [
+    ...leadingUnknown,
+    ...imports,
+    ...SECTION_ORDER.flatMap(section => bySection[section]),
+  ]
+}
+
+/**
+ * @param {import('estree').Statement[]} left
+ * @param {import('estree').Statement[]} right
+ */
+function statementsEqual(left, right) {
+  return (
+    left.length === right.length &&
+    left.every((statement, index) => statement === right[index])
+  )
+}
+
 /** @param {string} filename */
 function shouldSkipFile(filename) {
   return (
@@ -133,6 +178,7 @@ function shouldSkipFile(filename) {
     filename.includes('/_generated/') ||
     filename.includes('/.next/') ||
     filename.endsWith('routeTree.gen.ts') ||
+    /(?:^|\/)scripts\//.test(filename) ||
     /(?:^|\/)(?:drizzle|sentry)\.[^/]+\.ts$/.test(filename) ||
     /(?:^|\/)tailwind\.config\.ts$/.test(filename)
   )
@@ -142,6 +188,7 @@ function shouldSkipFile(filename) {
 const moduleOrderingRule = {
   meta: {
     type: 'layout',
+    fixable: 'code',
     docs: {
       description:
         'Enforce module section order: imports, module constants, export default, export const, export function, export type, module functions, module types',
@@ -157,6 +204,8 @@ const moduleOrderingRule = {
     },
   },
   create(context) {
+    const sourceCode = context.sourceCode
+
     return {
       /** @param {import('estree').Program} node */
       Program(node) {
@@ -164,6 +213,30 @@ const moduleOrderingRule = {
 
         if (shouldSkipFile(filename)) {
           return
+        }
+
+        const reordered = stableReorder(node.body)
+        const canFix =
+          node.body.length > 0 && !statementsEqual(node.body, reordered)
+        let fixAttached = false
+
+        /** @param {import('eslint').Rule.ReportDescriptor} descriptor */
+        const withFix = descriptor => {
+          if (!canFix || fixAttached) {
+            return descriptor
+          }
+          fixAttached = true
+          return {
+            ...descriptor,
+            fix(fixer) {
+              const start = node.body[0].range[0]
+              const end = node.body[node.body.length - 1].range[1]
+              const text = reordered
+                .map(statement => sourceCode.getText(statement))
+                .join('\n')
+              return fixer.replaceTextRange([start, end], text)
+            },
+          }
         }
 
         let maxSectionIndex = -1
@@ -183,11 +256,13 @@ const moduleOrderingRule = {
           }
 
           if (section === 'import' && seenNonImport) {
-            context.report({
-              node: statement,
-              messageId: 'importsNotFirst',
-              data: { found: lastSection || 'other code' },
-            })
+            context.report(
+              withFix({
+                node: statement,
+                messageId: 'importsNotFirst',
+                data: { found: lastSection || 'other code' },
+              })
+            )
             continue
           }
 
@@ -195,28 +270,32 @@ const moduleOrderingRule = {
             section === 'export-type' &&
             hasSectionLater(node.body, index, 'export-function')
           ) {
-            context.report({
-              node: statement,
-              messageId: 'wrongOrderBefore',
-              data: {
-                current: section,
-                later: 'export-function',
-                order: SECTION_ORDER.join(' → '),
-              },
-            })
+            context.report(
+              withFix({
+                node: statement,
+                messageId: 'wrongOrderBefore',
+                data: {
+                  current: section,
+                  later: 'export-function',
+                  order: SECTION_ORDER.join(' → '),
+                },
+              })
+            )
           }
 
           const sectionIndex = SECTION_INDEX[section]
           if (sectionIndex < maxSectionIndex) {
-            context.report({
-              node: statement,
-              messageId: 'wrongOrder',
-              data: {
-                current: section,
-                previous: lastSection,
-                order: SECTION_ORDER.join(' → '),
-              },
-            })
+            context.report(
+              withFix({
+                node: statement,
+                messageId: 'wrongOrder',
+                data: {
+                  current: section,
+                  previous: lastSection,
+                  order: SECTION_ORDER.join(' → '),
+                },
+              })
+            )
           }
 
           if (sectionIndex > maxSectionIndex) {

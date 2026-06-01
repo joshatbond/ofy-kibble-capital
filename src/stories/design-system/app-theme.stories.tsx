@@ -6,7 +6,6 @@ import type { AppThemeId } from '~/lib/themes'
 import type { Meta, StoryObj } from '@storybook/react'
 
 const themeIds = Object.keys(appThemes) as Array<AppThemeId>
-
 const meta = {
   title: 'Design System/Theme',
   parameters: {
@@ -19,12 +18,7 @@ const meta = {
     },
   },
 } satisfies Meta
-
 export default meta
-
-type Story = StoryObj<typeof meta>
-
-/** Toolbar-driven preview — switch Theme in the toolbar to change `data-theme`. */
 export const ToolbarPreview: Story = {
   render: () => (
     <div className="flex flex-col items-start gap-3">
@@ -32,6 +26,7 @@ export const ToolbarPreview: Story = {
         <span>
           Change <strong>Theme</strong> in the toolbar to update&nbsp;
         </span>
+
         <code className="text-foreground">data-theme</code>.
       </p>
 
@@ -53,8 +48,6 @@ export const ToolbarPreview: Story = {
     </div>
   ),
 }
-
-/** All three themes at once (decorator disabled to avoid nested wrappers). */
 export const AllSurfaces: Story = {
   parameters: { disableAppThemeDecorator: true },
   render: () => (
@@ -91,3 +84,4 @@ export const AllSurfaces: Story = {
     </div>
   ),
 }
+type Story = StoryObj<typeof meta>

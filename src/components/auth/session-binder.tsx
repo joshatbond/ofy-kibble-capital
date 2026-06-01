@@ -13,17 +13,6 @@ import { api } from '../../../convex/_generated/api'
 
 import type { Id } from '../../../convex/_generated/dataModel'
 
-type ApplyOAuthStudentApp = ReturnType<
-  typeof useMutation<typeof api.features.auth.studentAuth.applyOAuthStudentApp>
->
-
-/**
- * On the rising edge of `isAuthenticated` (sign-in), runs
- * `applyOAuthStudentApp` once to bind the current Convex Auth session to a
- * student app.
- *
- * Renders nothing. Mount inside `ConvexAuthProvider`.
- */
 export function SessionBinder() {
   const { isAuthenticated, isLoading } = useConvexAuth()
   const applyOAuthStudentApp = useMutation(api.features.auth.studentAuth.applyOAuthStudentApp)
@@ -42,7 +31,6 @@ export function SessionBinder() {
 
   return null
 }
-
 async function bindSessionStudentApp(
   applyOAuthStudentApp: ApplyOAuthStudentApp
 ): Promise<void> {
@@ -67,3 +55,6 @@ async function bindSessionStudentApp(
     clearPendingOAuthRedirectTo()
   }
 }
+type ApplyOAuthStudentApp = ReturnType<
+  typeof useMutation<typeof api.features.auth.studentAuth.applyOAuthStudentApp>
+>

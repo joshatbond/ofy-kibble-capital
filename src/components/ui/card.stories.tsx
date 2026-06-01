@@ -23,12 +23,7 @@ const meta = {
     },
   },
 } satisfies Meta<typeof Card>
-
 export default meta
-
-type Story = StoryObj<typeof meta>
-
-/** Stitch neo-brutal card — matches Kibble / PawKet landing feature panels. */
 export const Brutal: Story = {
   render: () => (
     <Card variant="brutal" className="w-sm">
@@ -54,7 +49,6 @@ export const Brutal: Story = {
     </Card>
   ),
 }
-
 export const BrutalLarge: Story = {
   render: () => (
     <Card variant="brutal-lg" className="max-w-md gap-6 p-8">
@@ -74,8 +68,6 @@ export const BrutalLarge: Story = {
     </Card>
   ),
 }
-
-/** Flat card (ring only) — admin / dense UI. */
 export const Default: Story = {
   render: () => (
     <Card className="w-sm">
@@ -99,7 +91,6 @@ export const Default: Story = {
     </Card>
   ),
 }
-
 export const AllVariants: Story = {
   render: () => (
     <div className="flex flex-wrap items-start gap-6">
@@ -129,3 +120,4 @@ export const AllVariants: Story = {
     </div>
   ),
 }
+type Story = StoryObj<typeof meta>

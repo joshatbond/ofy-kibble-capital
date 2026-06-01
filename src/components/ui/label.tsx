@@ -3,6 +3,7 @@ import * as React from 'react'
 
 import { cn } from '~/lib/class-name-merge'
 
+export { Label }
 function Label({
   className,
   ...props
@@ -18,5 +19,3 @@ function Label({
     />
   )
 }
-
-export { Label }

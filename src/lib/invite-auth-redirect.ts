@@ -3,20 +3,12 @@ import { pathnameOfRedirect } from '~/lib/auth-redirect'
 export function invitePath(invitationId: string): string {
   return `/invite/${encodeURIComponent(invitationId)}`
 }
-
 export function inviteLoadingPath(invitationId: string): string {
   return `${invitePath(invitationId)}/loading`
 }
-
 export function isInvitePath(pathname: string): boolean {
   return pathname === '/invite' || pathname.startsWith('/invite/')
 }
-
-function isInviteLandingPath(pathname: string, invitationId: string): boolean {
-  return pathname === invitePath(invitationId)
-}
-
-/** Where OAuth should return after signing in from an invite link. */
 export function resolveInviteSignInRedirect(invitationId: string): string {
   const loadingPath = inviteLoadingPath(invitationId)
 
@@ -26,11 +18,6 @@ export function resolveInviteSignInRedirect(invitationId: string): string {
 
   return new URL(loadingPath, window.location.origin).href
 }
-
-export type InviteLoadingSearch = {
-  code?: string
-}
-
 export function parseInviteLoadingSearch(
   search: Record<string, unknown>
 ): InviteLoadingSearch {
@@ -42,7 +29,6 @@ export function parseInviteLoadingSearch(
 
   return result
 }
-
 export function resolveInvitePostAcceptRedirect(serverPath: string): string {
   if (!serverPath.startsWith('/')) {
     return '/kibble/'
@@ -50,8 +36,6 @@ export function resolveInvitePostAcceptRedirect(serverPath: string): string {
 
   return serverPath
 }
-
-/** @internal — for tests */
 export function normalizeInviteReturnPath(
   invitationId: string,
   returnTo?: string
@@ -67,4 +51,10 @@ export function normalizeInviteReturnPath(
   }
 
   return returnTo
+}
+export type InviteLoadingSearch = {
+  code?: string
+}
+function isInviteLandingPath(pathname: string, invitationId: string): boolean {
+  return pathname === invitePath(invitationId)
 }

@@ -9,24 +9,7 @@ import {
   studentAppValidator,
 } from './studentApp'
 
-function studentAppFromFallback(args: {
-  fallbackRedirectTo?: string
-  fallbackPathname?: string
-}) {
-  if (args.fallbackRedirectTo !== undefined) {
-    return studentAppFromRedirectTo(args.fallbackRedirectTo)
-  }
-
-  if (args.fallbackPathname !== undefined) {
-    return studentAppFromPathname(args.fallbackPathname)
-  }
-
-  return null
-}
-
 const OAUTH_INTENT_TTL_MS = 1000 * 60 * 15
-
-/** Which student surface this OAuth flow is signing into (from validated redirectTo). */
 export const recordOAuthStudentApp = mutation({
   args: {
     verifierId: v.id('authVerifiers'),
@@ -61,8 +44,6 @@ export const recordOAuthStudentApp = mutation({
     })
   },
 })
-
-/** Attach the student surface to the current session after OAuth completes. */
 export const applyOAuthStudentApp = mutation({
   args: {
     verifierId: v.optional(v.id('authVerifiers')),
@@ -115,8 +96,6 @@ export const applyOAuthStudentApp = mutation({
     return studentApp
   },
 })
-
-/** Student surface bound to the current auth session, if any. */
 export const currentStudentApp = query({
   args: {},
   returns: v.union(studentAppValidator, v.null()),
@@ -132,3 +111,17 @@ export const currentStudentApp = query({
     return session?.studentApp ?? null
   },
 })
+function studentAppFromFallback(args: {
+  fallbackRedirectTo?: string
+  fallbackPathname?: string
+}) {
+  if (args.fallbackRedirectTo !== undefined) {
+    return studentAppFromRedirectTo(args.fallbackRedirectTo)
+  }
+
+  if (args.fallbackPathname !== undefined) {
+    return studentAppFromPathname(args.fallbackPathname)
+  }
+
+  return null
+}

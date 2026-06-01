@@ -17,11 +17,11 @@ const seedResultValidator = v.object({
     classroomId: v.id('classrooms'),
   }),
 })
-
-/**
- * Idempotent dev seed: region `ofysb`, sites `ofysb-mv` / `ofysb-sb1` / `ofysb-sb2`,
- * and one classroom organization on `ofysb-mv`.
- */
+const devTeacherRoleValidator = v.union(
+  v.literal('owner'),
+  v.literal('admin'),
+  v.literal('teacher')
+)
 export const seedV1Catalog = internalMutation({
   args: {},
   returns: seedResultValidator,
@@ -29,17 +29,6 @@ export const seedV1Catalog = internalMutation({
     return await applyV1Catalog(ctx)
   },
 })
-
-const devTeacherRoleValidator = v.union(
-  v.literal('owner'),
-  v.literal('admin'),
-  v.literal('teacher')
-)
-
-/**
- * Grant a real signed-in user teacher access to the dev classroom org.
- * Run after `seedV1Catalog` and at least one Google sign-in (creates `users` row).
- */
 export const linkDevTeacherByEmail = internalMutation({
   args: {
     email: v.string(),

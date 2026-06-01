@@ -1,10 +1,10 @@
 'use client'
-
 import { Separator as SeparatorPrimitive } from 'radix-ui'
 import * as React from 'react'
 
 import { cn } from '~/lib/class-name-merge'
 
+export { Separator }
 function Separator({
   className,
   orientation = 'horizontal',
@@ -24,5 +24,3 @@ function Separator({
     />
   )
 }
-
-export { Separator }

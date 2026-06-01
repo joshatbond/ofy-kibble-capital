@@ -1,22 +1,5 @@
 import { cn } from '~/lib/class-name-merge'
 
-type KibbleShieldIconProps = {
-  className?: string
-  /** Extra classes for the red shield path. */
-  shieldClassName?: string
-  /** Extra classes for the white K mark path. */
-  markClassName?: string
-  /** Hide the K so loaders can render the mark separately if needed. */
-  hideMark?: boolean
-}
-
-/**
- * Vectorised Kibble Capital shield mark (icon only — no wordmark).
- *
- * Paths come from `src/assets/kibble_capital.svg`. The shield and the K are
- * each a single path so loaders can target them via `.kibble-shield` /
- * `.kibble-mark`.
- */
 export function KibbleShieldIcon(props: KibbleShieldIconProps) {
   return (
     <svg
@@ -47,4 +30,13 @@ export function KibbleShieldIcon(props: KibbleShieldIconProps) {
       </g>
     </svg>
   )
+}
+type KibbleShieldIconProps = {
+  className?: string
+  /** Extra classes for the red shield path. */
+  shieldClassName?: string
+  /** Extra classes for the white K mark path. */
+  markClassName?: string
+  /** Hide the K so loaders can render the mark separately if needed. */
+  hideMark?: boolean
 }

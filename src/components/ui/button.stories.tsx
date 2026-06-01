@@ -37,12 +37,7 @@ const meta = {
     },
   },
 } satisfies Meta<typeof Button>
-
 export default meta
-
-type Story = StoryObj<typeof meta>
-
-/** Primary CTA — matches Stitch neo-brutal buttons on Kibble / PawKet landings. */
 export const Brutal: Story = {
   args: {
     variant: 'brutal',
@@ -51,7 +46,6 @@ export const Brutal: Story = {
     children: 'Continue',
   },
 }
-
 export const BrutalOutline: Story = {
   args: {
     variant: 'brutal-outline',
@@ -60,7 +54,6 @@ export const BrutalOutline: Story = {
     children: 'Learn more',
   },
 }
-
 export const BrutalLarge: Story = {
   args: {
     variant: 'brutal',
@@ -70,29 +63,24 @@ export const BrutalLarge: Story = {
     children: 'Get started',
   },
 }
-
-/** Flat shadcn default (no brutal shadow) — admin / dense UI. */
 export const Default: Story = {
   args: {
     variant: 'default',
     children: 'Continue',
   },
 }
-
 export const Outline: Story = {
   args: {
     variant: 'outline',
     children: 'Cancel',
   },
 }
-
 export const Destructive: Story = {
   args: {
     variant: 'destructive',
     children: 'Remove',
   },
 }
-
 export const AllVariants: Story = {
   render: () => (
     <div className="flex flex-wrap items-center gap-3">
@@ -126,3 +114,4 @@ export const AllVariants: Story = {
     </div>
   ),
 }
+type Story = StoryObj<typeof meta>

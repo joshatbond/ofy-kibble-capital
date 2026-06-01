@@ -1,54 +1,14 @@
 import { v } from 'convex/values'
 
-/**
- * Central field maps for app-owned Convex tables.
- *
- * - Pass directly to `defineTable(...)` in `schema.ts`.
- * - Wrap with `v.object(tableFields)` for mutation `args` / query `returns`.
- *
- * Auth component tables (`authTables` spread) are not defined here.
- */
-
-/**
- * PawKet account type on `bankAccounts` (one row per kind per student).
- *
- * - `checking` — spending / everyday balance (PawKet Exchange)
- * - `savings` — interest-bearing balance (`savingsApyPercent` in class settings)
- *
- * Both are created at invite send via `provisionStudentBankAccounts`.
- */
 const bankAccountKind = v.union(v.literal('checking'), v.literal('savings'))
-
-/** Student **Grade** — 7 or 8 only in v1 (CONTEXT.md). */
-export const grade = v.union(v.literal(7), v.literal(8))
-
-/**
- * Lifecycle of a `rosterStudents` row relative to its classroom invitation.
- *
- * - `pending` — invite sent; student has not signed in and accepted yet
- * - `active` — student accepted; `userId` is set and they can use the apps
- * - `revoked` — teacher cancelled the invite; accept flow must reject
- */
 const rosterStatus = v.union(
   v.literal('pending'),
   v.literal('active'),
   v.literal('revoked')
 )
-/** Canonical site slug, e.g. `ofysb-mv`. */
 const siteSlug = v.string()
-
-/**
- * Which student-facing PWA the user signed in from.
- *
- * - `kibble` — Kibble Capital (accounting)
- * - `pawket` — PawKet Exchange (banking)
- *
- */
 const studentApp = v.union(v.literal('kibble'), v.literal('pawket'))
-
-/** 0 = Sunday … 6 = Saturday (matches JS `Date.getDay()`). */
 const weekdayValidator = v.number()
-/** Classroom pay cadence (weekly, biweekly, semi-monthly, or monthly). */
 const payScheduleValidator = v.union(
   v.object({
     type: v.literal('weekly'),
@@ -69,11 +29,7 @@ const payScheduleValidator = v.union(
     dayOfMonth: v.number(),
   })
 )
-
-/**
- * Signed-in identity (Convex Auth) plus app flags.
- * @see `users` in `schema.ts`
- */
+export const grade = v.union(v.literal(7), v.literal(8))
 export const usersTableFields = {
   /**
    * Allows `organizations.createOrganization` (operator tooling only in v1).
@@ -96,22 +52,12 @@ export const usersTableFields = {
   /** Unix ms when phone was verified (Convex Auth). */
   phoneVerificationTime: v.optional(v.number()),
 }
-
-/**
- * Operator catalog region (e.g. Options for Youth South Bay).
- * @see `regions` in `schema.ts`
- */
 export const regionsTableFields = {
   /** Human-readable region name. */
   name: v.string(),
   /** Short code, e.g. `ofysb`. */
   slug: v.string(),
 }
-
-/**
- * Physical school site within a region (catalog row, not a tenant).
- * @see `schoolSites` in `schema.ts`
- */
 export const schoolSitesTableFields = {
   /** Parent region. */
   regionId: v.id('regions'),
@@ -120,11 +66,6 @@ export const schoolSitesTableFields = {
   /** Canonical site slug, e.g. `ofysb-mv`. */
   siteSlug,
 }
-
-/**
- * Links a tenant classroom organization to operator catalog site slug.
- * @see `classrooms` in `schema.ts`
- */
 export const classroomsTableFields = {
   /** `@djpanda/convex-tenants` organization id for this classroom. */
   organizationId: v.string(),
@@ -135,11 +76,6 @@ export const classroomsTableFields = {
   /** URL-safe slug unique within the site. */
   orgSlug: v.string(),
 }
-
-/**
- * Shared payroll / product settings columns (hourly rate, pay schedule, vault cap, etc.).
- * Composed into `regionSettings`, `schoolSiteSettings`, and `classSettings`.
- */
 export const settingsTableFields = {
   /** Hourly wage in cents. */
   hourlyRateCents: v.number(),
@@ -162,39 +98,19 @@ export const settingsTableFields = {
   /** Maximum vault balance cap. */
   vaultCap: v.number(),
 } as const
-
-/**
- * Region-level default settings (operator catalog).
- * @see `regionSettings` in `schema.ts`
- */
 export const regionSettingsTableFields = {
   regionId: v.id('regions'),
   ...settingsTableFields,
 }
-
-/**
- * School-site overrides on top of region defaults.
- * @see `schoolSiteSettings` in `schema.ts`
- */
 export const schoolSiteSettingsTableFields = {
   schoolSiteId: v.id('schoolSites'),
   ...settingsTableFields,
 }
-
-/**
- * Snapshot of effective settings at classroom create (editable by teachers later).
- * @see `classSettings` in `schema.ts`
- */
 export const classSettingsTableFields = {
   organizationId: v.string(),
   classroomId: v.id('classrooms'),
   ...settingsTableFields,
 }
-
-/**
- * App session metadata keyed off Convex Auth sessions.
- * @see `authSessions` in `schema.ts`
- */
 export const authSessionsTableFields = {
   userId: v.id('users'),
   /** Unix ms when this session expires. */
@@ -202,23 +118,12 @@ export const authSessionsTableFields = {
   /** Which student app this session was opened from (set at OAuth sign-in). */
   studentApp: v.optional(studentApp),
 }
-
-/**
- * Binds OAuth verifier to target student app before redirect completes.
- * @see `studentOAuthIntents` in `schema.ts`
- */
 export const studentOAuthIntentsTableFields = {
   verifierId: v.id('authVerifiers'),
   studentApp: studentApp,
   /** Unix ms when this intent row expires. */
   expirationTime: v.number(),
 }
-
-/**
- * Classroom roster row for a **Student** — pending until invitation accept.
- * Pay token and bank accounts are provisioned at invite send.
- * @see `rosterStudents` in `schema.ts`
- */
 export const rosterStudentsTableFields = {
   classroomId: v.id('classrooms'),
   organizationId: v.string(),
@@ -235,11 +140,6 @@ export const rosterStudentsTableFields = {
   payToken: v.string(),
   status: rosterStatus,
 }
-
-/**
- * Empty checking/savings accounts created when a student invite is sent.
- * @see `bankAccounts` in `schema.ts`
- */
 export const bankAccountsTableFields = {
   organizationId: v.string(),
   rosterStudentId: v.id('rosterStudents'),
@@ -247,8 +147,6 @@ export const bankAccountsTableFields = {
   balanceCents: v.number(),
   kind: bankAccountKind,
 }
-
-/** Re-export validators for function `args` / `returns` (see `convex/schema/`). */
 export const rosterStatusValidator = rosterStatus
 export const studentAppValidator = studentApp
 export { payScheduleValidator, weekdayValidator }

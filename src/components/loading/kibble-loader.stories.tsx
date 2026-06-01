@@ -18,16 +18,11 @@ const meta = {
     appTheme: 'kibble',
   },
 } satisfies Meta<typeof KibbleLoader>
-
 export default meta
-
-type Story = StoryObj<typeof meta>
-
 export const InlineMark: Story = {
   name: 'Inline loader',
   render: () => <KibbleLoader />,
 }
-
 export const LoadingScreen: Story = {
   name: 'Full loading screen',
   parameters: {
@@ -50,3 +45,4 @@ export const LoadingScreen: Story = {
     )
   },
 }
+type Story = StoryObj<typeof meta>

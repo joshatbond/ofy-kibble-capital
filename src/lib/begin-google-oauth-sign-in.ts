@@ -3,15 +3,6 @@ import {
   writePendingOAuthRedirectTo,
 } from '~/lib/convex-auth-storage'
 
-type GoogleOAuthSignIn = (args: {
-  provider: 'google'
-  params: { redirectTo: string }
-}) => Promise<{ redirect?: string; verifier?: string }>
-
-/**
- * Start Convex Auth Google OAuth. Persists the PKCE verifier id in the same
- * localStorage slot `ConvexAuthProvider` reads on callback (`?code=…`).
- */
 export async function beginGoogleOAuthSignIn(props: {
   signIn: GoogleOAuthSignIn
   redirectTo: string
@@ -35,3 +26,7 @@ export async function beginGoogleOAuthSignIn(props: {
 
   window.location.href = result.redirect
 }
+type GoogleOAuthSignIn = (args: {
+  provider: 'google'
+  params: { redirectTo: string }
+}) => Promise<{ redirect?: string; verifier?: string }>
