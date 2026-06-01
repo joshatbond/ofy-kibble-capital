@@ -9,6 +9,7 @@ import {
   adminLandingPath,
   protectedAdminRouteReturnTo,
 } from '~/lib/admin-auth-redirect'
+import { clearStoredConvexAuthTokens } from '~/lib/convex-auth-storage'
 import { studentAppHomePath, studentAppLandingPath } from '~/lib/auth-redirect'
 
 /**
@@ -35,10 +36,12 @@ export function RequireTeacherAuth(props: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (signedOutMidSession) {
+      clearStoredConvexAuthTokens()
       void navigate({
         to: adminLandingPath(),
         search: {
           returnTo: protectedAdminRouteReturnTo(location.pathname),
+          signedOut: true,
         },
         replace: true,
       })

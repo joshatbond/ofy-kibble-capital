@@ -1,18 +1,18 @@
 import { useAction } from 'convex/react'
 
 import { PawketBrutalButton } from '~/components/pawket/landing/pawket-brutal-button'
-import { resolveTeacherSignInRedirect } from '~/lib/admin-auth-redirect'
 import { beginGoogleOAuthSignIn } from '~/lib/begin-google-oauth-sign-in'
+import { resolveInviteSignInRedirect } from '~/lib/invite-auth-redirect'
 
 import { api } from '../../../convex/_generated/api'
 
 import type { ComponentProps } from 'react'
 
-export function TeacherSignInButton(props: {
+export function InviteSignInButton(props: {
+  invitationId: string
   children: React.ReactNode
   className?: string
   large?: boolean
-  returnTo?: string
   variant?: ComponentProps<typeof PawketBrutalButton>['variant']
 }) {
   const signIn = useAction(api.auth.signIn)
@@ -26,7 +26,7 @@ export function TeacherSignInButton(props: {
       onClick={() => {
         void beginGoogleOAuthSignIn({
           signIn,
-          redirectTo: resolveTeacherSignInRedirect(props.returnTo),
+          redirectTo: resolveInviteSignInRedirect(props.invitationId),
         })
       }}
     >

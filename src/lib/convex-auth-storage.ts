@@ -8,8 +8,10 @@ const PENDING_OAUTH_REDIRECT_KEY = '__ofy.pendingOAuthRedirectTo'
  * with non-alphanumeric chars stripped), which is what we configure today.
  */
 const CONVEX_AUTH_JWT_KEY = '__convexAuthJWT'
+const REFRESH_TOKEN_STORAGE_KEY = '__convexAuthRefreshToken'
 
-function convexAuthStorageNamespace(): string {
+/** Must match `storageNamespace` on `ConvexAuthProvider` (defaults to client URL). */
+export function convexAuthStorageNamespace(): string {
   return (import.meta.env.VITE_CONVEX_URL ?? '').replace(/[^a-zA-Z0-9]/g, '')
 }
 
@@ -58,12 +60,22 @@ export function clearPendingOAuthRedirectTo(): void {
   window.sessionStorage.removeItem(PENDING_OAUTH_REDIRECT_KEY)
 }
 
+/** Drop stale Convex Auth tokens (e.g. after failed OAuth or expired JWT). */
+export function clearStoredConvexAuthTokens(): void {
+  if (typeof window === 'undefined') return
+
+  window.localStorage.removeItem(convexAuthStorageKey(CONVEX_AUTH_JWT_KEY))
+  window.localStorage.removeItem(
+    convexAuthStorageKey(REFRESH_TOKEN_STORAGE_KEY)
+  )
+  clearConvexOAuthVerifierId()
+  clearPendingOAuthRedirectTo()
+}
+
 /**
- * Synchronous "do we have a session?" check, suitable for use inside
- * `beforeLoad`. Reads the JWT directly from the same storage key Convex Auth
- * writes to — the token may be expired (the Convex client will catch that and
- * sign-out automatically), but presence is a reliable "is this a returning
- * user?" signal for routing decisions.
+ * Synchronous JWT presence check for **loading-route** `beforeLoad` only
+ * (OAuth in-flight). Do not use this to redirect from landing → protected app;
+ * a stored token may be expired while `useConvexAuth().isAuthenticated` is false.
  */
 export function hasConvexAuthToken(): boolean {
   if (typeof window === 'undefined') return false

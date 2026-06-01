@@ -5,6 +5,7 @@ import { createRouter } from '@tanstack/react-router'
 import { routerWithQueryClient } from '@tanstack/react-router-with-query'
 
 import { SessionBinder } from '~/components/auth/session-binder'
+import { convexAuthStorageNamespace } from '~/lib/convex-auth-storage'
 
 import { routeTree } from './routeTree.gen'
 
@@ -65,6 +66,7 @@ export function getRouter() {
       Wrap: ({ children }) => (
         <ConvexAuthProvider
           client={convexQueryClient.convexClient}
+          storageNamespace={convexAuthStorageNamespace()}
           replaceURL={relativeUrl => {
             const url = new URL(relativeUrl, window.location.origin)
             window.history.replaceState(

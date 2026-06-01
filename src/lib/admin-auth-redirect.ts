@@ -74,6 +74,8 @@ export function protectedAdminRouteReturnTo(pathname: string): string {
 export type AdminLandingSearch = {
   returnTo?: string
   signedOut?: boolean
+  /** Signed in but no teacher org membership — do not bounce to `/admin/`. */
+  accessDenied?: boolean
 }
 
 export function parseAdminLandingSearch(
@@ -90,6 +92,10 @@ export function parseAdminLandingSearch(
 
   if (search.signedOut === true || search.signedOut === 'true') {
     result.signedOut = true
+  }
+
+  if (search.accessDenied === true || search.accessDenied === 'true') {
+    result.accessDenied = true
   }
 
   return result

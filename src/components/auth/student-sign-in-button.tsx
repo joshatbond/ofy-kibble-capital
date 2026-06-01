@@ -1,12 +1,9 @@
-import { useAction, useMutation } from 'convex/react'
+import { useMutation, useAction } from 'convex/react'
 
 import { PawketBrutalButton } from '~/components/pawket/landing/pawket-brutal-button'
 import { resolveStudentSignInRedirect } from '~/lib/auth-redirect'
 import type { StudentApp } from '~/lib/auth-redirect'
-import {
-  writeConvexOAuthVerifierId,
-  writePendingOAuthRedirectTo,
-} from '~/lib/convex-auth-storage'
+import { beginGoogleOAuthSignIn } from '~/lib/begin-google-oauth-sign-in'
 
 import { api } from '../../../convex/_generated/api'
 
@@ -23,7 +20,7 @@ export function StudentSignInButton(props: {
 }) {
   const signIn = useAction(api.auth.signIn)
   const recordOAuthStudentApp = useMutation(
-    api.studentAuth.recordOAuthStudentApp
+    api.features.auth.studentAuth.recordOAuthStudentApp
   )
 
   return (
@@ -39,26 +36,16 @@ export function StudentSignInButton(props: {
             props.returnTo
           )
 
-          writePendingOAuthRedirectTo(redirectTo)
-
-          const result = await signIn({
-            provider: 'google',
-            params: { redirectTo },
+          await beginGoogleOAuthSignIn({
+            signIn,
+            redirectTo,
+            afterVerifierCreated: async verifierId => {
+              await recordOAuthStudentApp({
+                verifierId: verifierId as Id<'authVerifiers'>,
+                redirectTo,
+              })
+            },
           })
-
-          if (result.redirect === undefined) {
-            return
-          }
-
-          if (result.verifier !== undefined) {
-            writeConvexOAuthVerifierId(result.verifier)
-            await recordOAuthStudentApp({
-              verifierId: result.verifier as Id<'authVerifiers'>,
-              redirectTo,
-            })
-          }
-
-          window.location.href = result.redirect
         })()
       }}
     >

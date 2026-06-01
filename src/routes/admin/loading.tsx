@@ -9,6 +9,7 @@ import {
   parseAdminLoadingSearch,
 } from '~/lib/admin-auth-redirect'
 import {
+  clearStoredConvexAuthTokens,
   hasConvexAuthToken,
   readPendingOAuthRedirectTo,
 } from '~/lib/convex-auth-storage'
@@ -43,14 +44,26 @@ function AdminLoadingRoute() {
 
   useEffect(() => {
     if (!sessionResolved) return
+
     if (!isAuthenticated) {
-      void navigate({ to: adminLandingPath(), replace: true })
+      clearStoredConvexAuthTokens()
+      void navigate({
+        to: adminLandingPath(),
+        search: { signedOut: true },
+        replace: true,
+      })
       return
     }
+
     if (hasTeacherAccess === false) {
-      void navigate({ to: adminLandingPath(), replace: true })
+      void navigate({
+        to: adminLandingPath(),
+        search: { accessDenied: true },
+        replace: true,
+      })
       return
     }
+
     if (hasTeacherAccess !== true) return
 
     void navigate({ to: dest, replace: true })

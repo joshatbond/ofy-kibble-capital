@@ -14,7 +14,7 @@ import { api } from '../../../convex/_generated/api'
 import type { Id } from '../../../convex/_generated/dataModel'
 
 type ApplyOAuthStudentApp = ReturnType<
-  typeof useMutation<typeof api.studentAuth.applyOAuthStudentApp>
+  typeof useMutation<typeof api.features.auth.studentAuth.applyOAuthStudentApp>
 >
 
 /**
@@ -26,7 +26,7 @@ type ApplyOAuthStudentApp = ReturnType<
  */
 export function SessionBinder() {
   const { isAuthenticated, isLoading } = useConvexAuth()
-  const applyOAuthStudentApp = useMutation(api.studentAuth.applyOAuthStudentApp)
+  const applyOAuthStudentApp = useMutation(api.features.auth.studentAuth.applyOAuthStudentApp)
   const previouslyAuthenticated = useRef(false)
 
   useEffect(() => {
