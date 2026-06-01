@@ -1,9 +1,9 @@
-import { mergeSettingsLayers } from './effectiveSettingsMerge'
-import { settingsValuesValidator } from './settingsValues'
+import { mergeSettingsLayers } from './merge'
+import { settingsValuesValidator } from './values'
 
-import type { SettingsValues } from './settingsValues'
-import type { Doc, Id } from '../_generated/dataModel'
-import type { MutationCtx, QueryCtx } from '../_generated/server'
+import type { SettingsValues } from './values'
+import type { Doc, Id } from '../../_generated/dataModel'
+import type { MutationCtx, QueryCtx } from '../../_generated/server'
 
 export { mergeSettingsLayers, settingsValuesValidator }
 

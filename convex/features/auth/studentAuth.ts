@@ -1,12 +1,13 @@
 import { getAuthSessionId } from '@convex-dev/auth/server'
 import { v } from 'convex/values'
 
-import { mutation, query } from './_generated/server'
+import { mutation, query } from '../../_generated/server'
+
 import {
   studentAppFromPathname,
   studentAppFromRedirectTo,
   studentAppValidator,
-} from './lib/studentApp'
+} from './studentApp'
 
 function studentAppFromFallback(args: {
   fallbackRedirectTo?: string

@@ -1,9 +1,4 @@
-import { v } from 'convex/values'
-
-export const studentAppValidator = v.union(
-  v.literal('kibble'),
-  v.literal('pawket')
-)
+export { studentAppValidator } from '../../schema/schemaFields'
 
 export function pathnameOfRedirect(redirectTo: string): string {
   return redirectTo.startsWith('http')

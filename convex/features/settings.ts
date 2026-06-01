@@ -1,10 +1,11 @@
 import { v } from 'convex/values'
 
-import { internalQuery, query } from './_generated/server'
+import { internalQuery, query } from '../_generated/server'
+
 import {
   resolveEffectiveSettings,
   settingsValuesValidator,
-} from './lib/effectiveSettings'
+} from './settings/effectiveSettings'
 
 /**
  * Effective settings for a classroom organization (region → site → class snapshot).

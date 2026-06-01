@@ -1,4 +1,4 @@
-import type { SettingsValues } from './settingsValues'
+import type { SettingsValues } from './values'
 
 /** v1 product defaults — see CONTEXT.md (Savings APY, overtime, vault cap, etc.). */
 export const V1_BASE_SETTINGS: SettingsValues = {

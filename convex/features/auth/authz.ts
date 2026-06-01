@@ -1,8 +1,8 @@
 import { Authz, definePermissions, defineRoles } from '@djpanda/convex-authz'
 import { TENANTS_PERMISSIONS, TENANTS_ROLES } from '@djpanda/convex-tenants'
 
-import { components } from './_generated/api'
-import { APP_ROLES } from './lib/roles'
+import { components } from '../../_generated/api'
+import { APP_ROLES } from '../tenants/roles'
 
 const permissions = definePermissions(TENANTS_PERMISSIONS, {})
 

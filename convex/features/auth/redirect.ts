@@ -2,9 +2,42 @@
  * Post-OAuth paths allowed (must match client `~/lib/auth-redirect` and
  * `~/lib/admin-auth-redirect`).
  */
-const ALLOWED_APP_BASE_PATHS = ['/kibble', '/pawket', '/admin'] as const
+const ALLOWED_APP_BASE_PATHS = [
+  '/kibble',
+  '/pawket',
+  '/admin',
+  '/invite',
+] as const
 
 const LANDING_SUFFIX = '/landing'
+/**
+ * Convex Auth `callbacks.redirect` must return an absolute URL (see
+ * `setURLSearchParam` in @convex-dev/auth). Relative paths crash OAuth callback.
+ */
+export function resolvePostAuthRedirect(
+  redirectTo: string | undefined | null
+): string {
+  const path = resolveAppPath(redirectTo)
+  const allowedOrigins = allowedSiteOrigins()
+
+  if (allowedOrigins.length === 0) {
+    throw new Error(
+      'SITE_URL is not configured on the Convex deployment (set SITE_URL and optionally ALLOWED_SITE_URLS)'
+    )
+  }
+
+  if (redirectTo?.startsWith('http')) {
+    const requestOrigin = new URL(redirectTo).origin
+
+    if (allowedOrigins.includes(requestOrigin)) {
+      return `${requestOrigin}${path}`
+    }
+  }
+
+  const baseUrl = (process.env.SITE_URL ?? allowedOrigins[0]).replace(/\/$/, '')
+
+  return `${baseUrl}${path}`
+}
 
 function siteOrigin(siteUrl: string): string {
   return new URL(siteUrl.includes('://') ? siteUrl : `https://${siteUrl}`)
@@ -33,6 +66,10 @@ function allowedSiteOrigins(): Array<string> {
 }
 
 function normalizeAppPathname(pathname: string): string {
+  if (pathname.startsWith('/invite/')) {
+    return pathname
+  }
+
   if (
     pathname === '/kibble' ||
     pathname === '/pawket' ||
@@ -76,35 +113,3 @@ function resolveAppPath(redirectTo: string | undefined | null): string {
   const query = safe.includes('?') ? safe.slice(safe.indexOf('?')) : ''
   return `${normalized}${query}`
 }
-
-/**
- * Convex Auth `callbacks.redirect` must return an absolute URL (see
- * `setURLSearchParam` in @convex-dev/auth). Relative paths crash OAuth callback.
- */
-export function resolvePostAuthRedirect(
-  redirectTo: string | undefined | null
-): string {
-  const path = resolveAppPath(redirectTo)
-  const allowedOrigins = allowedSiteOrigins()
-
-  if (allowedOrigins.length === 0) {
-    throw new Error(
-      'SITE_URL is not configured on the Convex deployment (set SITE_URL and optionally ALLOWED_SITE_URLS)'
-    )
-  }
-
-  if (redirectTo?.startsWith('http')) {
-    const requestOrigin = new URL(redirectTo).origin
-
-    if (allowedOrigins.includes(requestOrigin)) {
-      return `${requestOrigin}${path}`
-    }
-  }
-
-  const baseUrl = (process.env.SITE_URL ?? allowedOrigins[0]).replace(/\/$/, '')
-
-  return `${baseUrl}${path}`
-}
-
-/** @deprecated Use {@link resolvePostAuthRedirect}. */
-export const resolveStudentAppRedirect = resolvePostAuthRedirect

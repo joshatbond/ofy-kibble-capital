@@ -1,66 +1,59 @@
 import { authTables } from '@convex-dev/auth/server'
 import { defineSchema, defineTable } from 'convex/server'
-import { v } from 'convex/values'
 
-import { settingsTableFields } from './lib/settingsValues'
-import { siteSlugValidator } from './lib/siteSlug'
-import { studentAppValidator } from './lib/studentApp'
-import { userFields } from './lib/userFields'
+import {
+  authSessionsTableFields,
+  bankAccountsTableFields,
+  classSettingsTableFields,
+  classroomsTableFields,
+  regionSettingsTableFields,
+  regionsTableFields,
+  rosterStudentsTableFields,
+  schoolSiteSettingsTableFields,
+  schoolSitesTableFields,
+  studentOAuthIntentsTableFields,
+  usersTableFields,
+} from './schema/schemaFields'
 
 export default defineSchema({
   ...authTables,
-  users: defineTable(userFields)
+  users: defineTable(usersTableFields)
     .index('email', ['email'])
     .index('phone', ['phone'])
     .index('is_active', ['inactiveDate']),
-  regions: defineTable({
-    /** Short code, e.g. `ofysb`. */
-    slug: v.string(),
-    name: v.string(),
-  }).index('by_slug', ['slug']),
-  schoolSites: defineTable({
-    siteSlug: siteSlugValidator,
-    regionId: v.id('regions'),
-    name: v.string(),
-  })
+  regions: defineTable(regionsTableFields).index('by_slug', ['slug']),
+  schoolSites: defineTable(schoolSitesTableFields)
     .index('by_siteSlug', ['siteSlug'])
     .index('by_regionId', ['regionId']),
-  /** Links a tenants classroom organization to operator catalog site slug. */
-  classrooms: defineTable({
-    organizationId: v.string(),
-    siteSlug: siteSlugValidator,
-    name: v.string(),
-    orgSlug: v.string(),
-  })
+  classrooms: defineTable(classroomsTableFields)
     .index('by_organizationId', ['organizationId'])
     .index('by_siteSlug', ['siteSlug'])
     .index('by_orgSlug', ['orgSlug']),
-  regionSettings: defineTable({
-    regionId: v.id('regions'),
-    ...settingsTableFields,
-  }).index('by_regionId', ['regionId']),
-  schoolSiteSettings: defineTable({
-    schoolSiteId: v.id('schoolSites'),
-    ...settingsTableFields,
-  }).index('by_schoolSiteId', ['schoolSiteId']),
-  /** Snapshot of effective settings at classroom create (editable by teachers later). */
-  classSettings: defineTable({
-    organizationId: v.string(),
-    classroomId: v.id('classrooms'),
-    ...settingsTableFields,
-  }).index('by_organizationId', ['organizationId']),
-  authSessions: defineTable({
-    userId: v.id('users'),
-    expirationTime: v.number(),
-    /** Which student app this session was opened from (set at OAuth sign-in). */
-    studentApp: v.optional(studentAppValidator),
-  }).index('userId', ['userId']),
-  studentOAuthIntents: defineTable({
-    verifierId: v.id('authVerifiers'),
-    studentApp: studentAppValidator,
-    expirationTime: v.number(),
-  }).index('by_verifier', ['verifierId']),
-  numbers: defineTable({
-    value: v.number(),
-  }),
+  regionSettings: defineTable(regionSettingsTableFields).index('by_regionId', [
+    'regionId',
+  ]),
+  schoolSiteSettings: defineTable(schoolSiteSettingsTableFields).index(
+    'by_schoolSiteId',
+    ['schoolSiteId']
+  ),
+  classSettings: defineTable(classSettingsTableFields).index(
+    'by_organizationId',
+    ['organizationId']
+  ),
+  authSessions: defineTable(authSessionsTableFields).index('userId', [
+    'userId',
+  ]),
+  studentOAuthIntents: defineTable(studentOAuthIntentsTableFields).index(
+    'by_verifier',
+    ['verifierId']
+  ),
+  rosterStudents: defineTable(rosterStudentsTableFields)
+    .index('by_organizationId', ['organizationId'])
+    .index('by_invitationId', ['invitationId'])
+    .index('by_org_payToken', ['organizationId', 'payToken'])
+    .index('by_org_externalStudentId', ['organizationId', 'externalStudentId'])
+    .index('by_userId', ['userId']),
+  bankAccounts: defineTable(bankAccountsTableFields)
+    .index('by_rosterStudent_kind', ['rosterStudentId', 'kind'])
+    .index('by_organizationId', ['organizationId']),
 })

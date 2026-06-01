@@ -10,8 +10,8 @@
  */
 import { makeTenantsAPI as makeTenantsAPIBase } from '@djpanda/convex-tenants'
 
-import type { Id } from '../_generated/dataModel'
-import type { MutationCtx, QueryCtx } from '../_generated/server'
+import type { Id } from '../../_generated/dataModel'
+import type { MutationCtx, QueryCtx } from '../../_generated/server'
 import type { ComponentApi } from '@djpanda/convex-tenants'
 import type { Auth } from 'convex/server'
 

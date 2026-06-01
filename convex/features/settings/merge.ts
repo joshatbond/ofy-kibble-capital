@@ -1,4 +1,4 @@
-import type { SettingsValues } from './settingsValues'
+import type { SettingsValues } from './values'
 
 /** Merge settings stack: region → school site → classroom (classroom wins). */
 export function mergeSettingsLayers(

@@ -9,28 +9,32 @@
  */
 
 import type * as auth from "../auth.js";
-import type * as authz from "../authz.js";
+import type * as features_auth_authz from "../features/auth/authz.js";
+import type * as features_auth_redirect from "../features/auth/redirect.js";
+import type * as features_auth_studentApp from "../features/auth/studentApp.js";
+import type * as features_auth_studentAuth from "../features/auth/studentAuth.js";
+import type * as features_catalog_siteSlug from "../features/catalog/siteSlug.js";
+import type * as features_invitations from "../features/invitations.js";
+import type * as features_invitations_payToken from "../features/invitations/payToken.js";
+import type * as features_invitations_policy from "../features/invitations/policy.js";
+import type * as features_organizations from "../features/organizations.js";
+import type * as features_roster_roster from "../features/roster/roster.js";
+import type * as features_roster_status from "../features/roster/status.js";
+import type * as features_settings from "../features/settings.js";
+import type * as features_settings_defaults from "../features/settings/defaults.js";
+import type * as features_settings_effectiveSettings from "../features/settings/effectiveSettings.js";
+import type * as features_settings_merge from "../features/settings/merge.js";
+import type * as features_settings_values from "../features/settings/values.js";
+import type * as features_tenants from "../features/tenants.js";
+import type * as features_tenants_makeTenantsAPI from "../features/tenants/makeTenantsAPI.js";
+import type * as features_tenants_roles from "../features/tenants/roles.js";
+import type * as features_users from "../features/users.js";
 import type * as http from "../http.js";
-import type * as lib_authRedirect from "../lib/authRedirect.js";
-import type * as lib_catalogSeed from "../lib/catalogSeed.js";
-import type * as lib_catalogSeedData from "../lib/catalogSeedData.js";
-import type * as lib_effectiveSettings from "../lib/effectiveSettings.js";
-import type * as lib_effectiveSettingsMerge from "../lib/effectiveSettingsMerge.js";
-import type * as lib_makeTenantsAPI from "../lib/makeTenantsAPI.js";
-import type * as lib_roles from "../lib/roles.js";
-import type * as lib_settingsCatalogSeed from "../lib/settingsCatalogSeed.js";
-import type * as lib_settingsDefaults from "../lib/settingsDefaults.js";
-import type * as lib_settingsValues from "../lib/settingsValues.js";
-import type * as lib_siteSlug from "../lib/siteSlug.js";
-import type * as lib_studentApp from "../lib/studentApp.js";
-import type * as lib_userFields from "../lib/userFields.js";
-import type * as myFunctions from "../myFunctions.js";
-import type * as organizations from "../organizations.js";
-import type * as seed from "../seed.js";
-import type * as settings from "../settings.js";
-import type * as studentAuth from "../studentAuth.js";
-import type * as tenants from "../tenants.js";
-import type * as users from "../users.js";
+import type * as schema_schemaFields from "../schema/schemaFields.js";
+import type * as seed_catalog from "../seed/catalog.js";
+import type * as seed_catalogData from "../seed/catalogData.js";
+import type * as seed_catalogSettings from "../seed/catalogSettings.js";
+import type * as seed_index from "../seed/index.js";
 
 import type {
   ApiFromModules,
@@ -40,28 +44,32 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
-  authz: typeof authz;
+  "features/auth/authz": typeof features_auth_authz;
+  "features/auth/redirect": typeof features_auth_redirect;
+  "features/auth/studentApp": typeof features_auth_studentApp;
+  "features/auth/studentAuth": typeof features_auth_studentAuth;
+  "features/catalog/siteSlug": typeof features_catalog_siteSlug;
+  "features/invitations": typeof features_invitations;
+  "features/invitations/payToken": typeof features_invitations_payToken;
+  "features/invitations/policy": typeof features_invitations_policy;
+  "features/organizations": typeof features_organizations;
+  "features/roster/roster": typeof features_roster_roster;
+  "features/roster/status": typeof features_roster_status;
+  "features/settings": typeof features_settings;
+  "features/settings/defaults": typeof features_settings_defaults;
+  "features/settings/effectiveSettings": typeof features_settings_effectiveSettings;
+  "features/settings/merge": typeof features_settings_merge;
+  "features/settings/values": typeof features_settings_values;
+  "features/tenants": typeof features_tenants;
+  "features/tenants/makeTenantsAPI": typeof features_tenants_makeTenantsAPI;
+  "features/tenants/roles": typeof features_tenants_roles;
+  "features/users": typeof features_users;
   http: typeof http;
-  "lib/authRedirect": typeof lib_authRedirect;
-  "lib/catalogSeed": typeof lib_catalogSeed;
-  "lib/catalogSeedData": typeof lib_catalogSeedData;
-  "lib/effectiveSettings": typeof lib_effectiveSettings;
-  "lib/effectiveSettingsMerge": typeof lib_effectiveSettingsMerge;
-  "lib/makeTenantsAPI": typeof lib_makeTenantsAPI;
-  "lib/roles": typeof lib_roles;
-  "lib/settingsCatalogSeed": typeof lib_settingsCatalogSeed;
-  "lib/settingsDefaults": typeof lib_settingsDefaults;
-  "lib/settingsValues": typeof lib_settingsValues;
-  "lib/siteSlug": typeof lib_siteSlug;
-  "lib/studentApp": typeof lib_studentApp;
-  "lib/userFields": typeof lib_userFields;
-  myFunctions: typeof myFunctions;
-  organizations: typeof organizations;
-  seed: typeof seed;
-  settings: typeof settings;
-  studentAuth: typeof studentAuth;
-  tenants: typeof tenants;
-  users: typeof users;
+  "schema/schemaFields": typeof schema_schemaFields;
+  "seed/catalog": typeof seed_catalog;
+  "seed/catalogData": typeof seed_catalogData;
+  "seed/catalogSettings": typeof seed_catalogSettings;
+  "seed/index": typeof seed_index;
 }>;
 
 /**

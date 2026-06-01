@@ -2,9 +2,10 @@ import { getAuthUserId } from '@convex-dev/auth/server'
 import { orgScope } from '@djpanda/convex-tenants'
 import { v } from 'convex/values'
 
-import { components } from './_generated/api'
-import { mutation } from './_generated/server'
-import { authz } from './authz'
+import { components } from '../_generated/api'
+import { mutation } from '../_generated/server'
+
+import { authz } from './auth/authz'
 
 /**
  * Create a classroom organization. Disabled for teachers in v1 — only users

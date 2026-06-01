@@ -1,30 +1,34 @@
 import { orgScope } from '@djpanda/convex-tenants'
 
 import { components } from '../_generated/api'
-import { authz } from '../authz'
+import { authz } from '../features/auth/authz'
+import { regionSlugFromSiteSlug } from '../features/catalog/siteSlug'
+import { ensureClassSettingsSnapshot } from '../features/settings/effectiveSettings'
 
 import {
-  SEED_OPERATOR_EMAIL,
+  OPERATOR_EMAIL,
   V1_DEV_CLASSROOM,
   V1_REGION,
   V1_SCHOOL_SITES,
-} from './catalogSeedData'
-import { ensureClassSettingsSnapshot } from './effectiveSettings'
+} from './catalogData'
 import {
   ensureRegionSettings,
   ensureSchoolSiteSettings,
-} from './settingsCatalogSeed'
-import { regionSlugFromSiteSlug } from './siteSlug'
+} from './catalogSettings'
 
 import type { Id } from '../_generated/dataModel'
 import type { MutationCtx } from '../_generated/server'
 
-export async function ensureSeedOperatorUser(
+/**
+ * Bootstrap operator user with `canCreateOrganization` for tenant org creation.
+ * Idempotent — keyed by {@link OPERATOR_EMAIL}.
+ */
+export async function ensureOperatorUser(
   ctx: MutationCtx
 ): Promise<Id<'users'>> {
   const existing = await ctx.db
     .query('users')
-    .withIndex('email', q => q.eq('email', SEED_OPERATOR_EMAIL))
+    .withIndex('email', q => q.eq('email', OPERATOR_EMAIL))
     .unique()
 
   if (existing) {
@@ -32,12 +36,16 @@ export async function ensureSeedOperatorUser(
   }
 
   return await ctx.db.insert('users', {
-    email: SEED_OPERATOR_EMAIL,
+    email: OPERATOR_EMAIL,
     name: 'Seed operator',
     canCreateOrganization: true,
   })
 }
 
+/**
+ * Insert a catalog region by slug if missing.
+ * Idempotent — returns the existing `regions` row when present.
+ */
 export async function ensureRegion(
   ctx: MutationCtx,
   slug: string,
@@ -55,6 +63,10 @@ export async function ensureRegion(
   return await ctx.db.insert('regions', { slug, name })
 }
 
+/**
+ * Insert a school site under a region if missing.
+ * Idempotent — returns the existing `schoolSites` row when present.
+ */
 export async function ensureSchoolSite(
   ctx: MutationCtx,
   siteSlug: string,
@@ -73,6 +85,10 @@ export async function ensureSchoolSite(
   return await ctx.db.insert('schoolSites', { siteSlug, name, regionId })
 }
 
+/**
+ * Create the v1 dev classroom tenant + `classrooms` link (or refresh class settings).
+ * Idempotent — keyed by {@link V1_DEV_CLASSROOM.orgSlug}.
+ */
 export async function ensureDevClassroom(
   ctx: MutationCtx,
   operatorUserId: Id<'users'>
@@ -143,8 +159,12 @@ export async function ensureDevClassroom(
   return { organizationId, classroomId }
 }
 
-export async function seedV1CatalogData(ctx: MutationCtx) {
-  const operatorUserId = await ensureSeedOperatorUser(ctx)
+/**
+ * Idempotent v1 operator catalog: region, school sites, settings stack, dev classroom.
+ * Called from `seed/index.ts` (`seed/index:seedV1Catalog`).
+ */
+export async function applyV1Catalog(ctx: MutationCtx) {
+  const operatorUserId = await ensureOperatorUser(ctx)
 
   const regionId = await ensureRegion(ctx, V1_REGION.slug, V1_REGION.name)
   await ensureRegionSettings(ctx, regionId)

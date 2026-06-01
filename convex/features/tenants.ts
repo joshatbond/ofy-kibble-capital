@@ -1,12 +1,21 @@
 import { getAuthUserId } from '@convex-dev/auth/server'
 
-import { components } from './_generated/api'
-import { authz } from './authz'
+import { components } from '../_generated/api'
+
+import { authz } from './auth/authz'
+import {
+  INVITATION_TTL_MS,
+  assertOfyOrgEmail,
+  emailsMatch,
+  normalizeInviteEmail,
+} from './invitations/policy'
+import { activateRosterStudent, getRosterByInvitationId } from './roster/roster'
 import {
   defineTenantsApiOptions,
   makeTypedTenantsAPI,
-} from './lib/makeTenantsAPI'
+} from './tenants/makeTenantsAPI'
 
+import type { Id } from '../_generated/dataModel'
 import type { Member } from '@djpanda/convex-tenants'
 
 const tenantsAPI = makeTypedTenantsAPI(
@@ -25,6 +34,60 @@ const tenantsAPI = makeTypedTenantsAPI(
             email: user.email ?? undefined,
           }
         : null
+    },
+
+    defaultInvitationExpiration: INVITATION_TTL_MS,
+
+    validateInvitationCreate: (_ctx, data) => {
+      try {
+        assertOfyOrgEmail(data.inviteeIdentifier)
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : 'Invalid invitation email.'
+        return Promise.resolve({ allowed: false as const, reason: message })
+      }
+
+      return Promise.resolve({ allowed: true as const })
+    },
+
+    validateInvitationAccept: async (ctx, data) => {
+      if (
+        !emailsMatch(
+          data.invitation.inviteeIdentifier,
+          data.acceptingUserIdentifier
+        )
+      ) {
+        return {
+          allowed: false,
+          reason: `Sign in with ${normalizeInviteEmail(data.invitation.inviteeIdentifier)} to accept this invitation.`,
+        }
+      }
+
+      const user = await ctx.db.get('users', data.acceptingUserId)
+      if (
+        user?.email !== undefined &&
+        !emailsMatch(user.email, data.acceptingUserIdentifier)
+      ) {
+        return {
+          allowed: false,
+          reason: 'Signed-in account does not match this invitation.',
+        }
+      }
+
+      return { allowed: true }
+    },
+
+    onInvitationAccepted: async (ctx, data) => {
+      if (data.role !== 'student') {
+        return
+      }
+
+      const roster = await getRosterByInvitationId(ctx, data.invitationId)
+      if (roster === null) {
+        return
+      }
+
+      await activateRosterStudent(ctx, roster._id, data.userId as Id<'users'>)
     },
 
     onBeforeUpdateMemberRole: async (ctx, { organizationId, memberUserId }) => {

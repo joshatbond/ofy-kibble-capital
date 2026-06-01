@@ -1,6 +1,6 @@
 import { getAuthUserId } from '@convex-dev/auth/server'
 
-import { query } from './_generated/server'
+import { query } from '../_generated/server'
 
 /** Current signed-in user id, or null when unauthenticated. */
 export const viewer = query({

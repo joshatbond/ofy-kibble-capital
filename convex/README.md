@@ -19,7 +19,7 @@ Development deployments need the **Region**, **School site**, and sample **Class
 From the repo root (Convex dev deployment linked):
 
 ```bash
-bunx convex run seed:seedV1Catalog
+bunx convex run seed/index:seedV1Catalog
 ```
 
 This is **idempotent**: safe to run again; it skips rows that already exist.
@@ -36,13 +36,33 @@ Classroom organizations are **not** teacher self-serve in v1. Teachers join via 
 
 The seed also writes **settings stack** defaults (`regionSettings`, `schoolSiteSettings`) and a **classSettings** snapshot for the dev classroom.
 
+### Link your Google account to the dev classroom
+
+**Region / school site rows are catalog only** — they do not grant admin access. Teacher admin checks **classroom org membership** in the tenants component (`owner`, `admin`, or `teacher` on `dev-classroom-ofysb-mv`), plus a matching authz role.
+
+1. Run the catalog seed (above).
+2. Sign in once at `/admin/landing` with your `@ofy.org` Google account (creates your `users` row).
+3. Link yourself to the dev classroom:
+
+```bash
+bunx convex run seed/index:linkDevTeacherByEmail '{"email":"you@ofy.org"}'
+```
+
+Optional role (default `owner`): `"role":"teacher"`.
+
+**Manual dashboard path** (if you prefer): after step 2, note your `users._id` and the dev classroom’s `organizationId` from the `classrooms` row (`orgSlug` `dev-classroom-ofysb-mv`). In the Convex dashboard, add **both**:
+
+- **tenants** component → `members` — `userId` = your user id, `organizationId` = dev org id, `role` = `owner` (or `admin` / `teacher`)
+- **authz** component — role assignment for the same user, org scope, and role (the CLI helper above does both)
+
+Do **not** expect a row in `regions` alone to unlock `/admin/`.
+
 ### Effective settings (dev)
 
 After seeding, inspect merged settings for the dev classroom org (use the `organizationId` from seed output):
 
 ```bash
-bunx convex run settings:effectiveSettingsForOrganizationInternal \
-  --args '{"organizationId": "<org id>"}'
+bunx convex run settings:effectiveSettingsForOrganizationInternal '{"organizationId":"<org id>"}'
 ```
 
 Or call `settings:effectiveSettingsForOrganization` from the Convex dashboard / client.
