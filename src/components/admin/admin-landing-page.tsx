@@ -2,7 +2,10 @@ import { Link } from '@tanstack/react-router'
 
 import { TeacherSignInButton } from '~/components/auth/teacher-sign-in-button'
 
-export function AdminLandingPage(props: { returnTo?: string }) {
+export function AdminLandingPage(props: {
+  returnTo?: string
+  accessDenied?: boolean
+}) {
   return (
     <div className="bg-background text-foreground flex min-h-dvh flex-col">
       <header className="border-ink shadow-brutal border-b-2 px-4 py-4 md:px-12">
@@ -21,6 +24,13 @@ export function AdminLandingPage(props: { returnTo?: string }) {
             Sign in with the Google account your school invited. Payroll inputs,
             invitations, and store tools live here — not in the student apps.
           </p>
+
+          {props.accessDenied ? (
+            <p className="text-destructive mt-3 text-sm font-medium">
+              This Google account is not linked to a teacher classroom yet.
+              Accept a teacher invitation or use a student app instead.
+            </p>
+          ) : null}
         </div>
 
         <TeacherSignInButton

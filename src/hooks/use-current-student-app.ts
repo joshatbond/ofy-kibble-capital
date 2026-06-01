@@ -23,7 +23,7 @@ export function useCurrentStudentApp(): {
 } {
   const { isAuthenticated, isLoading: authLoading } = useConvexAuth()
   const studentApp = useQuery(
-    api.studentAuth.currentStudentApp,
+    api.features.auth.studentAuth.currentStudentApp,
     isAuthenticated ? {} : 'skip'
   )
 

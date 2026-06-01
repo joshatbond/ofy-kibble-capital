@@ -17,7 +17,7 @@ export function useTeacherAccess(): {
 } {
   const { isAuthenticated, isLoading: authLoading } = useConvexAuth()
   const orgs = useQuery(
-    api.tenants.listOrganizations,
+    api.features.tenants.listOrganizations,
     isAuthenticated ? {} : 'skip'
   )
 

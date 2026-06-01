@@ -1,4 +1,4 @@
-/** Mirror of `convex/lib/roles.ts` — keep in sync for client route guards. */
+/** Mirror of `convex/features/tenants/roles.ts` — keep in sync for client route guards. */
 export const TEACHER_MEMBER_ROLES = ['owner', 'admin', 'teacher'] as const
 
 export function isTeacherMemberRole(role: string): boolean {

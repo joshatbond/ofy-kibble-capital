@@ -22,17 +22,17 @@ Resend **Email alert** + PWA push matrix; permission prompts on install.
 
 ### Event matrix
 
-| Event | Channel |
-|--------|---------|
-| **Payday notice** | Teacher: PWA + **Email alert** |
-| **Paycheck notification** | Student PawKet: PWA |
-| **PTO pending notification** | Teacher: PWA + email + admin UI |
-| **PTO decision notification** | Student Kibble: PWA +/or **In-app badge** (no icon badge) |
-| New **Posted paystub** | Student Kibble: **In-app badge** only |
-| **Peer transfer** received | Student PawKet: PWA |
-| **POS** purchase | Student PawKet: PWA |
-| **Recurring vault transfer** skipped | Student PawKet: in-app only |
-| **Transfer skipped notice** | (no push) |
+| Event                                | Channel                                                   |
+| ------------------------------------ | --------------------------------------------------------- |
+| **Payday notice**                    | Teacher: PWA + **Email alert**                            |
+| **Paycheck notification**            | Student PawKet: PWA                                       |
+| **PTO pending notification**         | Teacher: PWA + email + admin UI                           |
+| **PTO decision notification**        | Student Kibble: PWA +/or **In-app badge** (no icon badge) |
+| New **Posted paystub**               | Student Kibble: **In-app badge** only                     |
+| **Peer transfer** received           | Student PawKet: PWA                                       |
+| **POS** purchase                     | Student PawKet: PWA                                       |
+| **Recurring vault transfer** skipped | Student PawKet: in-app only                               |
+| **Transfer skipped notice**          | (no push)                                                 |
 
 ## Acceptance criteria
 

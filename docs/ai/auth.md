@@ -35,6 +35,7 @@ Do **not** port ms-engage’s domain-specific `afterUserCreatedOrUpdated` allowl
 
 ## Product-specific notes
 
+- **Google Workspace** — OAuth client is **Internal**; only `@ofy.org` accounts complete Google sign-in. **Accept** enforces invitee email match only (domain is implied by OAuth). **`assertOfyOrgEmail`** runs on invite create (`invitations.ts`, `tenants.validateInvitationCreate`) so teachers cannot invite off-domain addresses.
 - **Teacher admin** creates/manages classroom tenants and invitations.
 - **Students** access Kibble and/or PawKet only within their tenant after accept.
 - Store POS and payroll mutations must enforce teacher role (or finer scopes) server-side.
@@ -45,9 +46,9 @@ Do **not** port ms-engage’s domain-specific `afterUserCreatedOrUpdated` allowl
 - [x] `authTables` in `convex/schema.ts`
 - [x] Google OAuth in `convex/auth.ts` (`AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET` on deployment)
 - [x] `ConvexAuthProvider` in `src/router.tsx`
-- [x] Post-OAuth redirect: `signIn('google', { redirectTo: '/kibble' | '/pawket' })` + `callbacks.redirect` in `convex/auth.ts` / `convex/lib/authRedirect.ts`
+- [x] Post-OAuth redirect: `signIn('google', { redirectTo: '/kibble' | '/pawket' })` + `callbacks.redirect` in `convex/auth.ts` / `convex/features/auth/redirect.ts`
 - [x] Register tenants + authz components in `convex/convex.config.ts`
-- [ ] Invitation mutations/queries and `/invite/$invitationId` (or equivalent)
+- [x] Invitation mutations/queries and `/invite/$invitationId` (see `convex/invitations.ts`, `src/routes/invite/`)
 - [ ] `getAuthUserId` (and authz) on all public functions that touch user or classroom data
 
 ### Dual-surface redirect
@@ -56,7 +57,7 @@ Marketing sign-in uses `StudentSignInButton` with `app="kibble"` or `app="pawket
 
 ### Multi-host redirects (local / Netlify / production)
 
-Post-OAuth URLs are built in `convex/lib/authRedirect.ts`. The client sends an **absolute** `redirectTo` (`window.location.origin` + path). The server keeps that origin only if it is allowlisted on that Convex deployment.
+Post-OAuth URLs are built in `convex/features/auth/redirect.ts`. The client sends an **absolute** `redirectTo` (`window.location.origin` + path). The server keeps that origin only if it is allowlisted on that Convex deployment.
 
 This project uses **two Convex deployments** (Development + Production), not three. Map frontends like this:
 
