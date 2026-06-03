@@ -9,230 +9,38 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as PawketRouteRouteImport } from './routes/pawket/route'
-import { Route as KibbleRouteRouteImport } from './routes/kibble/route'
-import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as PawketIndexRouteImport } from './routes/pawket/index'
-import { Route as KibbleIndexRouteImport } from './routes/kibble/index'
-import { Route as AdminIndexRouteImport } from './routes/admin/index'
-import { Route as PawketLoadingRouteImport } from './routes/pawket/loading'
-import { Route as PawketLandingRouteImport } from './routes/pawket/landing'
-import { Route as KibbleLoadingRouteImport } from './routes/kibble/loading'
-import { Route as KibbleLandingRouteImport } from './routes/kibble/landing'
-import { Route as InviteInvitationIdRouteImport } from './routes/invite/$invitationId'
-import { Route as AdminLoadingRouteImport } from './routes/admin/loading'
-import { Route as AdminLandingRouteImport } from './routes/admin/landing'
-import { Route as InviteInvitationIdLoadingRouteImport } from './routes/invite/$invitationId/loading'
 
-const PawketRouteRoute = PawketRouteRouteImport.update({
-  id: '/pawket',
-  path: '/pawket',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const KibbleRouteRoute = KibbleRouteRouteImport.update({
-  id: '/kibble',
-  path: '/kibble',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminRouteRoute = AdminRouteRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PawketIndexRoute = PawketIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => PawketRouteRoute,
-} as any)
-const KibbleIndexRoute = KibbleIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => KibbleRouteRoute,
-} as any)
-const AdminIndexRoute = AdminIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
-const PawketLoadingRoute = PawketLoadingRouteImport.update({
-  id: '/loading',
-  path: '/loading',
-  getParentRoute: () => PawketRouteRoute,
-} as any)
-const PawketLandingRoute = PawketLandingRouteImport.update({
-  id: '/landing',
-  path: '/landing',
-  getParentRoute: () => PawketRouteRoute,
-} as any)
-const KibbleLoadingRoute = KibbleLoadingRouteImport.update({
-  id: '/loading',
-  path: '/loading',
-  getParentRoute: () => KibbleRouteRoute,
-} as any)
-const KibbleLandingRoute = KibbleLandingRouteImport.update({
-  id: '/landing',
-  path: '/landing',
-  getParentRoute: () => KibbleRouteRoute,
-} as any)
-const InviteInvitationIdRoute = InviteInvitationIdRouteImport.update({
-  id: '/invite/$invitationId',
-  path: '/invite/$invitationId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminLoadingRoute = AdminLoadingRouteImport.update({
-  id: '/loading',
-  path: '/loading',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
-const AdminLandingRoute = AdminLandingRouteImport.update({
-  id: '/landing',
-  path: '/landing',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
-const InviteInvitationIdLoadingRoute =
-  InviteInvitationIdLoadingRouteImport.update({
-    id: '/loading',
-    path: '/loading',
-    getParentRoute: () => InviteInvitationIdRoute,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRouteRouteWithChildren
-  '/kibble': typeof KibbleRouteRouteWithChildren
-  '/pawket': typeof PawketRouteRouteWithChildren
-  '/admin/landing': typeof AdminLandingRoute
-  '/admin/loading': typeof AdminLoadingRoute
-  '/invite/$invitationId': typeof InviteInvitationIdRouteWithChildren
-  '/kibble/landing': typeof KibbleLandingRoute
-  '/kibble/loading': typeof KibbleLoadingRoute
-  '/pawket/landing': typeof PawketLandingRoute
-  '/pawket/loading': typeof PawketLoadingRoute
-  '/admin/': typeof AdminIndexRoute
-  '/kibble/': typeof KibbleIndexRoute
-  '/pawket/': typeof PawketIndexRoute
-  '/invite/$invitationId/loading': typeof InviteInvitationIdLoadingRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/admin/landing': typeof AdminLandingRoute
-  '/admin/loading': typeof AdminLoadingRoute
-  '/invite/$invitationId': typeof InviteInvitationIdRouteWithChildren
-  '/kibble/landing': typeof KibbleLandingRoute
-  '/kibble/loading': typeof KibbleLoadingRoute
-  '/pawket/landing': typeof PawketLandingRoute
-  '/pawket/loading': typeof PawketLoadingRoute
-  '/admin': typeof AdminIndexRoute
-  '/kibble': typeof KibbleIndexRoute
-  '/pawket': typeof PawketIndexRoute
-  '/invite/$invitationId/loading': typeof InviteInvitationIdLoadingRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/admin': typeof AdminRouteRouteWithChildren
-  '/kibble': typeof KibbleRouteRouteWithChildren
-  '/pawket': typeof PawketRouteRouteWithChildren
-  '/admin/landing': typeof AdminLandingRoute
-  '/admin/loading': typeof AdminLoadingRoute
-  '/invite/$invitationId': typeof InviteInvitationIdRouteWithChildren
-  '/kibble/landing': typeof KibbleLandingRoute
-  '/kibble/loading': typeof KibbleLoadingRoute
-  '/pawket/landing': typeof PawketLandingRoute
-  '/pawket/loading': typeof PawketLoadingRoute
-  '/admin/': typeof AdminIndexRoute
-  '/kibble/': typeof KibbleIndexRoute
-  '/pawket/': typeof PawketIndexRoute
-  '/invite/$invitationId/loading': typeof InviteInvitationIdLoadingRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/admin'
-    | '/kibble'
-    | '/pawket'
-    | '/admin/landing'
-    | '/admin/loading'
-    | '/invite/$invitationId'
-    | '/kibble/landing'
-    | '/kibble/loading'
-    | '/pawket/landing'
-    | '/pawket/loading'
-    | '/admin/'
-    | '/kibble/'
-    | '/pawket/'
-    | '/invite/$invitationId/loading'
+  fullPaths: '/'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/admin/landing'
-    | '/admin/loading'
-    | '/invite/$invitationId'
-    | '/kibble/landing'
-    | '/kibble/loading'
-    | '/pawket/landing'
-    | '/pawket/loading'
-    | '/admin'
-    | '/kibble'
-    | '/pawket'
-    | '/invite/$invitationId/loading'
-  id:
-    | '__root__'
-    | '/'
-    | '/admin'
-    | '/kibble'
-    | '/pawket'
-    | '/admin/landing'
-    | '/admin/loading'
-    | '/invite/$invitationId'
-    | '/kibble/landing'
-    | '/kibble/loading'
-    | '/pawket/landing'
-    | '/pawket/loading'
-    | '/admin/'
-    | '/kibble/'
-    | '/pawket/'
-    | '/invite/$invitationId/loading'
+  to: '/'
+  id: '__root__' | '/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AdminRouteRoute: typeof AdminRouteRouteWithChildren
-  KibbleRouteRoute: typeof KibbleRouteRouteWithChildren
-  PawketRouteRoute: typeof PawketRouteRouteWithChildren
-  InviteInvitationIdRoute: typeof InviteInvitationIdRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/pawket': {
-      id: '/pawket'
-      path: '/pawket'
-      fullPath: '/pawket'
-      preLoaderRoute: typeof PawketRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/kibble': {
-      id: '/kibble'
-      path: '/kibble'
-      fullPath: '/kibble'
-      preLoaderRoute: typeof KibbleRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -240,151 +48,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/pawket/': {
-      id: '/pawket/'
-      path: '/'
-      fullPath: '/pawket/'
-      preLoaderRoute: typeof PawketIndexRouteImport
-      parentRoute: typeof PawketRouteRoute
-    }
-    '/kibble/': {
-      id: '/kibble/'
-      path: '/'
-      fullPath: '/kibble/'
-      preLoaderRoute: typeof KibbleIndexRouteImport
-      parentRoute: typeof KibbleRouteRoute
-    }
-    '/admin/': {
-      id: '/admin/'
-      path: '/'
-      fullPath: '/admin/'
-      preLoaderRoute: typeof AdminIndexRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    '/pawket/loading': {
-      id: '/pawket/loading'
-      path: '/loading'
-      fullPath: '/pawket/loading'
-      preLoaderRoute: typeof PawketLoadingRouteImport
-      parentRoute: typeof PawketRouteRoute
-    }
-    '/pawket/landing': {
-      id: '/pawket/landing'
-      path: '/landing'
-      fullPath: '/pawket/landing'
-      preLoaderRoute: typeof PawketLandingRouteImport
-      parentRoute: typeof PawketRouteRoute
-    }
-    '/kibble/loading': {
-      id: '/kibble/loading'
-      path: '/loading'
-      fullPath: '/kibble/loading'
-      preLoaderRoute: typeof KibbleLoadingRouteImport
-      parentRoute: typeof KibbleRouteRoute
-    }
-    '/kibble/landing': {
-      id: '/kibble/landing'
-      path: '/landing'
-      fullPath: '/kibble/landing'
-      preLoaderRoute: typeof KibbleLandingRouteImport
-      parentRoute: typeof KibbleRouteRoute
-    }
-    '/invite/$invitationId': {
-      id: '/invite/$invitationId'
-      path: '/invite/$invitationId'
-      fullPath: '/invite/$invitationId'
-      preLoaderRoute: typeof InviteInvitationIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/loading': {
-      id: '/admin/loading'
-      path: '/loading'
-      fullPath: '/admin/loading'
-      preLoaderRoute: typeof AdminLoadingRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    '/admin/landing': {
-      id: '/admin/landing'
-      path: '/landing'
-      fullPath: '/admin/landing'
-      preLoaderRoute: typeof AdminLandingRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    '/invite/$invitationId/loading': {
-      id: '/invite/$invitationId/loading'
-      path: '/loading'
-      fullPath: '/invite/$invitationId/loading'
-      preLoaderRoute: typeof InviteInvitationIdLoadingRouteImport
-      parentRoute: typeof InviteInvitationIdRoute
-    }
   }
 }
 
-interface AdminRouteRouteChildren {
-  AdminLandingRoute: typeof AdminLandingRoute
-  AdminLoadingRoute: typeof AdminLoadingRoute
-  AdminIndexRoute: typeof AdminIndexRoute
-}
-
-const AdminRouteRouteChildren: AdminRouteRouteChildren = {
-  AdminLandingRoute: AdminLandingRoute,
-  AdminLoadingRoute: AdminLoadingRoute,
-  AdminIndexRoute: AdminIndexRoute,
-}
-
-const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
-  AdminRouteRouteChildren,
-)
-
-interface KibbleRouteRouteChildren {
-  KibbleLandingRoute: typeof KibbleLandingRoute
-  KibbleLoadingRoute: typeof KibbleLoadingRoute
-  KibbleIndexRoute: typeof KibbleIndexRoute
-}
-
-const KibbleRouteRouteChildren: KibbleRouteRouteChildren = {
-  KibbleLandingRoute: KibbleLandingRoute,
-  KibbleLoadingRoute: KibbleLoadingRoute,
-  KibbleIndexRoute: KibbleIndexRoute,
-}
-
-const KibbleRouteRouteWithChildren = KibbleRouteRoute._addFileChildren(
-  KibbleRouteRouteChildren,
-)
-
-interface PawketRouteRouteChildren {
-  PawketLandingRoute: typeof PawketLandingRoute
-  PawketLoadingRoute: typeof PawketLoadingRoute
-  PawketIndexRoute: typeof PawketIndexRoute
-}
-
-const PawketRouteRouteChildren: PawketRouteRouteChildren = {
-  PawketLandingRoute: PawketLandingRoute,
-  PawketLoadingRoute: PawketLoadingRoute,
-  PawketIndexRoute: PawketIndexRoute,
-}
-
-const PawketRouteRouteWithChildren = PawketRouteRoute._addFileChildren(
-  PawketRouteRouteChildren,
-)
-
-interface InviteInvitationIdRouteChildren {
-  InviteInvitationIdLoadingRoute: typeof InviteInvitationIdLoadingRoute
-}
-
-const InviteInvitationIdRouteChildren: InviteInvitationIdRouteChildren = {
-  InviteInvitationIdLoadingRoute: InviteInvitationIdLoadingRoute,
-}
-
-const InviteInvitationIdRouteWithChildren =
-  InviteInvitationIdRoute._addFileChildren(InviteInvitationIdRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AdminRouteRoute: AdminRouteRouteWithChildren,
-  KibbleRouteRoute: KibbleRouteRouteWithChildren,
-  PawketRouteRoute: PawketRouteRouteWithChildren,
-  InviteInvitationIdRoute: InviteInvitationIdRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
