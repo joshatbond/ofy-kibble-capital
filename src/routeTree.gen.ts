@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as KibbleRouteRouteImport } from './routes/kibble/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PawketIndexRouteImport } from './routes/pawket/index'
 import { Route as KibbleIndexRouteImport } from './routes/kibble/index'
@@ -36,6 +37,11 @@ import { Route as PawketSavingsVaultsVaultIdIndexRouteImport } from './routes/pa
 import { Route as PawketSavingsVaultsVaultIdTransactionsIndexRouteImport } from './routes/pawket/savings/vaults/$vaultId/transactions/index'
 import { Route as PawketSavingsVaultsVaultIdTransactionsTransactionIdRouteImport } from './routes/pawket/savings/vaults/$vaultId/transactions/$transactionId'
 
+const KibbleRouteRoute = KibbleRouteRouteImport.update({
+  id: '/kibble',
+  path: '/kibble',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -47,9 +53,9 @@ const PawketIndexRoute = PawketIndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const KibbleIndexRoute = KibbleIndexRouteImport.update({
-  id: '/kibble/',
-  path: '/kibble/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => KibbleRouteRoute,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/admin/',
@@ -62,14 +68,14 @@ const PawketLandingRoute = PawketLandingRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const KibbleTimeRoute = KibbleTimeRouteImport.update({
-  id: '/kibble/time',
-  path: '/kibble/time',
-  getParentRoute: () => rootRouteImport,
+  id: '/time',
+  path: '/time',
+  getParentRoute: () => KibbleRouteRoute,
 } as any)
 const KibbleLandingRoute = KibbleLandingRouteImport.update({
-  id: '/kibble/landing',
-  path: '/kibble/landing',
-  getParentRoute: () => rootRouteImport,
+  id: '/landing',
+  path: '/landing',
+  getParentRoute: () => KibbleRouteRoute,
 } as any)
 const AdminLandingRoute = AdminLandingRouteImport.update({
   id: '/admin/landing',
@@ -92,14 +98,14 @@ const PawketCheckingIndexRoute = PawketCheckingIndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const KibblePayIndexRoute = KibblePayIndexRouteImport.update({
-  id: '/kibble/pay/',
-  path: '/kibble/pay/',
-  getParentRoute: () => rootRouteImport,
+  id: '/pay/',
+  path: '/pay/',
+  getParentRoute: () => KibbleRouteRoute,
 } as any)
 const KibbleAbsenceIndexRoute = KibbleAbsenceIndexRouteImport.update({
-  id: '/kibble/absence/',
-  path: '/kibble/absence/',
-  getParentRoute: () => rootRouteImport,
+  id: '/absence/',
+  path: '/absence/',
+  getParentRoute: () => KibbleRouteRoute,
 } as any)
 const AdminOrgIdIndexRoute = AdminOrgIdIndexRouteImport.update({
   id: '/admin/$orgId/',
@@ -125,14 +131,14 @@ const PawketCheckingTransactionIdRoute =
     getParentRoute: () => rootRouteImport,
   } as any)
 const KibblePayIdRoute = KibblePayIdRouteImport.update({
-  id: '/kibble/pay/$id',
-  path: '/kibble/pay/$id',
-  getParentRoute: () => rootRouteImport,
+  id: '/pay/$id',
+  path: '/pay/$id',
+  getParentRoute: () => KibbleRouteRoute,
 } as any)
 const KibbleAbsenceIdRoute = KibbleAbsenceIdRouteImport.update({
-  id: '/kibble/absence/$id',
-  path: '/kibble/absence/$id',
-  getParentRoute: () => rootRouteImport,
+  id: '/absence/$id',
+  path: '/absence/$id',
+  getParentRoute: () => KibbleRouteRoute,
 } as any)
 const PawketSavingsVaultsIndexRoute =
   PawketSavingsVaultsIndexRouteImport.update({
@@ -176,6 +182,7 @@ const PawketSavingsVaultsVaultIdTransactionsTransactionIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/kibble': typeof KibbleRouteRouteWithChildren
   '/admin/landing': typeof AdminLandingRoute
   '/kibble/landing': typeof KibbleLandingRoute
   '/kibble/time': typeof KibbleTimeRoute
@@ -233,6 +240,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/kibble': typeof KibbleRouteRouteWithChildren
   '/admin/landing': typeof AdminLandingRoute
   '/kibble/landing': typeof KibbleLandingRoute
   '/kibble/time': typeof KibbleTimeRoute
@@ -263,6 +271,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/kibble'
     | '/admin/landing'
     | '/kibble/landing'
     | '/kibble/time'
@@ -319,6 +328,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/kibble'
     | '/admin/landing'
     | '/kibble/landing'
     | '/kibble/time'
@@ -348,21 +358,15 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  KibbleRouteRoute: typeof KibbleRouteRouteWithChildren
   AdminLandingRoute: typeof AdminLandingRoute
-  KibbleLandingRoute: typeof KibbleLandingRoute
-  KibbleTimeRoute: typeof KibbleTimeRoute
   PawketLandingRoute: typeof PawketLandingRoute
   AdminIndexRoute: typeof AdminIndexRoute
-  KibbleIndexRoute: typeof KibbleIndexRoute
   PawketIndexRoute: typeof PawketIndexRoute
-  KibbleAbsenceIdRoute: typeof KibbleAbsenceIdRoute
-  KibblePayIdRoute: typeof KibblePayIdRoute
   PawketCheckingTransactionIdRoute: typeof PawketCheckingTransactionIdRoute
   PawketSavingsTransactionIdRoute: typeof PawketSavingsTransactionIdRoute
   PawketTransferTransactionIdRoute: typeof PawketTransferTransactionIdRoute
   AdminOrgIdIndexRoute: typeof AdminOrgIdIndexRoute
-  KibbleAbsenceIndexRoute: typeof KibbleAbsenceIndexRoute
-  KibblePayIndexRoute: typeof KibblePayIndexRoute
   PawketCheckingIndexRoute: typeof PawketCheckingIndexRoute
   PawketSavingsIndexRoute: typeof PawketSavingsIndexRoute
   PawketTransferIndexRoute: typeof PawketTransferIndexRoute
@@ -377,6 +381,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/kibble': {
+      id: '/kibble'
+      path: '/kibble'
+      fullPath: '/kibble'
+      preLoaderRoute: typeof KibbleRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -393,10 +404,10 @@ declare module '@tanstack/react-router' {
     }
     '/kibble/': {
       id: '/kibble/'
-      path: '/kibble'
+      path: '/'
       fullPath: '/kibble/'
       preLoaderRoute: typeof KibbleIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof KibbleRouteRoute
     }
     '/admin/': {
       id: '/admin/'
@@ -414,17 +425,17 @@ declare module '@tanstack/react-router' {
     }
     '/kibble/time': {
       id: '/kibble/time'
-      path: '/kibble/time'
+      path: '/time'
       fullPath: '/kibble/time'
       preLoaderRoute: typeof KibbleTimeRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof KibbleRouteRoute
     }
     '/kibble/landing': {
       id: '/kibble/landing'
-      path: '/kibble/landing'
+      path: '/landing'
       fullPath: '/kibble/landing'
       preLoaderRoute: typeof KibbleLandingRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof KibbleRouteRoute
     }
     '/admin/landing': {
       id: '/admin/landing'
@@ -456,17 +467,17 @@ declare module '@tanstack/react-router' {
     }
     '/kibble/pay/': {
       id: '/kibble/pay/'
-      path: '/kibble/pay'
+      path: '/pay'
       fullPath: '/kibble/pay/'
       preLoaderRoute: typeof KibblePayIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof KibbleRouteRoute
     }
     '/kibble/absence/': {
       id: '/kibble/absence/'
-      path: '/kibble/absence'
+      path: '/absence'
       fullPath: '/kibble/absence/'
       preLoaderRoute: typeof KibbleAbsenceIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof KibbleRouteRoute
     }
     '/admin/$orgId/': {
       id: '/admin/$orgId/'
@@ -498,17 +509,17 @@ declare module '@tanstack/react-router' {
     }
     '/kibble/pay/$id': {
       id: '/kibble/pay/$id'
-      path: '/kibble/pay/$id'
+      path: '/pay/$id'
       fullPath: '/kibble/pay/$id'
       preLoaderRoute: typeof KibblePayIdRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof KibbleRouteRoute
     }
     '/kibble/absence/$id': {
       id: '/kibble/absence/$id'
-      path: '/kibble/absence/$id'
+      path: '/absence/$id'
       fullPath: '/kibble/absence/$id'
       preLoaderRoute: typeof KibbleAbsenceIdRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof KibbleRouteRoute
     }
     '/pawket/savings/vaults/': {
       id: '/pawket/savings/vaults/'
@@ -562,23 +573,41 @@ declare module '@tanstack/react-router' {
   }
 }
 
-const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  AdminLandingRoute: AdminLandingRoute,
+interface KibbleRouteRouteChildren {
+  KibbleLandingRoute: typeof KibbleLandingRoute
+  KibbleTimeRoute: typeof KibbleTimeRoute
+  KibbleIndexRoute: typeof KibbleIndexRoute
+  KibbleAbsenceIdRoute: typeof KibbleAbsenceIdRoute
+  KibblePayIdRoute: typeof KibblePayIdRoute
+  KibbleAbsenceIndexRoute: typeof KibbleAbsenceIndexRoute
+  KibblePayIndexRoute: typeof KibblePayIndexRoute
+}
+
+const KibbleRouteRouteChildren: KibbleRouteRouteChildren = {
   KibbleLandingRoute: KibbleLandingRoute,
   KibbleTimeRoute: KibbleTimeRoute,
-  PawketLandingRoute: PawketLandingRoute,
-  AdminIndexRoute: AdminIndexRoute,
   KibbleIndexRoute: KibbleIndexRoute,
-  PawketIndexRoute: PawketIndexRoute,
   KibbleAbsenceIdRoute: KibbleAbsenceIdRoute,
   KibblePayIdRoute: KibblePayIdRoute,
+  KibbleAbsenceIndexRoute: KibbleAbsenceIndexRoute,
+  KibblePayIndexRoute: KibblePayIndexRoute,
+}
+
+const KibbleRouteRouteWithChildren = KibbleRouteRoute._addFileChildren(
+  KibbleRouteRouteChildren,
+)
+
+const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
+  KibbleRouteRoute: KibbleRouteRouteWithChildren,
+  AdminLandingRoute: AdminLandingRoute,
+  PawketLandingRoute: PawketLandingRoute,
+  AdminIndexRoute: AdminIndexRoute,
+  PawketIndexRoute: PawketIndexRoute,
   PawketCheckingTransactionIdRoute: PawketCheckingTransactionIdRoute,
   PawketSavingsTransactionIdRoute: PawketSavingsTransactionIdRoute,
   PawketTransferTransactionIdRoute: PawketTransferTransactionIdRoute,
   AdminOrgIdIndexRoute: AdminOrgIdIndexRoute,
-  KibbleAbsenceIndexRoute: KibbleAbsenceIndexRoute,
-  KibblePayIndexRoute: KibblePayIndexRoute,
   PawketCheckingIndexRoute: PawketCheckingIndexRoute,
   PawketSavingsIndexRoute: PawketSavingsIndexRoute,
   PawketTransferIndexRoute: PawketTransferIndexRoute,

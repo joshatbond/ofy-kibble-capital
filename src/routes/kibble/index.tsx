@@ -1,5 +1,7 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
 
+import { SignOutButton } from '~/components/auth/sign-out-button'
+
 export const Route = createFileRoute('/kibble/')({
   component: KibbleIndexPage,
 })
@@ -14,7 +16,7 @@ function KibbleIndexPage() {
       <nav>
         <ul>
           <li>
-            <Link to="/kibble/landing">Sign out</Link>
+            <SignOutButton landingTo="/kibble/landing" />
           </li>
 
           <li>

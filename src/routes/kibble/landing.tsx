@@ -1,4 +1,6 @@
-import { Link, createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
+
+import { StudentSignInButton } from '~/components/auth/student-sign-in-button'
 
 export const Route = createFileRoute('/kibble/landing')({
   component: KibbleLandingPage,
@@ -14,7 +16,7 @@ function KibbleLandingPage() {
       <nav>
         <ul>
           <li>
-            <Link to="/kibble">Sign in</Link>
+            <StudentSignInButton app="kibble" />
           </li>
         </ul>
       </nav>
