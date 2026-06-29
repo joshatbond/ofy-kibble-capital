@@ -4,6 +4,7 @@ import { useMutation, useQuery } from 'convex/react'
 import { useEffect, useState } from 'react'
 
 import { KibbleLoadingScreen } from '~/components/loading/kibble-loader'
+import { Case, SwitchOn } from '~/components/switch-on'
 import { studentAppHomePath } from '~/lib/auth-redirect'
 import type { StudentApp } from '~/lib/auth-redirect'
 
@@ -30,27 +31,34 @@ function AuthGateWithConvex(props: { app: StudentApp; landingPath: string }) {
   )
   const [intentApplied, intentAppliedAssign] = useState(false)
 
+  const homePath = studentAppHomePath(props.app)
   const isLanding = pathname === props.landingPath
   const authPending = isLoading || viewer === undefined
   const isAuthed = isAuthenticated && viewer !== null
 
   useEffect(() => {
-    if (isLanding) return
     if (authPending) {
       phaseAssign('checking')
       return
     }
-    if (!isAuthed) {
+
+    if (isLanding && isAuthenticated) {
+      void navigate({ to: homePath, replace: true })
+      return
+    }
+
+    if (!isLanding && !isAuthenticated) {
       void navigate({ to: props.landingPath, replace: true })
       return
     }
+
     if (intentApplied) {
       phaseAssign('completing')
       return
     }
 
     void applyStudentApp({
-      fallbackPathname: studentAppHomePath(props.app),
+      fallbackPathname: homePath,
     }).then(() => {
       intentAppliedAssign(true)
       phaseAssign('completing')
@@ -58,17 +66,15 @@ function AuthGateWithConvex(props: { app: StudentApp; landingPath: string }) {
   }, [
     applyStudentApp,
     authPending,
+    homePath,
     intentApplied,
-    isAuthed,
+    isAuthenticated,
     isLanding,
     navigate,
-    props.app,
     props.landingPath,
   ])
 
-  if (isLanding || phase === 'ready') return <Outlet />
-
-  const isRedirecting = !isAuthed && !authPending
+  const isRedirecting = !isAuthenticated && !authPending
   const loaderLabel = isRedirecting
     ? 'Redirecting…'
     : authPending
@@ -78,11 +84,32 @@ function AuthGateWithConvex(props: { app: StudentApp; landingPath: string }) {
     !isRedirecting && phase === 'completing' && isAuthed && intentApplied
 
   return (
-    <KibbleLoadingScreen
-      label={loaderLabel}
-      isReady={loaderReady}
-      onComplete={() => phaseAssign('ready')}
-      fullScreen
-    />
+    <SwitchOn>
+      <Case predicate={isLanding && (authPending || isAuthenticated)}>
+        <KibbleLoadingScreen
+          label={isAuthenticated ? 'Redirecting…' : 'Loading…'}
+          isReady={false}
+          onComplete={() => {}}
+          fullScreen
+        />
+      </Case>
+
+      <Case predicate={isLanding}>
+        <Outlet />
+      </Case>
+
+      <Case predicate={phase === 'ready'}>
+        <Outlet />
+      </Case>
+
+      <Case>
+        <KibbleLoadingScreen
+          label={loaderLabel}
+          isReady={loaderReady}
+          onComplete={() => phaseAssign('ready')}
+          fullScreen
+        />
+      </Case>
+    </SwitchOn>
   )
 }
