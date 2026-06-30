@@ -1,4 +1,6 @@
-import { Link, createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
+
+import { StudentLandingSignIn } from '~/components/auth/student-landing-sign-in'
 
 export const Route = createFileRoute('/pawket/landing')({
   component: PawketLandingPage,
@@ -12,11 +14,7 @@ function PawketLandingPage() {
       <p>Unauthenticated marketing page (stub).</p>
 
       <nav>
-        <ul>
-          <li>
-            <Link to="/pawket">Sign in</Link>
-          </li>
-        </ul>
+        <StudentLandingSignIn app="pawket" />
       </nav>
     </main>
   )

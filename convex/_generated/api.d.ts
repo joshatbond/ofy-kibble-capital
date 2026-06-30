@@ -9,10 +9,15 @@
  */
 
 import type * as auth from "../auth.js";
+import type * as features_admin_context from "../features/admin/context.js";
 import type * as features_auth_authz from "../features/auth/authz.js";
+import type * as features_auth_devOnly from "../features/auth/devOnly.js";
+import type * as features_auth_devPassword from "../features/auth/devPassword.js";
+import type * as features_auth_devPasswordProvider from "../features/auth/devPasswordProvider.js";
 import type * as features_auth_redirect from "../features/auth/redirect.js";
 import type * as features_auth_studentApp from "../features/auth/studentApp.js";
 import type * as features_auth_studentAuth from "../features/auth/studentAuth.js";
+import type * as features_auth_teacher from "../features/auth/teacher.js";
 import type * as features_catalog_siteSlug from "../features/catalog/siteSlug.js";
 import type * as features_invitations from "../features/invitations.js";
 import type * as features_invitations_payToken from "../features/invitations/payToken.js";
@@ -44,10 +49,15 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
+  "features/admin/context": typeof features_admin_context;
   "features/auth/authz": typeof features_auth_authz;
+  "features/auth/devOnly": typeof features_auth_devOnly;
+  "features/auth/devPassword": typeof features_auth_devPassword;
+  "features/auth/devPasswordProvider": typeof features_auth_devPasswordProvider;
   "features/auth/redirect": typeof features_auth_redirect;
   "features/auth/studentApp": typeof features_auth_studentApp;
   "features/auth/studentAuth": typeof features_auth_studentAuth;
+  "features/auth/teacher": typeof features_auth_teacher;
   "features/catalog/siteSlug": typeof features_catalog_siteSlug;
   "features/invitations": typeof features_invitations;
   "features/invitations/payToken": typeof features_invitations_payToken;

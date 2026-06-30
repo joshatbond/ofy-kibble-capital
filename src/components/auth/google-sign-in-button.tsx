@@ -1,11 +1,8 @@
 import { useAuthActions } from '@convex-dev/auth/react'
 import { useState } from 'react'
 
-import { studentAppRedirectTo } from '~/lib/auth-redirect'
-import type { StudentApp } from '~/lib/auth-redirect'
-
-export function StudentSignInButton(props: {
-  app: StudentApp
+export function GoogleSignInButton(props: {
+  redirectTo: string
   className?: string
 }) {
   const { signIn } = useAuthActions()
@@ -27,7 +24,7 @@ export function StudentSignInButton(props: {
 
     try {
       await signIn('google', {
-        redirectTo: studentAppRedirectTo(props.app),
+        redirectTo: props.redirectTo,
       })
     } finally {
       setPending(false)

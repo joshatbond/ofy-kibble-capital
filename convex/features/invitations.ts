@@ -1,12 +1,11 @@
 import { getAuthUserId } from '@convex-dev/auth/server'
-import { orgScope } from '@djpanda/convex-tenants'
 import { v } from 'convex/values'
 
 import { api, components } from '../_generated/api'
 import { mutation, query } from '../_generated/server'
 import { grade } from '../schema/schemaFields'
 
-import { authz } from './auth/authz'
+import { requireTeacherForOrg } from './auth/teacher'
 import { generatePayToken } from './invitations/payToken'
 import {
   assertOfyOrgEmail,
@@ -432,14 +431,6 @@ export const listClassroomRoster = query({
     return rows
   },
 })
-async function requireTeacherForOrg(
-  ctx: Parameters<typeof authz.require>[0],
-  userId: string,
-  organizationId: string,
-  permission: string
-): Promise<void> {
-  await authz.require(ctx, userId, permission, orgScope(organizationId))
-}
 async function getInviterName(
   ctx: MutationCtx,
   userId: Id<'users'>

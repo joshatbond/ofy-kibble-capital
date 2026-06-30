@@ -5,10 +5,9 @@ import { useEffect, useState } from 'react'
 
 import { KibbleLoadingScreen } from '~/components/loading/kibble-loader'
 import { Case, SwitchOn } from '~/components/switch-on'
+import { api } from '~/convex/_generated/api'
 import { studentAppHomePath } from '~/lib/auth-redirect'
 import type { StudentApp } from '~/lib/auth-redirect'
-
-import { api } from '../../../convex/_generated/api'
 
 export function AuthGate(props: { app: StudentApp; landingPath: string }) {
   if (!import.meta.env.VITE_CONVEX_URL) return <Outlet />

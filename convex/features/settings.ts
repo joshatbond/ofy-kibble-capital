@@ -1,7 +1,9 @@
+import { getAuthUserId } from '@convex-dev/auth/server'
 import { v } from 'convex/values'
 
 import { internalQuery, query } from '../_generated/server'
 
+import { requireTeacherForOrg } from './auth/teacher'
 import {
   resolveEffectiveSettings,
   settingsValuesValidator,
@@ -9,12 +11,24 @@ import {
 
 /**
  * Effective settings for a classroom organization (region → site → class snapshot).
- * Public for dev/dashboard inspection; protect with auth when exposing to clients.
+ * Teachers only.
  */
 export const effectiveSettingsForOrganization = query({
   args: { organizationId: v.string() },
   returns: settingsValuesValidator,
   handler: async (ctx, { organizationId }) => {
+    const userId = await getAuthUserId(ctx)
+    if (userId === null) {
+      throw new Error('Not authenticated')
+    }
+
+    await requireTeacherForOrg(
+      ctx,
+      userId,
+      organizationId,
+      'organizations:read'
+    )
+
     return await resolveEffectiveSettings(ctx, organizationId)
   },
 })

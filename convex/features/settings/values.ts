@@ -22,4 +22,20 @@ export function assertPaydayNoticeLeadDays(days: number): void {
     )
   }
 }
+export function pickSettingsValues(
+  source: SettingsValues & Record<string, unknown>
+): SettingsValues {
+  return {
+    hourlyRateCents: source.hourlyRateCents,
+    standardDayHours: source.standardDayHours,
+    paySchedule: source.paySchedule,
+    savingsApyPercent: source.savingsApyPercent,
+    retirement401kPercentGross: source.retirement401kPercentGross,
+    medicalInsuranceCentsPerPayRun: source.medicalInsuranceCentsPerPayRun,
+    overtimeMultiplier: source.overtimeMultiplier,
+    paydayNoticeLeadDays: source.paydayNoticeLeadDays,
+    currencyLabel: source.currencyLabel,
+    vaultCap: source.vaultCap,
+  }
+}
 export type SettingsValues = Infer<typeof settingsValuesValidator>

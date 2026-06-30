@@ -53,7 +53,7 @@ Do **not** port ms-engage’s domain-specific `afterUserCreatedOrUpdated` allowl
 
 ### Dual-surface redirect
 
-Marketing sign-in uses `StudentSignInButton` with `app="kibble"` or `app="pawket"`. Public landings live at `/kibble/landing` and `/pawket/landing`; protected app homes are `/kibble` and `/pawket`. OAuth `redirectTo` keeps users on the surface they signed in from.
+Marketing sign-in uses `GoogleSignInButton` with `redirectTo={studentAppRedirectTo(app)}` on student landings (`app` is `"kibble"` or `"pawket"`). Public landings live at `/kibble/landing` and `/pawket/landing`; protected app homes are `/kibble` and `/pawket`. OAuth `redirectTo` keeps users on the surface they signed in from.
 
 ### Multi-host redirects (local / Netlify / production)
 

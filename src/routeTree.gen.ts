@@ -9,7 +9,9 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as PawketRouteRouteImport } from './routes/pawket/route'
 import { Route as KibbleRouteRouteImport } from './routes/kibble/route'
+import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PawketIndexRouteImport } from './routes/pawket/index'
 import { Route as KibbleIndexRouteImport } from './routes/kibble/index'
@@ -17,6 +19,7 @@ import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as PawketLandingRouteImport } from './routes/pawket/landing'
 import { Route as KibbleTimeRouteImport } from './routes/kibble/time'
 import { Route as KibbleLandingRouteImport } from './routes/kibble/landing'
+import { Route as InviteInvitationIdRouteImport } from './routes/invite/$invitationId'
 import { Route as AdminLandingRouteImport } from './routes/admin/landing'
 import { Route as PawketTransferIndexRouteImport } from './routes/pawket/transfer/index'
 import { Route as PawketSavingsIndexRouteImport } from './routes/pawket/savings/index'
@@ -37,9 +40,19 @@ import { Route as PawketSavingsVaultsVaultIdIndexRouteImport } from './routes/pa
 import { Route as PawketSavingsVaultsVaultIdTransactionsIndexRouteImport } from './routes/pawket/savings/vaults/$vaultId/transactions/index'
 import { Route as PawketSavingsVaultsVaultIdTransactionsTransactionIdRouteImport } from './routes/pawket/savings/vaults/$vaultId/transactions/$transactionId'
 
+const PawketRouteRoute = PawketRouteRouteImport.update({
+  id: '/pawket',
+  path: '/pawket',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const KibbleRouteRoute = KibbleRouteRouteImport.update({
   id: '/kibble',
   path: '/kibble',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRouteRoute = AdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -48,9 +61,9 @@ const IndexRoute = IndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const PawketIndexRoute = PawketIndexRouteImport.update({
-  id: '/pawket/',
-  path: '/pawket/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => PawketRouteRoute,
 } as any)
 const KibbleIndexRoute = KibbleIndexRouteImport.update({
   id: '/',
@@ -58,14 +71,14 @@ const KibbleIndexRoute = KibbleIndexRouteImport.update({
   getParentRoute: () => KibbleRouteRoute,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
-  id: '/admin/',
-  path: '/admin/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRouteRoute,
 } as any)
 const PawketLandingRoute = PawketLandingRouteImport.update({
-  id: '/pawket/landing',
-  path: '/pawket/landing',
-  getParentRoute: () => rootRouteImport,
+  id: '/landing',
+  path: '/landing',
+  getParentRoute: () => PawketRouteRoute,
 } as any)
 const KibbleTimeRoute = KibbleTimeRouteImport.update({
   id: '/time',
@@ -77,25 +90,30 @@ const KibbleLandingRoute = KibbleLandingRouteImport.update({
   path: '/landing',
   getParentRoute: () => KibbleRouteRoute,
 } as any)
-const AdminLandingRoute = AdminLandingRouteImport.update({
-  id: '/admin/landing',
-  path: '/admin/landing',
+const InviteInvitationIdRoute = InviteInvitationIdRouteImport.update({
+  id: '/invite/$invitationId',
+  path: '/invite/$invitationId',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AdminLandingRoute = AdminLandingRouteImport.update({
+  id: '/landing',
+  path: '/landing',
+  getParentRoute: () => AdminRouteRoute,
 } as any)
 const PawketTransferIndexRoute = PawketTransferIndexRouteImport.update({
-  id: '/pawket/transfer/',
-  path: '/pawket/transfer/',
-  getParentRoute: () => rootRouteImport,
+  id: '/transfer/',
+  path: '/transfer/',
+  getParentRoute: () => PawketRouteRoute,
 } as any)
 const PawketSavingsIndexRoute = PawketSavingsIndexRouteImport.update({
-  id: '/pawket/savings/',
-  path: '/pawket/savings/',
-  getParentRoute: () => rootRouteImport,
+  id: '/savings/',
+  path: '/savings/',
+  getParentRoute: () => PawketRouteRoute,
 } as any)
 const PawketCheckingIndexRoute = PawketCheckingIndexRouteImport.update({
-  id: '/pawket/checking/',
-  path: '/pawket/checking/',
-  getParentRoute: () => rootRouteImport,
+  id: '/checking/',
+  path: '/checking/',
+  getParentRoute: () => PawketRouteRoute,
 } as any)
 const KibblePayIndexRoute = KibblePayIndexRouteImport.update({
   id: '/pay/',
@@ -108,27 +126,27 @@ const KibbleAbsenceIndexRoute = KibbleAbsenceIndexRouteImport.update({
   getParentRoute: () => KibbleRouteRoute,
 } as any)
 const AdminOrgIdIndexRoute = AdminOrgIdIndexRouteImport.update({
-  id: '/admin/$orgId/',
-  path: '/admin/$orgId/',
-  getParentRoute: () => rootRouteImport,
+  id: '/$orgId/',
+  path: '/$orgId/',
+  getParentRoute: () => AdminRouteRoute,
 } as any)
 const PawketTransferTransactionIdRoute =
   PawketTransferTransactionIdRouteImport.update({
-    id: '/pawket/transfer/$transactionId',
-    path: '/pawket/transfer/$transactionId',
-    getParentRoute: () => rootRouteImport,
+    id: '/transfer/$transactionId',
+    path: '/transfer/$transactionId',
+    getParentRoute: () => PawketRouteRoute,
   } as any)
 const PawketSavingsTransactionIdRoute =
   PawketSavingsTransactionIdRouteImport.update({
-    id: '/pawket/savings/$transactionId',
-    path: '/pawket/savings/$transactionId',
-    getParentRoute: () => rootRouteImport,
+    id: '/savings/$transactionId',
+    path: '/savings/$transactionId',
+    getParentRoute: () => PawketRouteRoute,
   } as any)
 const PawketCheckingTransactionIdRoute =
   PawketCheckingTransactionIdRouteImport.update({
-    id: '/pawket/checking/$transactionId',
-    path: '/pawket/checking/$transactionId',
-    getParentRoute: () => rootRouteImport,
+    id: '/checking/$transactionId',
+    path: '/checking/$transactionId',
+    getParentRoute: () => PawketRouteRoute,
   } as any)
 const KibblePayIdRoute = KibblePayIdRouteImport.update({
   id: '/pay/$id',
@@ -142,48 +160,51 @@ const KibbleAbsenceIdRoute = KibbleAbsenceIdRouteImport.update({
 } as any)
 const PawketSavingsVaultsIndexRoute =
   PawketSavingsVaultsIndexRouteImport.update({
-    id: '/pawket/savings/vaults/',
-    path: '/pawket/savings/vaults/',
-    getParentRoute: () => rootRouteImport,
+    id: '/savings/vaults/',
+    path: '/savings/vaults/',
+    getParentRoute: () => PawketRouteRoute,
   } as any)
 const AdminOrgIdClassIdIndexRoute = AdminOrgIdClassIdIndexRouteImport.update({
-  id: '/admin/$orgId/$classId/',
-  path: '/admin/$orgId/$classId/',
-  getParentRoute: () => rootRouteImport,
+  id: '/$orgId/$classId/',
+  path: '/$orgId/$classId/',
+  getParentRoute: () => AdminRouteRoute,
 } as any)
 const AdminOrgIdClassIdStoreRoute = AdminOrgIdClassIdStoreRouteImport.update({
-  id: '/admin/$orgId/$classId/store',
-  path: '/admin/$orgId/$classId/store',
-  getParentRoute: () => rootRouteImport,
+  id: '/$orgId/$classId/store',
+  path: '/$orgId/$classId/store',
+  getParentRoute: () => AdminRouteRoute,
 } as any)
 const AdminOrgIdClassIdPosRoute = AdminOrgIdClassIdPosRouteImport.update({
-  id: '/admin/$orgId/$classId/pos',
-  path: '/admin/$orgId/$classId/pos',
-  getParentRoute: () => rootRouteImport,
+  id: '/$orgId/$classId/pos',
+  path: '/$orgId/$classId/pos',
+  getParentRoute: () => AdminRouteRoute,
 } as any)
 const PawketSavingsVaultsVaultIdIndexRoute =
   PawketSavingsVaultsVaultIdIndexRouteImport.update({
-    id: '/pawket/savings/vaults/$vaultId/',
-    path: '/pawket/savings/vaults/$vaultId/',
-    getParentRoute: () => rootRouteImport,
+    id: '/savings/vaults/$vaultId/',
+    path: '/savings/vaults/$vaultId/',
+    getParentRoute: () => PawketRouteRoute,
   } as any)
 const PawketSavingsVaultsVaultIdTransactionsIndexRoute =
   PawketSavingsVaultsVaultIdTransactionsIndexRouteImport.update({
-    id: '/pawket/savings/vaults/$vaultId/transactions/',
-    path: '/pawket/savings/vaults/$vaultId/transactions/',
-    getParentRoute: () => rootRouteImport,
+    id: '/savings/vaults/$vaultId/transactions/',
+    path: '/savings/vaults/$vaultId/transactions/',
+    getParentRoute: () => PawketRouteRoute,
   } as any)
 const PawketSavingsVaultsVaultIdTransactionsTransactionIdRoute =
   PawketSavingsVaultsVaultIdTransactionsTransactionIdRouteImport.update({
-    id: '/pawket/savings/vaults/$vaultId/transactions/$transactionId',
-    path: '/pawket/savings/vaults/$vaultId/transactions/$transactionId',
-    getParentRoute: () => rootRouteImport,
+    id: '/savings/vaults/$vaultId/transactions/$transactionId',
+    path: '/savings/vaults/$vaultId/transactions/$transactionId',
+    getParentRoute: () => PawketRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteRouteWithChildren
   '/kibble': typeof KibbleRouteRouteWithChildren
+  '/pawket': typeof PawketRouteRouteWithChildren
   '/admin/landing': typeof AdminLandingRoute
+  '/invite/$invitationId': typeof InviteInvitationIdRoute
   '/kibble/landing': typeof KibbleLandingRoute
   '/kibble/time': typeof KibbleTimeRoute
   '/pawket/landing': typeof PawketLandingRoute
@@ -212,6 +233,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin/landing': typeof AdminLandingRoute
+  '/invite/$invitationId': typeof InviteInvitationIdRoute
   '/kibble/landing': typeof KibbleLandingRoute
   '/kibble/time': typeof KibbleTimeRoute
   '/pawket/landing': typeof PawketLandingRoute
@@ -240,8 +262,11 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteRouteWithChildren
   '/kibble': typeof KibbleRouteRouteWithChildren
+  '/pawket': typeof PawketRouteRouteWithChildren
   '/admin/landing': typeof AdminLandingRoute
+  '/invite/$invitationId': typeof InviteInvitationIdRoute
   '/kibble/landing': typeof KibbleLandingRoute
   '/kibble/time': typeof KibbleTimeRoute
   '/pawket/landing': typeof PawketLandingRoute
@@ -271,8 +296,11 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/kibble'
+    | '/pawket'
     | '/admin/landing'
+    | '/invite/$invitationId'
     | '/kibble/landing'
     | '/kibble/time'
     | '/pawket/landing'
@@ -301,6 +329,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/admin/landing'
+    | '/invite/$invitationId'
     | '/kibble/landing'
     | '/kibble/time'
     | '/pawket/landing'
@@ -328,8 +357,11 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/kibble'
+    | '/pawket'
     | '/admin/landing'
+    | '/invite/$invitationId'
     | '/kibble/landing'
     | '/kibble/time'
     | '/pawket/landing'
@@ -358,34 +390,33 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRouteRoute: typeof AdminRouteRouteWithChildren
   KibbleRouteRoute: typeof KibbleRouteRouteWithChildren
-  AdminLandingRoute: typeof AdminLandingRoute
-  PawketLandingRoute: typeof PawketLandingRoute
-  AdminIndexRoute: typeof AdminIndexRoute
-  PawketIndexRoute: typeof PawketIndexRoute
-  PawketCheckingTransactionIdRoute: typeof PawketCheckingTransactionIdRoute
-  PawketSavingsTransactionIdRoute: typeof PawketSavingsTransactionIdRoute
-  PawketTransferTransactionIdRoute: typeof PawketTransferTransactionIdRoute
-  AdminOrgIdIndexRoute: typeof AdminOrgIdIndexRoute
-  PawketCheckingIndexRoute: typeof PawketCheckingIndexRoute
-  PawketSavingsIndexRoute: typeof PawketSavingsIndexRoute
-  PawketTransferIndexRoute: typeof PawketTransferIndexRoute
-  AdminOrgIdClassIdPosRoute: typeof AdminOrgIdClassIdPosRoute
-  AdminOrgIdClassIdStoreRoute: typeof AdminOrgIdClassIdStoreRoute
-  AdminOrgIdClassIdIndexRoute: typeof AdminOrgIdClassIdIndexRoute
-  PawketSavingsVaultsIndexRoute: typeof PawketSavingsVaultsIndexRoute
-  PawketSavingsVaultsVaultIdIndexRoute: typeof PawketSavingsVaultsVaultIdIndexRoute
-  PawketSavingsVaultsVaultIdTransactionsTransactionIdRoute: typeof PawketSavingsVaultsVaultIdTransactionsTransactionIdRoute
-  PawketSavingsVaultsVaultIdTransactionsIndexRoute: typeof PawketSavingsVaultsVaultIdTransactionsIndexRoute
+  PawketRouteRoute: typeof PawketRouteRouteWithChildren
+  InviteInvitationIdRoute: typeof InviteInvitationIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/pawket': {
+      id: '/pawket'
+      path: '/pawket'
+      fullPath: '/pawket'
+      preLoaderRoute: typeof PawketRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/kibble': {
       id: '/kibble'
       path: '/kibble'
       fullPath: '/kibble'
       preLoaderRoute: typeof KibbleRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -397,10 +428,10 @@ declare module '@tanstack/react-router' {
     }
     '/pawket/': {
       id: '/pawket/'
-      path: '/pawket'
+      path: '/'
       fullPath: '/pawket/'
       preLoaderRoute: typeof PawketIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof PawketRouteRoute
     }
     '/kibble/': {
       id: '/kibble/'
@@ -411,17 +442,17 @@ declare module '@tanstack/react-router' {
     }
     '/admin/': {
       id: '/admin/'
-      path: '/admin'
+      path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRouteRoute
     }
     '/pawket/landing': {
       id: '/pawket/landing'
-      path: '/pawket/landing'
+      path: '/landing'
       fullPath: '/pawket/landing'
       preLoaderRoute: typeof PawketLandingRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof PawketRouteRoute
     }
     '/kibble/time': {
       id: '/kibble/time'
@@ -437,33 +468,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KibbleLandingRouteImport
       parentRoute: typeof KibbleRouteRoute
     }
+    '/invite/$invitationId': {
+      id: '/invite/$invitationId'
+      path: '/invite/$invitationId'
+      fullPath: '/invite/$invitationId'
+      preLoaderRoute: typeof InviteInvitationIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/landing': {
       id: '/admin/landing'
-      path: '/admin/landing'
+      path: '/landing'
       fullPath: '/admin/landing'
       preLoaderRoute: typeof AdminLandingRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRouteRoute
     }
     '/pawket/transfer/': {
       id: '/pawket/transfer/'
-      path: '/pawket/transfer'
+      path: '/transfer'
       fullPath: '/pawket/transfer/'
       preLoaderRoute: typeof PawketTransferIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof PawketRouteRoute
     }
     '/pawket/savings/': {
       id: '/pawket/savings/'
-      path: '/pawket/savings'
+      path: '/savings'
       fullPath: '/pawket/savings/'
       preLoaderRoute: typeof PawketSavingsIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof PawketRouteRoute
     }
     '/pawket/checking/': {
       id: '/pawket/checking/'
-      path: '/pawket/checking'
+      path: '/checking'
       fullPath: '/pawket/checking/'
       preLoaderRoute: typeof PawketCheckingIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof PawketRouteRoute
     }
     '/kibble/pay/': {
       id: '/kibble/pay/'
@@ -481,31 +519,31 @@ declare module '@tanstack/react-router' {
     }
     '/admin/$orgId/': {
       id: '/admin/$orgId/'
-      path: '/admin/$orgId'
+      path: '/$orgId'
       fullPath: '/admin/$orgId/'
       preLoaderRoute: typeof AdminOrgIdIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRouteRoute
     }
     '/pawket/transfer/$transactionId': {
       id: '/pawket/transfer/$transactionId'
-      path: '/pawket/transfer/$transactionId'
+      path: '/transfer/$transactionId'
       fullPath: '/pawket/transfer/$transactionId'
       preLoaderRoute: typeof PawketTransferTransactionIdRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof PawketRouteRoute
     }
     '/pawket/savings/$transactionId': {
       id: '/pawket/savings/$transactionId'
-      path: '/pawket/savings/$transactionId'
+      path: '/savings/$transactionId'
       fullPath: '/pawket/savings/$transactionId'
       preLoaderRoute: typeof PawketSavingsTransactionIdRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof PawketRouteRoute
     }
     '/pawket/checking/$transactionId': {
       id: '/pawket/checking/$transactionId'
-      path: '/pawket/checking/$transactionId'
+      path: '/checking/$transactionId'
       fullPath: '/pawket/checking/$transactionId'
       preLoaderRoute: typeof PawketCheckingTransactionIdRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof PawketRouteRoute
     }
     '/kibble/pay/$id': {
       id: '/kibble/pay/$id'
@@ -523,55 +561,77 @@ declare module '@tanstack/react-router' {
     }
     '/pawket/savings/vaults/': {
       id: '/pawket/savings/vaults/'
-      path: '/pawket/savings/vaults'
+      path: '/savings/vaults'
       fullPath: '/pawket/savings/vaults/'
       preLoaderRoute: typeof PawketSavingsVaultsIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof PawketRouteRoute
     }
     '/admin/$orgId/$classId/': {
       id: '/admin/$orgId/$classId/'
-      path: '/admin/$orgId/$classId'
+      path: '/$orgId/$classId'
       fullPath: '/admin/$orgId/$classId/'
       preLoaderRoute: typeof AdminOrgIdClassIdIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRouteRoute
     }
     '/admin/$orgId/$classId/store': {
       id: '/admin/$orgId/$classId/store'
-      path: '/admin/$orgId/$classId/store'
+      path: '/$orgId/$classId/store'
       fullPath: '/admin/$orgId/$classId/store'
       preLoaderRoute: typeof AdminOrgIdClassIdStoreRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRouteRoute
     }
     '/admin/$orgId/$classId/pos': {
       id: '/admin/$orgId/$classId/pos'
-      path: '/admin/$orgId/$classId/pos'
+      path: '/$orgId/$classId/pos'
       fullPath: '/admin/$orgId/$classId/pos'
       preLoaderRoute: typeof AdminOrgIdClassIdPosRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRouteRoute
     }
     '/pawket/savings/vaults/$vaultId/': {
       id: '/pawket/savings/vaults/$vaultId/'
-      path: '/pawket/savings/vaults/$vaultId'
+      path: '/savings/vaults/$vaultId'
       fullPath: '/pawket/savings/vaults/$vaultId/'
       preLoaderRoute: typeof PawketSavingsVaultsVaultIdIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof PawketRouteRoute
     }
     '/pawket/savings/vaults/$vaultId/transactions/': {
       id: '/pawket/savings/vaults/$vaultId/transactions/'
-      path: '/pawket/savings/vaults/$vaultId/transactions'
+      path: '/savings/vaults/$vaultId/transactions'
       fullPath: '/pawket/savings/vaults/$vaultId/transactions/'
       preLoaderRoute: typeof PawketSavingsVaultsVaultIdTransactionsIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof PawketRouteRoute
     }
     '/pawket/savings/vaults/$vaultId/transactions/$transactionId': {
       id: '/pawket/savings/vaults/$vaultId/transactions/$transactionId'
-      path: '/pawket/savings/vaults/$vaultId/transactions/$transactionId'
+      path: '/savings/vaults/$vaultId/transactions/$transactionId'
       fullPath: '/pawket/savings/vaults/$vaultId/transactions/$transactionId'
       preLoaderRoute: typeof PawketSavingsVaultsVaultIdTransactionsTransactionIdRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof PawketRouteRoute
     }
   }
 }
+
+interface AdminRouteRouteChildren {
+  AdminLandingRoute: typeof AdminLandingRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+  AdminOrgIdIndexRoute: typeof AdminOrgIdIndexRoute
+  AdminOrgIdClassIdPosRoute: typeof AdminOrgIdClassIdPosRoute
+  AdminOrgIdClassIdStoreRoute: typeof AdminOrgIdClassIdStoreRoute
+  AdminOrgIdClassIdIndexRoute: typeof AdminOrgIdClassIdIndexRoute
+}
+
+const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminLandingRoute: AdminLandingRoute,
+  AdminIndexRoute: AdminIndexRoute,
+  AdminOrgIdIndexRoute: AdminOrgIdIndexRoute,
+  AdminOrgIdClassIdPosRoute: AdminOrgIdClassIdPosRoute,
+  AdminOrgIdClassIdStoreRoute: AdminOrgIdClassIdStoreRoute,
+  AdminOrgIdClassIdIndexRoute: AdminOrgIdClassIdIndexRoute,
+}
+
+const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
+  AdminRouteRouteChildren,
+)
 
 interface KibbleRouteRouteChildren {
   KibbleLandingRoute: typeof KibbleLandingRoute
@@ -597,29 +657,48 @@ const KibbleRouteRouteWithChildren = KibbleRouteRoute._addFileChildren(
   KibbleRouteRouteChildren,
 )
 
-const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  KibbleRouteRoute: KibbleRouteRouteWithChildren,
-  AdminLandingRoute: AdminLandingRoute,
+interface PawketRouteRouteChildren {
+  PawketLandingRoute: typeof PawketLandingRoute
+  PawketIndexRoute: typeof PawketIndexRoute
+  PawketCheckingTransactionIdRoute: typeof PawketCheckingTransactionIdRoute
+  PawketSavingsTransactionIdRoute: typeof PawketSavingsTransactionIdRoute
+  PawketTransferTransactionIdRoute: typeof PawketTransferTransactionIdRoute
+  PawketCheckingIndexRoute: typeof PawketCheckingIndexRoute
+  PawketSavingsIndexRoute: typeof PawketSavingsIndexRoute
+  PawketTransferIndexRoute: typeof PawketTransferIndexRoute
+  PawketSavingsVaultsIndexRoute: typeof PawketSavingsVaultsIndexRoute
+  PawketSavingsVaultsVaultIdIndexRoute: typeof PawketSavingsVaultsVaultIdIndexRoute
+  PawketSavingsVaultsVaultIdTransactionsTransactionIdRoute: typeof PawketSavingsVaultsVaultIdTransactionsTransactionIdRoute
+  PawketSavingsVaultsVaultIdTransactionsIndexRoute: typeof PawketSavingsVaultsVaultIdTransactionsIndexRoute
+}
+
+const PawketRouteRouteChildren: PawketRouteRouteChildren = {
   PawketLandingRoute: PawketLandingRoute,
-  AdminIndexRoute: AdminIndexRoute,
   PawketIndexRoute: PawketIndexRoute,
   PawketCheckingTransactionIdRoute: PawketCheckingTransactionIdRoute,
   PawketSavingsTransactionIdRoute: PawketSavingsTransactionIdRoute,
   PawketTransferTransactionIdRoute: PawketTransferTransactionIdRoute,
-  AdminOrgIdIndexRoute: AdminOrgIdIndexRoute,
   PawketCheckingIndexRoute: PawketCheckingIndexRoute,
   PawketSavingsIndexRoute: PawketSavingsIndexRoute,
   PawketTransferIndexRoute: PawketTransferIndexRoute,
-  AdminOrgIdClassIdPosRoute: AdminOrgIdClassIdPosRoute,
-  AdminOrgIdClassIdStoreRoute: AdminOrgIdClassIdStoreRoute,
-  AdminOrgIdClassIdIndexRoute: AdminOrgIdClassIdIndexRoute,
   PawketSavingsVaultsIndexRoute: PawketSavingsVaultsIndexRoute,
   PawketSavingsVaultsVaultIdIndexRoute: PawketSavingsVaultsVaultIdIndexRoute,
   PawketSavingsVaultsVaultIdTransactionsTransactionIdRoute:
     PawketSavingsVaultsVaultIdTransactionsTransactionIdRoute,
   PawketSavingsVaultsVaultIdTransactionsIndexRoute:
     PawketSavingsVaultsVaultIdTransactionsIndexRoute,
+}
+
+const PawketRouteRouteWithChildren = PawketRouteRoute._addFileChildren(
+  PawketRouteRouteChildren,
+)
+
+const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
+  AdminRouteRoute: AdminRouteRouteWithChildren,
+  KibbleRouteRoute: KibbleRouteRouteWithChildren,
+  PawketRouteRoute: PawketRouteRouteWithChildren,
+  InviteInvitationIdRoute: InviteInvitationIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

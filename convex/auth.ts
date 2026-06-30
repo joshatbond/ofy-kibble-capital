@@ -1,10 +1,10 @@
-import Google from '@auth/core/providers/google'
 import { convexAuth } from '@convex-dev/auth/server'
 
+import { authProvidersForDeployment } from './features/auth/devPasswordProvider'
 import { resolvePostAuthRedirect } from './features/auth/redirect'
 
 export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
-  providers: [Google],
+  providers: authProvidersForDeployment(),
   callbacks: {
     async redirect({ redirectTo }) {
       return Promise.resolve(resolvePostAuthRedirect(redirectTo))
