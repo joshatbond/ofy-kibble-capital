@@ -2,7 +2,6 @@ import { cva } from 'class-variance-authority'
 import { Slot } from 'radix-ui'
 import * as React from 'react'
 
-import { brutalChromeInteractive } from '~/lib/brutal-chrome'
 import { cn } from '~/lib/class-name-merge'
 
 import type { VariantProps } from 'class-variance-authority'
@@ -13,14 +12,10 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: 'bg-primary text-primary-foreground [a]:hover:bg-primary/80',
-        brutal: cn(
-          brutalChromeInteractive,
-          'bg-primary text-primary-foreground [a]:hover:bg-primary/90'
-        ),
-        'brutal-outline': cn(
-          brutalChromeInteractive,
-          'bg-background text-foreground hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground'
-        ),
+        brutal:
+          'rounded-lg border-2 border-ink bg-primary text-primary-foreground shadow-brutal transition-all active:translate-x-0.5 active:translate-y-0.5 active:shadow-none [a]:hover:bg-primary/90',
+        'brutal-outline':
+          'rounded-lg border-2 border-ink bg-background text-foreground shadow-brutal transition-all hover:bg-muted hover:text-foreground active:translate-x-0.5 active:translate-y-0.5 active:shadow-none aria-expanded:bg-muted aria-expanded:text-foreground',
         outline:
           'border-border bg-background hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50',
         secondary:

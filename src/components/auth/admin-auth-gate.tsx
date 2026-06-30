@@ -8,8 +8,10 @@ import {
 import { useQuery } from 'convex/react'
 import { useEffect } from 'react'
 
+import { AdminShell } from '~/components/admin/admin-shell'
 import { Case, SwitchOn } from '~/components/switch-on'
 import { api } from '~/convex/_generated/api'
+import { isScopedAdminPath } from '~/lib/admin-route-context'
 import { adminAppHomePath, adminAppLandingPath } from '~/lib/auth-redirect'
 
 export function AdminAuthGate() {
@@ -30,30 +32,58 @@ function AdminAuthGateWithConvex() {
 
   const teacherContext = useQuery(
     api.features.admin.context.getTeacherClassroomContext,
-    isAuthenticated && !isLanding ? {} : 'skip'
+    isAuthenticated ? {} : 'skip'
   )
 
   const teacherContextPending =
-    isAuthenticated && !isLanding && teacherContext === undefined
+    isAuthenticated &&
+    teacherContext === undefined &&
+    !isScopedAdminPath(pathname)
 
   useEffect(() => {
     if (isLoading) return
 
     if (isLanding && isAuthenticated) {
-      void navigate({ to: homePath, replace: true })
+      if (teacherContext === undefined) {
+        return
+      }
+
+      if (teacherContext === null) {
+        void navigate({ to: homePath, replace: true })
+        return
+      }
+
+      void navigate({
+        to: '/admin/$orgId/$classId',
+        params: {
+          orgId: teacherContext.organizationId,
+          classId: teacherContext.classroomId,
+        },
+        replace: true,
+      })
       return
     }
 
     if (!isLanding && !isAuthenticated) {
       void navigate({ to: landingPath, replace: true })
     }
-  }, [homePath, isAuthenticated, isLanding, isLoading, landingPath, navigate])
+  }, [
+    homePath,
+    isAuthenticated,
+    isLanding,
+    isLoading,
+    landingPath,
+    navigate,
+    teacherContext,
+  ])
 
   return (
     <SwitchOn>
       <Case predicate={isLanding}>
         <SwitchOn>
-          <Case predicate={isLoading || isAuthenticated}>
+          <Case
+            predicate={isLoading || (isAuthenticated && teacherContextPending)}
+          >
             <p>{isAuthenticated ? 'Redirecting…' : 'Loading…'}</p>
           </Case>
 
@@ -86,7 +116,9 @@ function AdminAuthGateWithConvex() {
           </Case>
 
           <Case>
-            <Outlet />
+            <AdminShell>
+              <Outlet />
+            </AdminShell>
           </Case>
         </SwitchOn>
       </Case>

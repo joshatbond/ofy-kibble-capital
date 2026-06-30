@@ -36,6 +36,7 @@ import { Route as PawketSavingsVaultsIndexRouteImport } from './routes/pawket/sa
 import { Route as AdminOrgIdClassIdIndexRouteImport } from './routes/admin/$orgId/$classId/index'
 import { Route as AdminOrgIdClassIdStoreRouteImport } from './routes/admin/$orgId/$classId/store'
 import { Route as AdminOrgIdClassIdPosRouteImport } from './routes/admin/$orgId/$classId/pos'
+import { Route as AdminOrgIdClassIdAbsencesRouteImport } from './routes/admin/$orgId/$classId/absences'
 import { Route as PawketSavingsVaultsVaultIdIndexRouteImport } from './routes/pawket/savings/vaults/$vaultId/index'
 import { Route as PawketSavingsVaultsVaultIdTransactionsIndexRouteImport } from './routes/pawket/savings/vaults/$vaultId/transactions/index'
 import { Route as PawketSavingsVaultsVaultIdTransactionsTransactionIdRouteImport } from './routes/pawket/savings/vaults/$vaultId/transactions/$transactionId'
@@ -179,6 +180,12 @@ const AdminOrgIdClassIdPosRoute = AdminOrgIdClassIdPosRouteImport.update({
   path: '/$orgId/$classId/pos',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminOrgIdClassIdAbsencesRoute =
+  AdminOrgIdClassIdAbsencesRouteImport.update({
+    id: '/$orgId/$classId/absences',
+    path: '/$orgId/$classId/absences',
+    getParentRoute: () => AdminRouteRoute,
+  } as any)
 const PawketSavingsVaultsVaultIdIndexRoute =
   PawketSavingsVaultsVaultIdIndexRouteImport.update({
     id: '/savings/vaults/$vaultId/',
@@ -222,6 +229,7 @@ export interface FileRoutesByFullPath {
   '/pawket/checking/': typeof PawketCheckingIndexRoute
   '/pawket/savings/': typeof PawketSavingsIndexRoute
   '/pawket/transfer/': typeof PawketTransferIndexRoute
+  '/admin/$orgId/$classId/absences': typeof AdminOrgIdClassIdAbsencesRoute
   '/admin/$orgId/$classId/pos': typeof AdminOrgIdClassIdPosRoute
   '/admin/$orgId/$classId/store': typeof AdminOrgIdClassIdStoreRoute
   '/admin/$orgId/$classId/': typeof AdminOrgIdClassIdIndexRoute
@@ -251,6 +259,7 @@ export interface FileRoutesByTo {
   '/pawket/checking': typeof PawketCheckingIndexRoute
   '/pawket/savings': typeof PawketSavingsIndexRoute
   '/pawket/transfer': typeof PawketTransferIndexRoute
+  '/admin/$orgId/$classId/absences': typeof AdminOrgIdClassIdAbsencesRoute
   '/admin/$orgId/$classId/pos': typeof AdminOrgIdClassIdPosRoute
   '/admin/$orgId/$classId/store': typeof AdminOrgIdClassIdStoreRoute
   '/admin/$orgId/$classId': typeof AdminOrgIdClassIdIndexRoute
@@ -284,6 +293,7 @@ export interface FileRoutesById {
   '/pawket/checking/': typeof PawketCheckingIndexRoute
   '/pawket/savings/': typeof PawketSavingsIndexRoute
   '/pawket/transfer/': typeof PawketTransferIndexRoute
+  '/admin/$orgId/$classId/absences': typeof AdminOrgIdClassIdAbsencesRoute
   '/admin/$orgId/$classId/pos': typeof AdminOrgIdClassIdPosRoute
   '/admin/$orgId/$classId/store': typeof AdminOrgIdClassIdStoreRoute
   '/admin/$orgId/$classId/': typeof AdminOrgIdClassIdIndexRoute
@@ -318,6 +328,7 @@ export interface FileRouteTypes {
     | '/pawket/checking/'
     | '/pawket/savings/'
     | '/pawket/transfer/'
+    | '/admin/$orgId/$classId/absences'
     | '/admin/$orgId/$classId/pos'
     | '/admin/$orgId/$classId/store'
     | '/admin/$orgId/$classId/'
@@ -347,6 +358,7 @@ export interface FileRouteTypes {
     | '/pawket/checking'
     | '/pawket/savings'
     | '/pawket/transfer'
+    | '/admin/$orgId/$classId/absences'
     | '/admin/$orgId/$classId/pos'
     | '/admin/$orgId/$classId/store'
     | '/admin/$orgId/$classId'
@@ -379,6 +391,7 @@ export interface FileRouteTypes {
     | '/pawket/checking/'
     | '/pawket/savings/'
     | '/pawket/transfer/'
+    | '/admin/$orgId/$classId/absences'
     | '/admin/$orgId/$classId/pos'
     | '/admin/$orgId/$classId/store'
     | '/admin/$orgId/$classId/'
@@ -587,6 +600,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminOrgIdClassIdPosRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/$orgId/$classId/absences': {
+      id: '/admin/$orgId/$classId/absences'
+      path: '/$orgId/$classId/absences'
+      fullPath: '/admin/$orgId/$classId/absences'
+      preLoaderRoute: typeof AdminOrgIdClassIdAbsencesRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/pawket/savings/vaults/$vaultId/': {
       id: '/pawket/savings/vaults/$vaultId/'
       path: '/savings/vaults/$vaultId'
@@ -615,6 +635,7 @@ interface AdminRouteRouteChildren {
   AdminLandingRoute: typeof AdminLandingRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminOrgIdIndexRoute: typeof AdminOrgIdIndexRoute
+  AdminOrgIdClassIdAbsencesRoute: typeof AdminOrgIdClassIdAbsencesRoute
   AdminOrgIdClassIdPosRoute: typeof AdminOrgIdClassIdPosRoute
   AdminOrgIdClassIdStoreRoute: typeof AdminOrgIdClassIdStoreRoute
   AdminOrgIdClassIdIndexRoute: typeof AdminOrgIdClassIdIndexRoute
@@ -624,6 +645,7 @@ const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminLandingRoute: AdminLandingRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminOrgIdIndexRoute: AdminOrgIdIndexRoute,
+  AdminOrgIdClassIdAbsencesRoute: AdminOrgIdClassIdAbsencesRoute,
   AdminOrgIdClassIdPosRoute: AdminOrgIdClassIdPosRoute,
   AdminOrgIdClassIdStoreRoute: AdminOrgIdClassIdStoreRoute,
   AdminOrgIdClassIdIndexRoute: AdminOrgIdClassIdIndexRoute,

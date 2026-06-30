@@ -3,11 +3,19 @@ import { v } from 'convex/values'
 
 import { components } from '../../_generated/api'
 import { query } from '../../_generated/server'
-import { getClassroomByOrganizationId } from '../settings/effectiveSettings'
 import { isTeacherMemberRole } from '../tenants/roles'
 
 import type { Id } from '../../_generated/dataModel'
 import type { QueryCtx } from '../../_generated/server'
+
+const teacherClassroomRowValidator = v.object({
+  organizationId: v.string(),
+  organizationName: v.string(),
+  classroomId: v.id('classrooms'),
+  classroomName: v.string(),
+  siteSlug: v.string(),
+  orgSlug: v.string(),
+})
 
 const teacherClassroomContextValidator = v.object({
   organizationId: v.string(),
@@ -17,6 +25,8 @@ const teacherClassroomContextValidator = v.object({
   siteSlug: v.string(),
   orgSlug: v.string(),
   viewerEmail: v.string(),
+  viewerName: v.optional(v.string()),
+  viewerImage: v.optional(v.string()),
 })
 
 const classroomTeacherValidator = v.object({
@@ -26,42 +36,53 @@ const classroomTeacherValidator = v.object({
   role: v.string(),
 })
 
-export const getTeacherClassroomContext = query({
+export const listTeacherClassrooms = query({
   args: {},
-  returns: v.union(teacherClassroomContextValidator, v.null()),
+  returns: v.array(teacherClassroomRowValidator),
   handler: async ctx => {
     const userId = await getAuthUserId(ctx)
     if (userId === null) {
       throw new Error('Not authenticated')
     }
 
+    return await listTeacherClassroomsForUser(ctx, userId)
+  },
+})
+
+export const getTeacherClassroomContext = query({
+  args: {
+    organizationId: v.optional(v.string()),
+    classroomId: v.optional(v.id('classrooms')),
+  },
+  returns: v.union(teacherClassroomContextValidator, v.null()),
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx)
+    if (userId === null) {
+      throw new Error('Not authenticated')
+    }
+
     const user = await ctx.db.get('users', userId)
-    const viewerEmail = user?.email
-    if (viewerEmail === undefined) {
+    if (user === null || user.email === undefined) {
       return null
     }
 
-    const teacherOrg = await findFirstTeacherOrganization(ctx, userId)
-    if (teacherOrg === null) {
+    const viewerEmail = user.email
+
+    const classrooms = await listTeacherClassroomsForUser(ctx, userId)
+    if (classrooms.length === 0) {
       return null
     }
 
-    const classroom = await getClassroomByOrganizationId(
-      ctx,
-      teacherOrg.organizationId
-    )
-    if (classroom === null) {
+    const selected = resolveTeacherClassroom(classrooms, args)
+    if (selected === null) {
       return null
     }
 
     return {
-      organizationId: teacherOrg.organizationId,
-      organizationName: teacherOrg.organizationName,
-      classroomId: classroom._id,
-      classroomName: classroom.name,
-      siteSlug: classroom.siteSlug,
-      orgSlug: classroom.orgSlug,
+      ...selected,
       viewerEmail,
+      viewerName: user.name,
+      viewerImage: user.image,
     }
   },
 })
@@ -115,11 +136,50 @@ export const listClassroomTeachers = query({
   },
 })
 
-async function findFirstTeacherOrganization(
+type TeacherClassroomRow = {
+  organizationId: string
+  organizationName: string
+  classroomId: Id<'classrooms'>
+  classroomName: string
+  siteSlug: string
+  orgSlug: string
+}
+
+function resolveTeacherClassroom(
+  classrooms: TeacherClassroomRow[],
+  args: {
+    organizationId?: string
+    classroomId?: Id<'classrooms'>
+  }
+): TeacherClassroomRow | null {
+  if (args.organizationId === undefined) {
+    return classrooms[0] ?? null
+  }
+
+  const matches = classrooms.filter(
+    classroom => classroom.organizationId === args.organizationId
+  )
+
+  if (matches.length === 0) {
+    return null
+  }
+
+  if (args.classroomId === undefined) {
+    return matches[0] ?? null
+  }
+
+  return (
+    matches.find(classroom => classroom.classroomId === args.classroomId) ??
+    null
+  )
+}
+
+async function listTeacherClassroomsForUser(
   ctx: QueryCtx,
   userId: Id<'users'>
-): Promise<{ organizationId: string; organizationName: string } | null> {
+): Promise<TeacherClassroomRow[]> {
   const classrooms = await ctx.db.query('classrooms').collect()
+  const teacherClassrooms: TeacherClassroomRow[] = []
 
   for (const classroom of classrooms) {
     const member = await ctx.runQuery(components.tenants.members.getMember, {
@@ -136,11 +196,24 @@ async function findFirstTeacherOrganization(
       { organizationId: classroom.organizationId }
     )
 
-    return {
+    teacherClassrooms.push({
       organizationId: classroom.organizationId,
       organizationName: organization?.name ?? classroom.name,
-    }
+      classroomId: classroom._id,
+      classroomName: classroom.name,
+      siteSlug: classroom.siteSlug,
+      orgSlug: classroom.orgSlug,
+    })
   }
 
-  return null
+  teacherClassrooms.sort((a, b) => {
+    const orgCompare = a.organizationName.localeCompare(b.organizationName)
+    if (orgCompare !== 0) {
+      return orgCompare
+    }
+
+    return a.classroomName.localeCompare(b.classroomName)
+  })
+
+  return teacherClassrooms
 }
