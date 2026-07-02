@@ -1,6 +1,6 @@
 import { useAuthActions } from '@convex-dev/auth/react'
 import { useNavigate } from '@tanstack/react-router'
-import { LogOut } from 'lucide-react'
+import { ChevronUp, LogOut } from 'lucide-react'
 import { useState } from 'react'
 
 import type { AdminNavTab } from '~/components/admin/admin-shell'
@@ -65,10 +65,10 @@ export function AdminAccountMenu(props: AdminAccountMenuProps) {
           size={layout === 'sidebar' ? 'default' : 'icon'}
           className={cn(
             layout === 'sidebar'
-              ? 'h-auto w-full justify-start gap-3 rounded-lg px-3 py-2'
+              ? 'border-ink hover:bg-muted h-auto w-full justify-start gap-3 rounded-lg border-2 px-3 py-3'
               : 'size-10 rounded-full p-0'
           )}
-          aria-label="Account menu"
+          aria-label="Open account menu"
         >
           <Avatar
             size="lg"
@@ -86,13 +86,20 @@ export function AdminAccountMenu(props: AdminAccountMenuProps) {
           </Avatar>
 
           {layout === 'sidebar' ? (
-            <div className="min-w-0 text-left">
-              <p className="truncate text-sm font-bold">{display}</p>
+            <>
+              <div className="min-w-0 flex-1 text-left">
+                <p className="truncate text-sm font-bold">{display}</p>
 
-              <p className="text-muted-foreground truncate text-xs">
-                {props.viewerEmail}
-              </p>
-            </div>
+                <p className="text-muted-foreground truncate text-xs">
+                  {props.viewerEmail}
+                </p>
+              </div>
+
+              <ChevronUp
+                className="text-muted-foreground size-5 shrink-0"
+                aria-hidden
+              />
+            </>
           ) : null}
         </Button>
       </DropdownMenuTrigger>
@@ -101,6 +108,7 @@ export function AdminAccountMenu(props: AdminAccountMenuProps) {
         className="w-56"
         align={layout === 'sidebar' ? 'start' : 'end'}
         side={layout === 'sidebar' ? 'top' : 'bottom'}
+        sideOffset={layout === 'sidebar' ? 8 : 4}
       >
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">

@@ -166,22 +166,24 @@ function AdminSidebar(props: {
   accountMenu: AdminAccountMenuProps
 }) {
   return (
-    <aside className="border-ink bg-background hidden min-h-0 grid-rows-[auto_1fr] border-r-2 @min-[48rem]/admin:grid">
+    <aside className="border-ink bg-background hidden min-h-0 grid-rows-[auto_minmax(0,1fr)_auto] border-r-2 @min-[48rem]/admin:grid">
       <div className="p-8 pb-4">
-        <div className="grid grid-cols-[1fr_auto] items-center gap-3">
-          <p className="font-heading text-primary text-xl font-bold">
-            Kibble Admin
-          </p>
-
-          <AdminAccountMenu {...props.accountMenu} layout="icon" />
-        </div>
+        <p className="font-heading text-primary text-xl font-bold">
+          Kibble Admin
+        </p>
 
         <p className="text-muted-foreground mt-1 text-sm">
           {props.classroomName}
         </p>
       </div>
 
-      <AdminSidebarNav current={props.current} navParams={props.navParams} />
+      <div className="min-h-0 overflow-y-auto overscroll-y-contain">
+        <AdminSidebarNav current={props.current} navParams={props.navParams} />
+      </div>
+
+      <div className="border-ink border-t-2 p-4">
+        <AdminAccountMenu {...props.accountMenu} layout="sidebar" />
+      </div>
     </aside>
   )
 }
