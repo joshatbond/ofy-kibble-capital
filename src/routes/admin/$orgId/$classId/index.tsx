@@ -12,6 +12,7 @@ import { api } from '~/convex/_generated/api'
 import type { Id } from '~/convex/_generated/dataModel'
 import { teacherContextQueryArgs } from '~/lib/admin-route-context'
 import { inviteRedirectTo } from '~/lib/auth-redirect'
+import { rosterRowDisplayName } from '~/lib/viewer-display'
 
 import type { FunctionReturnType } from 'convex/server'
 
@@ -290,6 +291,7 @@ function InvitePanels(props: {
 function InviteStudentForm(props: { organizationId: string }) {
   const inviteStudent = useMutation(api.features.invitations.inviteStudent)
   const [studentEmail, setStudentEmail] = useState('')
+  const [studentName, setStudentName] = useState('')
   const [externalStudentId, setExternalStudentId] = useState('')
   const [grade, setGrade] = useState<7 | 8>(7)
   const [formError, setFormError] = useState<string | null>(null)
@@ -319,6 +321,17 @@ function InviteStudentForm(props: { organizationId: string }) {
             value={studentEmail}
             onChange={event => setStudentEmail(event.target.value)}
             required
+            className="border-ink h-11 border-2"
+          />
+        </label>
+
+        <label className="grid gap-1 text-sm font-bold">
+          Student name
+          <Input
+            type="text"
+            value={studentName}
+            onChange={event => setStudentName(event.target.value)}
+            placeholder="Optional — Google fills this on first sign-in"
             className="border-ink h-11 border-2"
           />
         </label>
@@ -373,11 +386,13 @@ function InviteStudentForm(props: { organizationId: string }) {
       const result = await inviteStudent({
         organizationId: props.organizationId,
         email: studentEmail,
+        displayName: studentName.trim() === '' ? undefined : studentName,
         externalStudentId: parsedId,
         grade,
       })
 
       setStudentEmail('')
+      setStudentName('')
       setExternalStudentId('')
       setSuccessLink(inviteRedirectTo(result.invitationId))
     } catch (error) {
@@ -603,7 +618,10 @@ function RosterListRow(props: {
   onRotate: (rosterStudentId: Id<'rosterStudents'>) => void
 }) {
   const { row } = props
-  const displayName = row.email.split('@')[0] ?? row.email
+  const displayName = rosterRowDisplayName({
+    resolvedName: row.resolvedName,
+    email: row.email,
+  })
 
   return (
     <article className="hover:bg-muted/40 grid gap-4 px-4 py-6 transition-colors @min-[48rem]/admin:grid-cols-12 @min-[48rem]/admin:items-center @min-[48rem]/admin:gap-6">

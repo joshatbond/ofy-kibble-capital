@@ -77,6 +77,7 @@ export async function insertPendingRosterStudent(
     classroomId: Id<'classrooms'>
     invitationId: string
     email: string
+    displayName?: string
     externalStudentId: number
     grade: Infer<typeof grade>
     payToken: string

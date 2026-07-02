@@ -7,13 +7,14 @@ import {
   ShoppingBag,
   Users,
 } from 'lucide-react'
-import { useLayoutEffect, useRef, useState } from 'react'
+import { useRef } from 'react'
 
 import { AdminAccountMenu } from '~/components/admin/admin-account-menu'
 import type { AdminAccountMenuProps } from '~/components/admin/admin-account-menu'
 import { AppTheme } from '~/components/theme/app-theme'
 import { For } from '~/components/ui/for'
 import { api } from '~/convex/_generated/api'
+import { useNavTabIndicator } from '~/hooks/use-nav-tab-indicator'
 import { teacherContextQueryArgs } from '~/lib/admin-route-context'
 import { cn } from '~/lib/class-name-merge'
 
@@ -222,10 +223,10 @@ function AdminSidebarNav(props: {
     },
   ]
 
-  const { navRef, indicatorRef, indicatorReady } = useAdminNavIndicator({
+  const { navRef, indicatorRef, indicatorReady } = useNavTabIndicator({
     current: props.current,
-    navParams: props.navParams,
     orientation: 'vertical',
+    layoutKey: `${props.navParams.orgId}-${props.navParams.classId}`,
   })
 
   return (
@@ -270,7 +271,7 @@ function SidebarNavLink(props: {
     <Link
       to={props.to}
       params={props.params}
-      data-admin-tab={props.tab}
+      data-nav-tab={props.tab}
       aria-current={props.active ? 'page' : undefined}
       className={cn(
         'relative grid grid-cols-[auto_1fr] items-center gap-4 border-2 border-transparent px-4 py-3 transition-colors',
@@ -322,10 +323,10 @@ function AdminBottomNav(props: {
     },
   ]
 
-  const { navRef, indicatorRef, indicatorReady } = useAdminNavIndicator({
+  const { navRef, indicatorRef, indicatorReady } = useNavTabIndicator({
     current: props.current,
-    navParams: props.navParams,
     orientation: 'horizontal',
+    layoutKey: `${props.navParams.orgId}-${props.navParams.classId}`,
   })
 
   return (
@@ -362,305 +363,6 @@ function AdminBottomNav(props: {
     </nav>
   )
 }
-function useAdminNavIndicator(props: {
-  current: AdminNavTab
-  navParams: { orgId: string; classId: string }
-  orientation: 'horizontal' | 'vertical'
-}) {
-  const navRef = useRef<HTMLElement>(null)
-  const indicatorRef = useRef<HTMLSpanElement>(null)
-  const metricsRef = useRef<{
-    offset: number
-    size: number
-    crossOffset: number
-    crossSize: number
-  } | null>(null)
-  const committedTabRef = useRef<AdminNavTab | null>(null)
-  const animationRef = useRef<Animation | null>(null)
-  const [indicatorReady, setIndicatorReady] = useState(false)
-  const isHorizontal = props.orientation === 'horizontal'
-
-  useLayoutEffect(() => {
-    const nav = navRef.current
-    const indicator = indicatorRef.current
-    if (!nav || !indicator) return
-
-    function clearIndicator() {
-      setIndicatorReady(false)
-      metricsRef.current = null
-    }
-
-    function isNavMeasurable() {
-      const navElement = navRef.current
-      if (!navElement) {
-        return false
-      }
-
-      const rect = navElement.getBoundingClientRect()
-      return rect.width > 0 && rect.height > 0
-    }
-
-    function measureActiveTab() {
-      const navElement = navRef.current
-      if (!navElement) return null
-
-      const tab = navElement.querySelector<HTMLAnchorElement>(
-        `[data-admin-tab="${props.current}"]`
-      )
-
-      if (!tab) return null
-
-      const navRect = navElement.getBoundingClientRect()
-      const tabRect = tab.getBoundingClientRect()
-
-      if (isHorizontal) {
-        return {
-          offset: tabRect.left - navRect.left,
-          size: tabRect.width,
-          crossOffset: tabRect.top - navRect.top,
-          crossSize: tabRect.height,
-        }
-      }
-
-      return {
-        offset: tabRect.top - navRect.top,
-        size: tabRect.height,
-        crossOffset: tabRect.left - navRect.left,
-        crossSize: tabRect.width,
-      }
-    }
-
-    function applyMetrics(metrics: {
-      offset: number
-      size: number
-      crossOffset: number
-      crossSize: number
-    }) {
-      const el = indicatorRef.current
-      if (!el) return
-
-      if (isHorizontal) {
-        el.style.left = `${metrics.offset}px`
-        el.style.width = `${metrics.size}px`
-        el.style.top = `${metrics.crossOffset}px`
-        el.style.height = `${metrics.crossSize}px`
-      } else {
-        el.style.top = `${metrics.offset}px`
-        el.style.height = `${metrics.size}px`
-        el.style.left = `${metrics.crossOffset}px`
-        el.style.width = `${metrics.crossSize}px`
-      }
-
-      metricsRef.current = metrics
-      setIndicatorReady(true)
-    }
-
-    function animateRubberBand(
-      from: {
-        offset: number
-        size: number
-        crossOffset: number
-        crossSize: number
-      },
-      to: {
-        offset: number
-        size: number
-        crossOffset: number
-        crossSize: number
-      }
-    ) {
-      const el = indicatorRef.current
-      if (!el) return
-
-      const reducedMotion = window.matchMedia(
-        '(prefers-reduced-motion: reduce)'
-      ).matches
-
-      if (reducedMotion) {
-        applyMetrics(to)
-        committedTabRef.current = props.current
-        return
-      }
-
-      const goingForward = to.offset >= from.offset
-      const stretch = goingForward
-        ? {
-            ...from,
-            size: to.offset + to.size - from.offset,
-          }
-        : {
-            ...to,
-            size: from.offset + from.size - to.offset,
-          }
-
-      animationRef.current?.cancel()
-
-      const stretchKeyframes = isHorizontal
-        ? [
-            {
-              left: `${from.offset}px`,
-              width: `${from.size}px`,
-              top: `${from.crossOffset}px`,
-              height: `${from.crossSize}px`,
-            },
-            {
-              left: `${stretch.offset}px`,
-              width: `${stretch.size}px`,
-              top: `${stretch.crossOffset}px`,
-              height: `${stretch.crossSize}px`,
-            },
-          ]
-        : [
-            {
-              top: `${from.offset}px`,
-              height: `${from.size}px`,
-              left: `${from.crossOffset}px`,
-              width: `${from.crossSize}px`,
-            },
-            {
-              top: `${stretch.offset}px`,
-              height: `${stretch.size}px`,
-              left: `${stretch.crossOffset}px`,
-              width: `${stretch.crossSize}px`,
-            },
-          ]
-
-      const stretchAnimation = el.animate(stretchKeyframes, {
-        duration: 90,
-        easing: 'cubic-bezier(0.33, 1, 0.68, 1)',
-        fill: 'forwards',
-      })
-
-      animationRef.current = stretchAnimation
-
-      void stretchAnimation.finished
-        .then(() => {
-          const snapKeyframes = isHorizontal
-            ? [
-                {
-                  left: `${stretch.offset}px`,
-                  width: `${stretch.size}px`,
-                  top: `${stretch.crossOffset}px`,
-                  height: `${stretch.crossSize}px`,
-                },
-                {
-                  left: `${to.offset}px`,
-                  width: `${to.size}px`,
-                  top: `${to.crossOffset}px`,
-                  height: `${to.crossSize}px`,
-                },
-              ]
-            : [
-                {
-                  top: `${stretch.offset}px`,
-                  height: `${stretch.size}px`,
-                  left: `${stretch.crossOffset}px`,
-                  width: `${stretch.crossSize}px`,
-                },
-                {
-                  top: `${to.offset}px`,
-                  height: `${to.size}px`,
-                  left: `${to.crossOffset}px`,
-                  width: `${to.crossSize}px`,
-                },
-              ]
-
-          const snapAnimation = el.animate(snapKeyframes, {
-            duration: 110,
-            easing: 'cubic-bezier(0.55, 0, 1, 0.45)',
-            fill: 'forwards',
-          })
-
-          animationRef.current = snapAnimation
-          return snapAnimation.finished
-        })
-        .then(() => {
-          applyMetrics(to)
-          committedTabRef.current = props.current
-          animationRef.current = null
-        })
-        .catch(() => {
-          applyMetrics(to)
-          committedTabRef.current = props.current
-          animationRef.current = null
-        })
-    }
-
-    function syncIndicatorLayout() {
-      if (animationRef.current) {
-        return
-      }
-
-      if (!isNavMeasurable()) {
-        clearIndicator()
-        return
-      }
-
-      const target = measureActiveTab()
-      if (!target) {
-        return
-      }
-
-      applyMetrics(target)
-    }
-
-    function runTabTransition() {
-      if (!isNavMeasurable()) {
-        clearIndicator()
-        return
-      }
-
-      const previousTab = committedTabRef.current
-      const fromMetrics = metricsRef.current
-      const target = measureActiveTab()
-
-      if (!target) {
-        return
-      }
-
-      const isTabChange =
-        previousTab !== null &&
-        previousTab !== props.current &&
-        fromMetrics !== null
-
-      if (isTabChange) {
-        animateRubberBand(fromMetrics, target)
-        return
-      }
-
-      animationRef.current?.cancel()
-      animationRef.current = null
-      applyMetrics(target)
-      committedTabRef.current = props.current
-    }
-
-    runTabTransition()
-
-    let resizeFrame = 0
-    function handleWindowResize() {
-      cancelAnimationFrame(resizeFrame)
-      resizeFrame = requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          syncIndicatorLayout()
-        })
-      })
-    }
-    window.addEventListener('resize', handleWindowResize)
-
-    return () => {
-      animationRef.current?.cancel()
-      window.removeEventListener('resize', handleWindowResize)
-      cancelAnimationFrame(resizeFrame)
-    }
-  }, [
-    isHorizontal,
-    props.current,
-    props.navParams.classId,
-    props.navParams.orgId,
-  ])
-
-  return { navRef, indicatorRef, indicatorReady }
-}
 function BottomNavLink(props: {
   tab: AdminNavTab
   to: string
@@ -676,7 +378,7 @@ function BottomNavLink(props: {
     <Link
       to={props.to}
       params={props.params}
-      data-admin-tab={props.tab}
+      data-nav-tab={props.tab}
       aria-current={props.active ? 'page' : undefined}
       className={cn(
         'relative grid place-items-center gap-0.5 px-2 py-2 transition-colors',

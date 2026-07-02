@@ -9,13 +9,23 @@ import { api } from '~/convex/_generated/api'
 import { studentAppHomePath } from '~/lib/auth-redirect'
 import type { StudentApp } from '~/lib/auth-redirect'
 
-export function AuthGate(props: { app: StudentApp; landingPath: string }) {
+import type { ReactNode } from 'react'
+
+export function AuthGate(props: {
+  app: StudentApp
+  landingPath: string
+  authenticatedShell?: (children: ReactNode) => ReactNode
+}) {
   if (!import.meta.env.VITE_CONVEX_URL) return <Outlet />
 
   return <AuthGateWithConvex {...props} />
 }
 
-function AuthGateWithConvex(props: { app: StudentApp; landingPath: string }) {
+function AuthGateWithConvex(props: {
+  app: StudentApp
+  landingPath: string
+  authenticatedShell?: (children: ReactNode) => ReactNode
+}) {
   const { isLoading, isAuthenticated } = useConvexAuth()
   const viewer = useQuery(api.features.users.viewer)
   const applyStudentApp = useMutation(
@@ -98,7 +108,11 @@ function AuthGateWithConvex(props: { app: StudentApp; landingPath: string }) {
       </Case>
 
       <Case predicate={phase === 'ready'}>
-        <Outlet />
+        {props.authenticatedShell ? (
+          props.authenticatedShell(<Outlet />)
+        ) : (
+          <Outlet />
+        )}
       </Case>
 
       <Case>

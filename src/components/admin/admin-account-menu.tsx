@@ -4,6 +4,7 @@ import { ChevronUp, LogOut } from 'lucide-react'
 import { useState } from 'react'
 
 import type { AdminNavTab } from '~/components/admin/admin-shell'
+import { ViewerNameMenuSection } from '~/components/auth/viewer-name-menu-section'
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
 import { Button } from '~/components/ui/button'
 import {
@@ -24,6 +25,7 @@ import {
 import type { Id } from '~/convex/_generated/dataModel'
 import { adminAppLandingPath } from '~/lib/auth-redirect'
 import { cn } from '~/lib/class-name-merge'
+import { resolveViewerDisplayName, viewerInitials } from '~/lib/viewer-display'
 
 export function AdminAccountMenu(props: AdminAccountMenuProps) {
   const navigate = useNavigate()
@@ -31,10 +33,10 @@ export function AdminAccountMenu(props: AdminAccountMenuProps) {
   const [signOutPending, setSignOutPending] = useState(false)
   const layout = props.layout ?? 'icon'
 
-  const display =
-    props.viewerName !== undefined && props.viewerName.trim() !== ''
-      ? props.viewerName.trim()
-      : props.viewerEmail
+  const display = resolveViewerDisplayName({
+    name: props.viewerName,
+    email: props.viewerEmail,
+  })
   const initials = viewerInitials({
     email: props.viewerEmail,
     name: props.viewerName,
@@ -172,6 +174,10 @@ export function AdminAccountMenu(props: AdminAccountMenuProps) {
 
         <DropdownMenuSeparator />
 
+        <ViewerNameMenuSection viewerName={props.viewerName} />
+
+        <DropdownMenuSeparator />
+
         <DropdownMenuItem
           disabled={signOutPending}
           onSelect={() => {
@@ -206,26 +212,6 @@ export type AdminAccountMenuProps = {
   currentClassroomId: Id<'classrooms'>
   currentTab: AdminNavTab
   layout?: 'icon' | 'sidebar'
-}
-function viewerInitials(props: {
-  email: string
-  name: string | undefined
-}): string {
-  const name = props.name?.trim()
-  if (name !== undefined && name !== '') {
-    const parts = name.split(/\s+/).filter(Boolean)
-    const first = parts[0]?.charAt(0)
-    const second = parts[1]?.charAt(0)
-    if (first && second) {
-      return `${first}${second}`.toUpperCase()
-    }
-
-    if (first) {
-      return first.toUpperCase()
-    }
-  }
-
-  return props.email.slice(0, 1).toUpperCase()
 }
 function classroomSelectValue(classroom: TeacherClassroom): string {
   return `${classroom.organizationId}:${classroom.classroomId}`

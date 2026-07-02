@@ -3,6 +3,7 @@ import { v } from 'convex/values'
 
 import { api, components } from '../_generated/api'
 import { mutation, query } from '../_generated/server'
+import { optionalDisplayName } from '../lib/displayName'
 import { grade } from '../schema/schemaFields'
 
 import { requireTeacherForOrg } from './auth/teacher'
@@ -34,6 +35,8 @@ const invitationResultValidator = v.object({
 const rosterRowValidator = v.object({
   rosterStudentId: v.id('rosterStudents'),
   email: v.string(),
+  displayName: v.optional(v.string()),
+  resolvedName: v.optional(v.string()),
   externalStudentId: v.number(),
   grade,
   status: rosterStatusValidator,
@@ -57,6 +60,7 @@ export const inviteStudent = mutation({
   args: {
     organizationId: v.string(),
     email: v.string(),
+    displayName: v.optional(v.string()),
     externalStudentId: v.number(),
     grade,
   },
@@ -75,6 +79,7 @@ export const inviteStudent = mutation({
     )
 
     const email = assertOfyOrgEmail(args.email)
+    const displayName = optionalDisplayName(args.displayName)
     const classroomId = await getClassroomIdForOrganization(
       ctx,
       args.organizationId
@@ -106,6 +111,7 @@ export const inviteStudent = mutation({
       classroomId,
       invitationId: result.invitationId,
       email,
+      displayName,
       externalStudentId: args.externalStudentId,
       grade: args.grade,
       payToken,
@@ -411,9 +417,19 @@ export const listClassroomRoster = query({
         continue
       }
 
+      let resolvedName = roster.displayName
+      if (roster.userId !== undefined) {
+        const linkedUser = await ctx.db.get('users', roster.userId)
+        if (linkedUser?.name !== undefined && linkedUser.name.trim() !== '') {
+          resolvedName = linkedUser.name.trim()
+        }
+      }
+
       rows.push({
         rosterStudentId: roster._id,
         email: roster.email,
+        displayName: roster.displayName,
+        resolvedName,
         externalStudentId: roster.externalStudentId,
         grade: roster.grade,
         status: roster.status,

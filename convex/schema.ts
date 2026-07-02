@@ -6,6 +6,7 @@ import {
   bankAccountsTableFields,
   classSettingsTableFields,
   classroomsTableFields,
+  ledgerEntriesTableFields,
   regionSettingsTableFields,
   regionsTableFields,
   rosterStudentsTableFields,
@@ -56,4 +57,7 @@ export default defineSchema({
   bankAccounts: defineTable(bankAccountsTableFields)
     .index('by_rosterStudent_kind', ['rosterStudentId', 'kind'])
     .index('by_organizationId', ['organizationId']),
+  ledgerEntries: defineTable(ledgerEntriesTableFields)
+    .index('by_rosterStudent_createdAt', ['rosterStudentId', 'createdAt'])
+    .index('by_organizationId_createdAt', ['organizationId', 'createdAt']),
 })

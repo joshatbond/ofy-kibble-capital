@@ -18,6 +18,10 @@ import type * as features_auth_redirect from "../features/auth/redirect.js";
 import type * as features_auth_studentApp from "../features/auth/studentApp.js";
 import type * as features_auth_studentAuth from "../features/auth/studentAuth.js";
 import type * as features_auth_teacher from "../features/auth/teacher.js";
+import type * as features_banking from "../features/banking.js";
+import type * as features_banking_accounts from "../features/banking/accounts.js";
+import type * as features_banking_ledger from "../features/banking/ledger.js";
+import type * as features_banking_student from "../features/banking/student.js";
 import type * as features_catalog_siteSlug from "../features/catalog/siteSlug.js";
 import type * as features_invitations from "../features/invitations.js";
 import type * as features_invitations_payToken from "../features/invitations/payToken.js";
@@ -35,6 +39,7 @@ import type * as features_tenants_makeTenantsAPI from "../features/tenants/makeT
 import type * as features_tenants_roles from "../features/tenants/roles.js";
 import type * as features_users from "../features/users.js";
 import type * as http from "../http.js";
+import type * as lib_displayName from "../lib/displayName.js";
 import type * as schema_schemaFields from "../schema/schemaFields.js";
 import type * as seed_catalog from "../seed/catalog.js";
 import type * as seed_catalogData from "../seed/catalogData.js";
@@ -58,6 +63,10 @@ declare const fullApi: ApiFromModules<{
   "features/auth/studentApp": typeof features_auth_studentApp;
   "features/auth/studentAuth": typeof features_auth_studentAuth;
   "features/auth/teacher": typeof features_auth_teacher;
+  "features/banking": typeof features_banking;
+  "features/banking/accounts": typeof features_banking_accounts;
+  "features/banking/ledger": typeof features_banking_ledger;
+  "features/banking/student": typeof features_banking_student;
   "features/catalog/siteSlug": typeof features_catalog_siteSlug;
   "features/invitations": typeof features_invitations;
   "features/invitations/payToken": typeof features_invitations_payToken;
@@ -75,6 +84,7 @@ declare const fullApi: ApiFromModules<{
   "features/tenants/roles": typeof features_tenants_roles;
   "features/users": typeof features_users;
   http: typeof http;
+  "lib/displayName": typeof lib_displayName;
   "schema/schemaFields": typeof schema_schemaFields;
   "seed/catalog": typeof seed_catalog;
   "seed/catalogData": typeof seed_catalogData;

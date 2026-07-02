@@ -1,33 +1,20 @@
-import { Link, createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
+
+import { PawketTransactionDetailPage } from '~/components/pawket/transaction-detail-page'
+import type { Id } from '~/convex/_generated/dataModel'
 
 export const Route = createFileRoute('/pawket/checking/$transactionId')({
   component: PawketCheckingTransactionPage,
 })
 
 function PawketCheckingTransactionPage() {
-  const params = Route.useParams()
+  const { transactionId } = Route.useParams()
 
   return (
-    <main>
-      <h1>Pawket — Checking transaction</h1>
-
-      <p>Checking transaction detail (stub).</p>
-
-      <p>
-        transactionId: <code>{params.transactionId}</code>
-      </p>
-
-      <nav>
-        <ul>
-          <li>
-            <Link to="/pawket">Dashboard</Link>
-          </li>
-
-          <li>
-            <Link to="/pawket/checking">Checking</Link>
-          </li>
-        </ul>
-      </nav>
-    </main>
+    <PawketTransactionDetailPage
+      entryId={transactionId as Id<'ledgerEntries'>}
+      backTo="/pawket/checking"
+      backLabel="Back to checking"
+    />
   )
 }

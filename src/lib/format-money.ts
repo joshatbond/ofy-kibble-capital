@@ -3,6 +3,14 @@ export function formatCents(cents: number): string {
   return `$${(cents / 100).toFixed(2)}`
 }
 
+/** Format integer cents with a classroom currency label (e.g. Kibbles). */
+export function formatCentsWithLabel(
+  cents: number,
+  currencyLabel: string
+): string {
+  return `${formatCents(cents)} ${currencyLabel}`
+}
+
 export function formatPaySchedule(schedule: {
   type: string
   weekday?: number
