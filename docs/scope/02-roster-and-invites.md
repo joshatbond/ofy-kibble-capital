@@ -20,11 +20,19 @@ Invitation-only onboarding: teachers invite students and co-teachers; neutral ac
 
 ## Acceptance criteria
 
-- [ ] Non-matching email cannot accept invite
-- [ ] Expired invite cannot accept; teacher can resend
-- [ ] Revoked invite link dead
-- [ ] **POS** rejects token for pending (not active) students
-- [ ] Co-teacher invite grants equal **Teacher** role
+- [x] Non-matching email cannot accept invite
+- [x] Expired invite cannot accept; teacher can resend
+- [x] Revoked invite link dead
+- [ ] **POS** rejects token for pending (not active) students — deferred to slice 8 (store/POS backend)
+- [x] Co-teacher invite grants equal **Teacher** role
+
+## Admin UI (slice 2 deliverable)
+
+Teacher admin roster lives at `/admin/$orgId/$classId` inside `AdminShell`:
+
+- Searchable roster table with pending/active status, pay token display, resend/revoke, rotate token
+- Inline invite panels for students (email, external ID, grade) and co-teachers
+- Copy-link UX for invitations (email delivery in slice 10)
 
 ## Domain refs
 
