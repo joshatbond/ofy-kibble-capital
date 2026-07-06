@@ -1,9 +1,9 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 
-export const Route = createFileRoute('/admin/$orgId/$classId/pos')({
+export const Route = createFileRoute('/admin/$orgSlug/pos')({
   beforeLoad: ({ params }) => {
     throw redirect({
-      to: '/admin/$orgId/$classId/store',
+      to: '/admin/$orgSlug/store',
       params,
     })
   },

@@ -54,10 +54,9 @@ function AdminAuthGateWithConvex() {
       }
 
       void navigate({
-        to: '/admin/$orgId/$classId',
+        to: '/admin/$orgSlug',
         params: {
-          orgId: teacherContext.organizationId,
-          classId: teacherContext.classroomId,
+          orgSlug: teacherContext.orgSlug,
         },
         replace: true,
       })

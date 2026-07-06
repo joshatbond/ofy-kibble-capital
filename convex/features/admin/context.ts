@@ -16,7 +16,6 @@ const teacherClassroomRowValidator = v.object({
   siteSlug: v.string(),
   orgSlug: v.string(),
 })
-
 const teacherClassroomContextValidator = v.object({
   organizationId: v.string(),
   organizationName: v.string(),
@@ -28,14 +27,12 @@ const teacherClassroomContextValidator = v.object({
   viewerName: v.optional(v.string()),
   viewerImage: v.optional(v.string()),
 })
-
 const classroomTeacherValidator = v.object({
   userId: v.id('users'),
   email: v.string(),
   name: v.optional(v.string()),
   role: v.string(),
 })
-
 export const listTeacherClassrooms = query({
   args: {},
   returns: v.array(teacherClassroomRowValidator),
@@ -48,11 +45,9 @@ export const listTeacherClassrooms = query({
     return await listTeacherClassroomsForUser(ctx, userId)
   },
 })
-
 export const getTeacherClassroomContext = query({
   args: {
-    organizationId: v.optional(v.string()),
-    classroomId: v.optional(v.id('classrooms')),
+    orgSlug: v.optional(v.string()),
   },
   returns: v.union(teacherClassroomContextValidator, v.null()),
   handler: async (ctx, args) => {
@@ -86,7 +81,6 @@ export const getTeacherClassroomContext = query({
     }
   },
 })
-
 export const listClassroomTeachers = query({
   args: { organizationId: v.string() },
   returns: v.array(classroomTeacherValidator),
@@ -135,51 +129,26 @@ export const listClassroomTeachers = query({
     return teachers
   },
 })
-
-type TeacherClassroomRow = {
-  organizationId: string
-  organizationName: string
-  classroomId: Id<'classrooms'>
-  classroomName: string
-  siteSlug: string
-  orgSlug: string
-}
-
 function resolveTeacherClassroom(
-  classrooms: TeacherClassroomRow[],
+  classrooms: Array<TeacherClassroomRow>,
   args: {
-    organizationId?: string
-    classroomId?: Id<'classrooms'>
+    orgSlug?: string
   }
 ): TeacherClassroomRow | null {
-  if (args.organizationId === undefined) {
+  if (args.orgSlug === undefined) {
     return classrooms[0] ?? null
   }
 
-  const matches = classrooms.filter(
-    classroom => classroom.organizationId === args.organizationId
-  )
-
-  if (matches.length === 0) {
-    return null
-  }
-
-  if (args.classroomId === undefined) {
-    return matches[0] ?? null
-  }
-
   return (
-    matches.find(classroom => classroom.classroomId === args.classroomId) ??
-    null
+    classrooms.find(classroom => classroom.orgSlug === args.orgSlug) ?? null
   )
 }
-
 async function listTeacherClassroomsForUser(
   ctx: QueryCtx,
   userId: Id<'users'>
-): Promise<TeacherClassroomRow[]> {
+): Promise<Array<TeacherClassroomRow>> {
   const classrooms = await ctx.db.query('classrooms').collect()
-  const teacherClassrooms: TeacherClassroomRow[] = []
+  const teacherClassrooms: Array<TeacherClassroomRow> = []
 
   for (const classroom of classrooms) {
     const member = await ctx.runQuery(components.tenants.members.getMember, {
@@ -216,4 +185,12 @@ async function listTeacherClassroomsForUser(
   })
 
   return teacherClassrooms
+}
+type TeacherClassroomRow = {
+  organizationId: string
+  organizationName: string
+  classroomId: Id<'classrooms'>
+  classroomName: string
+  siteSlug: string
+  orgSlug: string
 }

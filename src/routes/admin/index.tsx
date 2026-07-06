@@ -43,10 +43,9 @@ function AdminIndexRedirect() {
 
   return (
     <Navigate
-      to="/admin/$orgId/$classId"
+      to="/admin/$orgSlug"
       params={{
-        orgId: context.organizationId,
-        classId: context.classroomId,
+        orgSlug: context.orgSlug,
       }}
       replace
     />

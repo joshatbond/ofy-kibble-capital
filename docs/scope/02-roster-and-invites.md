@@ -28,7 +28,7 @@ Invitation-only onboarding: teachers invite students and co-teachers; neutral ac
 
 ## Admin UI (slice 2 deliverable)
 
-Teacher admin roster lives at `/admin/$orgId/$classId` inside `AdminShell`:
+Teacher admin roster lives at `/admin/$orgSlug` inside `AdminShell`:
 
 - Searchable roster table with pending/active status, pay token display, resend/revoke, rotate token
 - Inline invite panels for students (email, external ID, grade) and co-teachers

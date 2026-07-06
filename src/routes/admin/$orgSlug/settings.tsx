@@ -6,15 +6,15 @@ import { Case, SwitchOn } from '~/components/switch-on'
 import { api } from '~/convex/_generated/api'
 import { teacherContextQueryArgs } from '~/lib/admin-route-context'
 
-export const Route = createFileRoute('/admin/$orgId/')({
-  component: AdminOrgPage,
+export const Route = createFileRoute('/admin/$orgSlug/settings')({
+  component: AdminSettingsPageRoute,
 })
 
-function AdminOrgPage() {
+function AdminSettingsPageRoute() {
   const params = Route.useParams()
   const context = useQuery(
     api.features.admin.context.getTeacherClassroomContext,
-    teacherContextQueryArgs({ orgId: params.orgId })
+    teacherContextQueryArgs(params)
   )
   const settings = useQuery(
     api.features.settings.effectiveSettingsForOrganization,

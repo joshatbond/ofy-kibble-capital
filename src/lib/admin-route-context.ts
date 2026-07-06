@@ -1,21 +1,21 @@
 import type { Id } from '~/convex/_generated/dataModel'
 
 export function isScopedAdminPath(pathname: string): boolean {
-  return /^\/admin\/[^/]+/.test(pathname)
+  return /^\/admin\/[^/]+/.test(pathname) && pathname !== '/admin/landing'
 }
 
-export function teacherContextQueryArgs(params: {
-  orgId?: string
-  classId?: string
-}) {
-  if (params.orgId === undefined) {
+export function teacherContextQueryArgs(params: { orgSlug?: string }) {
+  if (params.orgSlug === undefined) {
     return {}
   }
 
-  return {
-    organizationId: params.orgId,
-    ...(params.classId !== undefined
-      ? { classroomId: params.classId as Id<'classrooms'> }
-      : {}),
-  }
+  return { orgSlug: params.orgSlug }
+}
+
+export function classroomSelectValue(classroom: {
+  orgSlug: string
+  organizationId: string
+  classroomId: Id<'classrooms'>
+}): string {
+  return classroom.orgSlug
 }

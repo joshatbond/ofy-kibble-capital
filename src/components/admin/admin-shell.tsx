@@ -23,11 +23,10 @@ import type { ReactNode } from 'react'
 
 export function AdminShell(props: { children: ReactNode }) {
   const routeParams = useParams({ strict: false })
-  const orgId = 'orgId' in routeParams ? routeParams.orgId : undefined
-  const classId = 'classId' in routeParams ? routeParams.classId : undefined
+  const orgSlug = 'orgSlug' in routeParams ? routeParams.orgSlug : undefined
   const context = useQuery(
     api.features.admin.context.getTeacherClassroomContext,
-    teacherContextQueryArgs({ orgId, classId })
+    teacherContextQueryArgs({ orgSlug })
   )
   const classrooms = useQuery(api.features.admin.context.listTeacherClassrooms)
   const contextCache = useRef<TeacherClassroomContext | null>(null)
@@ -42,7 +41,7 @@ export function AdminShell(props: { children: ReactNode }) {
     classroomsCache.current = classrooms
   }
 
-  if (!orgId) {
+  if (!orgSlug) {
     return <>{props.children}</>
   }
 
@@ -57,10 +56,7 @@ export function AdminShell(props: { children: ReactNode }) {
     return <>{props.children}</>
   }
 
-  const navParams = {
-    orgId,
-    classId: classId ?? resolvedContext.classroomId,
-  }
+  const navParams = { orgSlug }
 
   return (
     <AppTheme
@@ -162,7 +158,7 @@ function AdminTopBar(props: AdminAccountMenuProps) {
 }
 function AdminSidebar(props: {
   current: AdminNavTab
-  navParams: { orgId: string; classId: string }
+  navParams: { orgSlug: string }
   classroomName: string
   accountMenu: AdminAccountMenuProps
 }) {
@@ -190,34 +186,34 @@ function AdminSidebar(props: {
 }
 function AdminSidebarNav(props: {
   current: AdminNavTab
-  navParams: { orgId: string; classId: string }
+  navParams: { orgSlug: string }
 }) {
   const tabs = [
     {
       tab: 'roster' as const,
-      to: '/admin/$orgId/$classId',
+      to: '/admin/$orgSlug',
       params: props.navParams,
       icon: Users,
       label: 'Roster',
     },
     {
       tab: 'absences' as const,
-      to: '/admin/$orgId/$classId/absences',
+      to: '/admin/$orgSlug/absences',
       params: props.navParams,
       icon: CalendarDays,
       label: 'Absences',
     },
     {
       tab: 'store' as const,
-      to: '/admin/$orgId/$classId/store',
+      to: '/admin/$orgSlug/store',
       params: props.navParams,
       icon: ShoppingBag,
       label: 'Student store',
     },
     {
       tab: 'settings' as const,
-      to: '/admin/$orgId',
-      params: { orgId: props.navParams.orgId },
+      to: '/admin/$orgSlug/settings',
+      params: props.navParams,
       icon: Settings,
       label: 'Settings',
     },
@@ -226,7 +222,7 @@ function AdminSidebarNav(props: {
   const { navRef, indicatorRef, indicatorReady } = useNavTabIndicator({
     current: props.current,
     orientation: 'vertical',
-    layoutKey: `${props.navParams.orgId}-${props.navParams.classId}`,
+    layoutKey: props.navParams.orgSlug,
   })
 
   return (
@@ -289,35 +285,35 @@ function SidebarNavLink(props: {
 }
 function AdminBottomNav(props: {
   current: AdminNavTab
-  navParams: { orgId: string; classId: string }
+  navParams: { orgSlug: string }
   className?: string
 }) {
   const tabs = [
     {
       tab: 'roster' as const,
-      to: '/admin/$orgId/$classId',
+      to: '/admin/$orgSlug',
       params: props.navParams,
       icon: Users,
       label: 'Students',
     },
     {
       tab: 'absences' as const,
-      to: '/admin/$orgId/$classId/absences',
+      to: '/admin/$orgSlug/absences',
       params: props.navParams,
       icon: CalendarDays,
       label: 'Absences',
     },
     {
       tab: 'store' as const,
-      to: '/admin/$orgId/$classId/store',
+      to: '/admin/$orgSlug/store',
       params: props.navParams,
       icon: ShoppingBag,
       label: 'Store',
     },
     {
       tab: 'settings' as const,
-      to: '/admin/$orgId',
-      params: { orgId: props.navParams.orgId },
+      to: '/admin/$orgSlug/settings',
+      params: props.navParams,
       icon: Settings,
       label: 'Settings',
     },
@@ -326,7 +322,7 @@ function AdminBottomNav(props: {
   const { navRef, indicatorRef, indicatorReady } = useNavTabIndicator({
     current: props.current,
     orientation: 'horizontal',
-    layoutKey: `${props.navParams.orgId}-${props.navParams.classId}`,
+    layoutKey: props.navParams.orgSlug,
   })
 
   return (
@@ -400,16 +396,16 @@ function useAdminNavTab(): AdminNavTab {
     select: state => state.location.pathname,
   })
 
+  if (pathname.includes('/settings')) {
+    return 'settings'
+  }
+
   if (pathname.includes('/absences')) {
     return 'absences'
   }
 
   if (pathname.includes('/store') || pathname.includes('/pos')) {
     return 'store'
-  }
-
-  if (/^\/admin\/[^/]+\/?$/.test(pathname)) {
-    return 'settings'
   }
 
   return 'roster'

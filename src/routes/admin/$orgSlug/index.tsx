@@ -49,7 +49,7 @@ const rosterStudentCardVariants = cva(
     },
   }
 )
-export const Route = createFileRoute('/admin/$orgId/$classId/')({
+export const Route = createFileRoute('/admin/$orgSlug/')({
   component: AdminClassPage,
 })
 function AdminClassPage() {
@@ -58,12 +58,15 @@ function AdminClassPage() {
     api.features.admin.context.getTeacherClassroomContext,
     teacherContextQueryArgs(params)
   )
-  const roster = useQuery(api.features.invitations.listClassroomRoster, {
-    organizationId: params.orgId,
-  })
-  const teachers = useQuery(api.features.admin.context.listClassroomTeachers, {
-    organizationId: params.orgId,
-  })
+  const organizationId = context?.organizationId
+  const roster = useQuery(
+    api.features.invitations.listClassroomRoster,
+    organizationId === undefined ? 'skip' : { organizationId }
+  )
+  const teachers = useQuery(
+    api.features.admin.context.listClassroomTeachers,
+    organizationId === undefined ? 'skip' : { organizationId }
+  )
 
   return (
     <SwitchOn>
@@ -95,12 +98,15 @@ function AdminClassRosterContent() {
     api.features.admin.context.getTeacherClassroomContext,
     teacherContextQueryArgs(params)
   )
-  const roster = useQuery(api.features.invitations.listClassroomRoster, {
-    organizationId: params.orgId,
-  })
-  const teachers = useQuery(api.features.admin.context.listClassroomTeachers, {
-    organizationId: params.orgId,
-  })
+  const organizationId = context?.organizationId
+  const roster = useQuery(
+    api.features.invitations.listClassroomRoster,
+    organizationId === undefined ? 'skip' : { organizationId }
+  )
+  const teachers = useQuery(
+    api.features.admin.context.listClassroomTeachers,
+    organizationId === undefined ? 'skip' : { organizationId }
+  )
   const [showInvites, setShowInvites] = useState(false)
 
   if (context === null || roster === undefined || teachers === undefined) {
@@ -124,10 +130,16 @@ function AdminClassRosterContent() {
         </Button>
       }
     >
-      <ClassroomRosterTable organizationId={params.orgId} roster={roster} />
+      <ClassroomRosterTable
+        organizationId={context.organizationId}
+        roster={roster}
+      />
 
       {showInvites ? (
-        <InvitePanels organizationId={params.orgId} teachers={teachers} />
+        <InvitePanels
+          organizationId={context.organizationId}
+          teachers={teachers}
+        />
       ) : null}
     </AdminPage>
   )

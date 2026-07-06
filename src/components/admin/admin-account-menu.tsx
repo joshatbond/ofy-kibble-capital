@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from '~/components/ui/select'
 import type { Id } from '~/convex/_generated/dataModel'
+import { classroomSelectValue } from '~/lib/admin-route-context'
 import { adminAppLandingPath } from '~/lib/auth-redirect'
 import { cn } from '~/lib/class-name-merge'
 import { resolveViewerDisplayName, viewerInitials } from '~/lib/viewer-display'
@@ -41,17 +42,15 @@ export function AdminAccountMenu(props: AdminAccountMenuProps) {
     email: props.viewerEmail,
     name: props.viewerName,
   })
-  const currentValue = classroomSelectValue({
-    organizationId: props.currentOrganizationId,
-    organizationName: '',
-    classroomId: props.currentClassroomId,
-    classroomName: '',
-  })
   const selectedClassroom = props.classrooms.find(
     classroom =>
       classroom.organizationId === props.currentOrganizationId &&
       classroom.classroomId === props.currentClassroomId
   )
+  const currentValue =
+    selectedClassroom !== undefined
+      ? classroomSelectValue(selectedClassroom)
+      : undefined
   const classroomForSelect = selectedClassroom ?? props.classrooms.at(0)
   const schoolSelectValue =
     classroomForSelect !== undefined
@@ -213,33 +212,21 @@ export type AdminAccountMenuProps = {
   currentTab: AdminNavTab
   layout?: 'icon' | 'sidebar'
 }
-function classroomSelectValue(classroom: TeacherClassroom): string {
-  return `${classroom.organizationId}:${classroom.classroomId}`
-}
 function adminPathForTab(
   tab: AdminNavTab,
   classroom: TeacherClassroom
 ): { to: string; params: Record<string, string> } {
-  const { organizationId, classroomId } = classroom
+  const params = { orgSlug: classroom.orgSlug }
 
   switch (tab) {
     case 'settings':
-      return { to: '/admin/$orgId', params: { orgId: organizationId } }
+      return { to: '/admin/$orgSlug/settings', params }
     case 'absences':
-      return {
-        to: '/admin/$orgId/$classId/absences',
-        params: { orgId: organizationId, classId: classroomId },
-      }
+      return { to: '/admin/$orgSlug/absences', params }
     case 'store':
-      return {
-        to: '/admin/$orgId/$classId/store',
-        params: { orgId: organizationId, classId: classroomId },
-      }
+      return { to: '/admin/$orgSlug/store', params }
     default:
-      return {
-        to: '/admin/$orgId/$classId',
-        params: { orgId: organizationId, classId: classroomId },
-      }
+      return { to: '/admin/$orgSlug', params }
   }
 }
 type TeacherClassroom = {
@@ -247,4 +234,6 @@ type TeacherClassroom = {
   organizationName: string
   classroomId: Id<'classrooms'>
   classroomName: string
+  orgSlug: string
+  siteSlug: string
 }

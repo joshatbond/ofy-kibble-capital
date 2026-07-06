@@ -24,12 +24,20 @@ function formatAdminDocumentTitle(path: string): string {
 }
 
 function adminSectionTitle(path: string): string | null {
+  if (!path.startsWith('/admin')) {
+    return null
+  }
+
   if (path === '/admin') {
     return null
   }
 
   if (path === '/admin/landing') {
     return 'Sign in'
+  }
+
+  if (path.includes('/settings')) {
+    return 'Global settings'
   }
 
   if (path.includes('/absences')) {
@@ -41,10 +49,6 @@ function adminSectionTitle(path: string): string | null {
   }
 
   if (/^\/admin\/[^/]+$/.test(path)) {
-    return 'Global settings'
-  }
-
-  if (/^\/admin\/[^/]+\/[^/]+$/.test(path)) {
     return 'Student roster'
   }
 

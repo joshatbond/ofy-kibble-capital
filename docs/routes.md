@@ -17,13 +17,13 @@
 
 Client-first; teachers only (`AdminAuthGate` + Convex teacher membership).
 
-- `/admin` — resolves the teacher's classroom and redirects to `/admin/$orgId/$classId`
+- `/admin` — resolves the teacher's classroom and redirects to `/admin/$orgSlug`
 - `/admin/landing` — unauthenticated marketing / Google sign-in
-- `/admin/$orgId` — **Settings** (persisted `classSettings` for the organization)
-- `/admin/$orgId/$classId` — **Student roster** (invites, pay tokens, resend/revoke)
-- `/admin/$orgId/$classId/absences` — absence calendar + approvals (**wireframe**; slice 7)
-- `/admin/$orgId/$classId/store` — store catalog + POS checkout (**wireframe**; slice 8)
-- `/admin/$orgId/$classId/pos` — redirects to `store`
+- `/admin/$orgSlug` — **Student roster** (invites, pay tokens, resend/revoke)
+- `/admin/$orgSlug/settings` — **Settings** (persisted `classSettings` for the organization)
+- `/admin/$orgSlug/absences` — absence calendar + approvals (**wireframe**; slice 7)
+- `/admin/$orgSlug/store` — store catalog + POS checkout (**wireframe**; slice 8)
+- `/admin/$orgSlug/pos` — redirects to `store`
 
 Shared chrome: `AdminShell` (sidebar on desktop, top bar on mobile, classroom switcher, account menu pinned to sidebar footer).
 
