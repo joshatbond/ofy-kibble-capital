@@ -22,6 +22,9 @@ export function RevealLabelButton(props: {
   const [revealed, setRevealed] = useState(false)
   const hoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const reducedMotionRef = useRef(false)
+  const lastPointerTypeRef = useRef<React.PointerEvent['pointerType'] | null>(
+    null
+  )
 
   useEffect(() => {
     reducedMotionRef.current = window.matchMedia(
@@ -59,13 +62,32 @@ export function RevealLabelButton(props: {
   }
 
   function handleClick(event: React.MouseEvent<HTMLButtonElement>) {
+    if (props.disabled) {
+      return
+    }
+
+    if (lastPointerTypeRef.current === 'touch') {
+      if (!revealed) {
+        reveal()
+        clearHoverTimer()
+        return
+      }
+
+      props.onClick?.(event)
+      return
+    }
+
     reveal()
     clearHoverTimer()
     props.onClick?.(event)
   }
 
-  function handlePointerEnter() {
-    if (props.disabled) {
+  function handlePointerDown(event: React.PointerEvent<HTMLButtonElement>) {
+    lastPointerTypeRef.current = event.pointerType
+  }
+
+  function handlePointerEnter(event: React.PointerEvent<HTMLButtonElement>) {
+    if (props.disabled || event.pointerType === 'touch') {
       return
     }
 
@@ -82,7 +104,19 @@ export function RevealLabelButton(props: {
     }, props.revealDelayMs ?? DEFAULT_REVEAL_DELAY_MS)
   }
 
-  function handleFocus() {
+  function handlePointerLeave(event: React.PointerEvent<HTMLButtonElement>) {
+    if (event.pointerType === 'touch') {
+      return
+    }
+
+    collapse()
+  }
+
+  function handleFocus(event: React.FocusEvent<HTMLButtonElement>) {
+    if (!event.currentTarget.matches(':focus-visible')) {
+      return
+    }
+
     reveal()
     clearHoverTimer()
   }
@@ -92,8 +126,9 @@ export function RevealLabelButton(props: {
       type={props.type ?? 'button'}
       disabled={props.disabled}
       onClick={handleClick}
+      onPointerDown={handlePointerDown}
       onPointerEnter={handlePointerEnter}
-      onPointerLeave={collapse}
+      onPointerLeave={handlePointerLeave}
       onFocus={handleFocus}
       onBlur={collapse}
       aria-label={revealed ? undefined : props.label}

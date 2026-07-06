@@ -6,6 +6,7 @@ import {
 } from '@tanstack/react-router'
 import * as React from 'react'
 
+import { useMobileButtonHaptics } from '~/hooks/use-mobile-button-haptics'
 import appCss from '~/styles/app.css?url'
 
 import type { QueryClient } from '@tanstack/react-query'
@@ -53,6 +54,8 @@ export const Route = createRootRouteWithContext<{
 })
 
 function RootComponent() {
+  useMobileButtonHaptics()
+
   return (
     <RootDocument>
       <Outlet />
