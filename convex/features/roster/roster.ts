@@ -1,3 +1,5 @@
+import { getBankAccountForStudent } from '../banking/accounts'
+
 import type { RosterStatus } from './status'
 import type { Id } from '../../_generated/dataModel'
 import type { MutationCtx, QueryCtx } from '../../_generated/server'
@@ -123,4 +125,53 @@ export async function activateRosterStudent(
     status: 'active',
     userId,
   })
+}
+
+export async function deleteNeverActiveRosterStudent(
+  ctx: MutationCtx,
+  rosterStudentId: Id<'rosterStudents'>
+): Promise<void> {
+  const roster = await ctx.db.get('rosterStudents', rosterStudentId)
+  if (roster === null) {
+    return
+  }
+
+  if (roster.userId !== undefined) {
+    throw new Error(
+      'Cannot remove a student who has already joined the classroom.'
+    )
+  }
+
+  if (roster.status === 'active') {
+    throw new Error(
+      'Cannot remove an active student. Revoke their access instead.'
+    )
+  }
+
+  const ledgerActivity = await ctx.db
+    .query('ledgerEntries')
+    .withIndex('by_rosterStudent_createdAt', q =>
+      q.eq('rosterStudentId', rosterStudentId)
+    )
+    .take(1)
+
+  if (ledgerActivity.length > 0) {
+    throw new Error('Cannot remove a student with banking activity.')
+  }
+
+  for (const kind of ['checking', 'savings'] as const) {
+    const account = await getBankAccountForStudent(ctx, rosterStudentId, kind)
+
+    if (account !== null) {
+      if (account.balanceCents !== 0) {
+        throw new Error(
+          'Cannot remove a student with a non-zero account balance.'
+        )
+      }
+
+      await ctx.db.delete('bankAccounts', account._id)
+    }
+  }
+
+  await ctx.db.delete('rosterStudents', rosterStudentId)
 }

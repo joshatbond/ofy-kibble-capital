@@ -19,6 +19,13 @@ import { Button } from '~/components/ui/button'
 import { For } from '~/components/ui/for'
 import { Input } from '~/components/ui/input'
 import { RevealLabelButton } from '~/components/ui/reveal-label-button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '~/components/ui/select'
 import { api } from '~/convex/_generated/api'
 import type { Id } from '~/convex/_generated/dataModel'
 import { teacherContextQueryArgs } from '~/lib/admin-route-context'
@@ -137,18 +144,33 @@ function ClassroomRosterTable(props: {
   )
   const rotatePayToken = useMutation(api.features.invitations.rotatePayToken)
   const [searchQuery, setSearchQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState<RosterStatusFilter>('all')
   const [rowActionError, setRowActionError] = useState<string | null>(null)
   const [resendSuccessLink, setResendSuccessLink] = useState<string | null>(
     null
   )
 
   const filteredRoster = props.roster.filter(row => {
+    if (statusFilter === 'active' && row.status !== 'active') {
+      return false
+    }
+
+    if (statusFilter === 'inactive' && row.status === 'active') {
+      return false
+    }
+
     const query = searchQuery.trim().toLowerCase()
     if (query === '') {
       return true
     }
 
+    const displayName = rosterRowDisplayName({
+      resolvedName: row.resolvedName,
+      email: row.email,
+    })
+
     return (
+      displayName.toLowerCase().includes(query) ||
       row.email.toLowerCase().includes(query) ||
       String(row.externalStudentId).includes(query)
     )
@@ -171,14 +193,24 @@ function ClassroomRosterTable(props: {
           />
         </div>
 
-        <Button
-          type="button"
-          variant="brutal-outline"
-          className="h-14 gap-2 px-8 font-bold"
+        <Select
+          value={statusFilter}
+          onValueChange={value => setStatusFilter(value as RosterStatusFilter)}
         >
-          <Filter className="size-4" aria-hidden />
-          Filter by class
-        </Button>
+          <SelectTrigger className="border-ink shadow-brutal h-14 w-full gap-2 border-2 px-4 font-bold @min-[30rem]/admin:w-auto">
+            <Filter className="size-4 shrink-0" aria-hidden />
+
+            <SelectValue placeholder="Filter by status" />
+          </SelectTrigger>
+
+          <SelectContent>
+            <SelectItem value="all">All students</SelectItem>
+
+            <SelectItem value="active">Active only</SelectItem>
+
+            <SelectItem value="inactive">Inactive only</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <InvitationSentSection link={resendSuccessLink} />
@@ -189,7 +221,7 @@ function ClassroomRosterTable(props: {
         <SwitchOn>
           <Case predicate={filteredRoster.length === 0}>
             <p className="text-muted-foreground py-12 text-center">
-              No students match your search yet.
+              No students match your search or filters yet.
             </p>
           </Case>
 
@@ -689,6 +721,7 @@ function PayTokenCopyButton(props: { payToken: string }) {
     />
   )
 }
+type RosterStatusFilter = 'all' | 'active' | 'inactive'
 type RosterRow = FunctionReturnType<
   typeof api.features.invitations.listClassroomRoster
 >[number]

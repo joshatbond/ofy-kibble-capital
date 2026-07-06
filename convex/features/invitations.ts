@@ -16,6 +16,7 @@ import {
 } from './invitations/policy'
 import {
   assertUniqueExternalStudentId,
+  deleteNeverActiveRosterStudent,
   getClassroomIdForOrganization,
   getRosterByInvitationId,
   insertPendingRosterStudent,
@@ -239,7 +240,11 @@ export const revokeClassroomInvitation = mutation({
 
     const roster = await getRosterByInvitationId(ctx, args.invitationId)
     if (roster !== null) {
-      await setRosterStatus(ctx, roster._id, 'revoked')
+      if (roster.userId !== undefined || roster.status === 'active') {
+        await setRosterStatus(ctx, roster._id, 'revoked')
+      } else {
+        await deleteNeverActiveRosterStudent(ctx, roster._id)
+      }
     }
 
     return null
