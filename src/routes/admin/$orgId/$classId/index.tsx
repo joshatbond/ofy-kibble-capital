@@ -1,6 +1,16 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
+import { cva } from 'class-variance-authority'
 import { useMutation, useQuery } from 'convex/react'
-import { Filter, Search, UserPlus } from 'lucide-react'
+import {
+  Ban,
+  CopyIcon,
+  Filter,
+  Link2,
+  RefreshCw,
+  RotateCw,
+  Search,
+  UserPlus,
+} from 'lucide-react'
 import { useState } from 'react'
 
 import { AdminPage } from '~/components/admin/admin-shell'
@@ -8,6 +18,7 @@ import { Case, SwitchOn } from '~/components/switch-on'
 import { Button } from '~/components/ui/button'
 import { For } from '~/components/ui/for'
 import { Input } from '~/components/ui/input'
+import { RevealLabelButton } from '~/components/ui/reveal-label-button'
 import { api } from '~/convex/_generated/api'
 import type { Id } from '~/convex/_generated/dataModel'
 import { teacherContextQueryArgs } from '~/lib/admin-route-context'
@@ -16,10 +27,24 @@ import { rosterRowDisplayName } from '~/lib/viewer-display'
 
 import type { FunctionReturnType } from 'convex/server'
 
+const rosterStudentCardVariants = cva(
+  'border-ink shadow-brutal grid gap-4 rounded-xl border-2 p-4',
+  {
+    variants: {
+      status: {
+        pending: 'bg-black/5',
+        revoked: 'bg-black/10',
+        active: 'bg-card',
+      },
+    },
+    defaultVariants: {
+      status: 'active',
+    },
+  }
+)
 export const Route = createFileRoute('/admin/$orgId/$classId/')({
   component: AdminClassPage,
 })
-
 function AdminClassPage() {
   const params = Route.useParams()
   const context = useQuery(
@@ -57,7 +82,6 @@ function AdminClassPage() {
     </SwitchOn>
   )
 }
-
 function AdminClassRosterContent() {
   const params = Route.useParams()
   const context = useQuery(
@@ -101,7 +125,6 @@ function AdminClassRosterContent() {
     </AdminPage>
   )
 }
-
 function ClassroomRosterTable(props: {
   organizationId: string
   roster: Array<RosterRow>
@@ -162,17 +185,7 @@ function ClassroomRosterTable(props: {
 
       <AlertMessage message={rowActionError} />
 
-      <section className="border-ink border-t-2">
-        <div className="border-ink bg-muted text-muted-foreground hidden border-b-2 px-4 py-3 text-xs font-bold tracking-wider uppercase @min-[48rem]/admin:grid @min-[48rem]/admin:grid-cols-12 @min-[48rem]/admin:gap-6">
-          <div className="@min-[48rem]/admin:col-span-5">Student</div>
-
-          <div className="@min-[48rem]/admin:col-span-3">Status</div>
-
-          <div className="text-right @min-[48rem]/admin:col-span-4">
-            Actions
-          </div>
-        </div>
-
+      <section className="grid gap-4">
         <SwitchOn>
           <Case predicate={filteredRoster.length === 0}>
             <p className="text-muted-foreground py-12 text-center">
@@ -181,10 +194,10 @@ function ClassroomRosterTable(props: {
           </Case>
 
           <Case>
-            <div className="divide-ink divide-y-2">
+            <div className="grid gap-4 @min-[30rem]/admin:grid-cols-2 @min-[48rem]/admin:grid-cols-3">
               <For data={filteredRoster} getKey={row => row.rosterStudentId}>
                 {row => (
-                  <RosterListRow
+                  <RosterStudentCard
                     row={row}
                     onResend={handleResend}
                     onRevoke={handleRevoke}
@@ -246,7 +259,6 @@ function ClassroomRosterTable(props: {
     }
   }
 }
-
 function InvitePanels(props: {
   organizationId: string
   teachers: Array<ClassroomTeacher>
@@ -287,7 +299,6 @@ function InvitePanels(props: {
     </div>
   )
 }
-
 function InviteStudentForm(props: { organizationId: string }) {
   const inviteStudent = useMutation(api.features.invitations.inviteStudent)
   const [studentEmail, setStudentEmail] = useState('')
@@ -404,7 +415,6 @@ function InviteStudentForm(props: { organizationId: string }) {
     }
   }
 }
-
 function InviteCoTeacherForm(props: {
   organizationId: string
   teachers: Array<ClassroomTeacher>
@@ -498,11 +508,9 @@ function InviteCoTeacherForm(props: {
     }
   }
 }
-
 async function copyText(text: string) {
   await navigator.clipboard.writeText(text)
 }
-
 function InvitationSentSection(props: { link: string | null }) {
   if (props.link === null) {
     return null
@@ -534,7 +542,6 @@ function InvitationSentSection(props: { link: string | null }) {
     </section>
   )
 }
-
 function AlertMessage(props: { message: string | null }) {
   if (props.message === null) {
     return null
@@ -549,35 +556,21 @@ function AlertMessage(props: { message: string | null }) {
     </p>
   )
 }
-
-function RosterInviteLink(props: {
-  invitationId: string
-  invitationStatus: RosterRow['invitationStatus']
-}) {
-  if (props.invitationStatus !== 'pending') {
-    return <>—</>
-  }
-
+function RosterCopyInviteLinkButton(props: { invitationId: string }) {
+  const [copied, setCopied] = useState(false)
   const link = inviteRedirectTo(props.invitationId)
 
   return (
-    <div className="grid gap-2 text-xs">
-      <code className="border-ink bg-muted block overflow-x-auto rounded border p-2">
-        {link}
-      </code>
-
-      <Button
-        type="button"
-        variant="brutal-outline"
-        size="sm"
-        onClick={() => void copyText(link)}
-      >
-        Copy link
-      </Button>
-    </div>
+    <RevealLabelButton
+      label={copied ? 'Copied!' : 'Copy link'}
+      icon={<Link2 aria-hidden />}
+      onClick={() => {
+        void copyText(link).then(() => setCopied(true))
+      }}
+      onCollapse={() => setCopied(false)}
+    />
   )
 }
-
 function PendingInvitationActions(props: {
   invitationId: string
   invitationStatus: RosterRow['invitationStatus']
@@ -590,28 +583,21 @@ function PendingInvitationActions(props: {
 
   return (
     <>
-      <Button
-        type="button"
-        variant="brutal-outline"
-        size="sm"
+      <RevealLabelButton
+        label="Resend"
+        icon={<RefreshCw aria-hidden />}
         onClick={() => props.onResend(props.invitationId)}
-      >
-        Resend
-      </Button>
+      />
 
-      <Button
-        type="button"
-        variant="brutal-outline"
-        size="sm"
+      <RevealLabelButton
+        label="Revoke"
+        icon={<Ban aria-hidden />}
         onClick={() => props.onRevoke(props.invitationId)}
-      >
-        Revoke
-      </Button>
+      />
     </>
   )
 }
-
-function RosterListRow(props: {
+function RosterStudentCard(props: {
   row: RosterRow
   onResend: (invitationId: string) => void
   onRevoke: (invitationId: string) => void
@@ -622,10 +608,13 @@ function RosterListRow(props: {
     resolvedName: row.resolvedName,
     email: row.email,
   })
+  const invitationAccepted = row.invitationStatus === 'accepted'
+  const showInviteActions =
+    !invitationAccepted && row.invitationStatus === 'pending'
 
   return (
-    <article className="hover:bg-muted/40 grid gap-4 px-4 py-6 transition-colors @min-[48rem]/admin:grid-cols-12 @min-[48rem]/admin:items-center @min-[48rem]/admin:gap-6">
-      <div className="grid grid-cols-[auto_1fr] items-center gap-4 @min-[48rem]/admin:col-span-5">
+    <article className={rosterStudentCardVariants({ status: row.status })}>
+      <div className="grid grid-cols-[auto_1fr] items-start gap-4">
         <div className="border-ink bg-accent text-accent-foreground grid size-12 place-items-center border-2">
           <span className="text-lg font-bold">
             {displayName.slice(0, 1).toUpperCase()}
@@ -640,57 +629,69 @@ function RosterListRow(props: {
           <p className="text-muted-foreground text-sm font-bold">
             ID: #{row.externalStudentId}
           </p>
+
+          {!invitationAccepted ? (
+            <p className="text-muted-foreground mt-1 text-sm font-bold">
+              {`Invite: ${row.invitationStatus}${row.invitationIsExpired ? ' (expired)' : ''}`}
+            </p>
+          ) : null}
         </div>
       </div>
 
-      <div className="grid gap-1 text-sm @min-[48rem]/admin:col-span-3">
-        <p className="text-sm">
-          <span className="font-bold">{`Roster: ${row.status}`}</span>
-        </p>
+      <div className="pt-4">
+        <SwitchOn>
+          <Case predicate={showInviteActions}>
+            <div className="flex items-center gap-3">
+              <RosterCopyInviteLinkButton invitationId={row.invitationId} />
 
-        <p className="text-sm">
-          <span className="font-bold">
-            {`Invite: ${row.invitationStatus}${row.invitationIsExpired ? ' (expired)' : ''}`}
-          </span>
-        </p>
+              <PendingInvitationActions
+                invitationId={row.invitationId}
+                invitationStatus={row.invitationStatus}
+                onResend={props.onResend}
+                onRevoke={props.onRevoke}
+              />
+            </div>
+          </Case>
 
-        <p className="truncate text-sm">
-          <span className="font-bold">{`Pay token: ${row.payToken}`}</span>
-        </p>
-      </div>
+          <Case predicate={row.status === 'active'}>
+            <div className="flex items-center gap-3">
+              <PayTokenCopyButton payToken={row.payToken} />
 
-      <div className="grid gap-2 @min-[48rem]/admin:col-span-4 @min-[48rem]/admin:justify-items-end">
-        <RosterInviteLink
-          invitationId={row.invitationId}
-          invitationStatus={row.invitationStatus}
-        />
+              <RevealLabelButton
+                label="Rotate token"
+                icon={<RotateCw aria-hidden />}
+                onClick={() => props.onRotate(row.rosterStudentId)}
+              />
+            </div>
+          </Case>
 
-        <div className="grid gap-2 @min-[22rem]/admin:grid-cols-[repeat(3,auto)]">
-          <PendingInvitationActions
-            invitationId={row.invitationId}
-            invitationStatus={row.invitationStatus}
-            onResend={props.onResend}
-            onRevoke={props.onRevoke}
-          />
-
-          <Button
-            type="button"
-            variant="brutal"
-            className="h-auto px-4 py-2 text-xs font-bold"
-            onClick={() => props.onRotate(row.rosterStudentId)}
-          >
-            Rotate token
-          </Button>
-        </div>
+          <Case>
+            <p className="text-muted-foreground text-sm">
+              No actions available for this student.
+            </p>
+          </Case>
+        </SwitchOn>
       </div>
     </article>
   )
 }
+function PayTokenCopyButton(props: { payToken: string }) {
+  const [copied, setCopied] = useState(false)
 
+  return (
+    <RevealLabelButton
+      label={copied ? 'Copied!' : 'Copy Pay Token'}
+      icon={<CopyIcon aria-hidden />}
+      onClick={() => {
+        void copyText(props.payToken).then(() => setCopied(true))
+      }}
+      onCollapse={() => setCopied(false)}
+    />
+  )
+}
 type RosterRow = FunctionReturnType<
   typeof api.features.invitations.listClassroomRoster
 >[number]
-
 type ClassroomTeacher = FunctionReturnType<
   typeof api.features.admin.context.listClassroomTeachers
 >[number]
