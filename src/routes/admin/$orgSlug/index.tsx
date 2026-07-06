@@ -110,7 +110,7 @@ function AdminClassRosterContent() {
   )
   const [showInvites, setShowInvites] = useState(false)
 
-  if (context === null || roster === undefined || teachers === undefined) {
+  if (context == null || roster === undefined || teachers === undefined) {
     return null
   }
 

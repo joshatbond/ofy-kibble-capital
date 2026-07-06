@@ -68,12 +68,12 @@ function RootComponent() {
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html>
+    <html suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>
 
-      <body>
+      <body suppressHydrationWarning>
         {children}
 
         <Scripts />

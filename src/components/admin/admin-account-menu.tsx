@@ -4,8 +4,8 @@ import { ChevronUp, LogOut } from 'lucide-react'
 import { useState } from 'react'
 
 import type { AdminNavTab } from '~/components/admin/admin-shell'
+import { UserAvatar } from '~/components/auth/user-avatar'
 import { ViewerNameMenuSection } from '~/components/auth/viewer-name-menu-section'
-import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
 import { Button } from '~/components/ui/button'
 import {
   DropdownMenu,
@@ -71,20 +71,13 @@ export function AdminAccountMenu(props: AdminAccountMenuProps) {
           )}
           aria-label="Open account menu"
         >
-          <Avatar
+          <UserAvatar
+            src={props.viewerImage}
+            initials={initials}
             size="lg"
             className="border-ink after:border-ink size-10 shrink-0 border-2"
-          >
-            <AvatarImage src={props.viewerImage} alt="" />
-
-            <AvatarFallback
-              className={cn(
-                'border-ink bg-secondary text-secondary-foreground text-sm font-bold'
-              )}
-            >
-              {initials}
-            </AvatarFallback>
-          </Avatar>
+            fallbackClassName="border-ink bg-secondary text-secondary-foreground text-sm font-bold"
+          />
 
           {layout === 'sidebar' ? (
             <>

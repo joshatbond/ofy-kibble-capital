@@ -3,9 +3,9 @@ import { useNavigate } from '@tanstack/react-router'
 import { ChevronUp, LogOut } from 'lucide-react'
 import { useState } from 'react'
 
+import { UserAvatar } from '~/components/auth/user-avatar'
 import { ViewerNameMenuSection } from '~/components/auth/viewer-name-menu-section'
 import { Case, SwitchOn } from '~/components/switch-on'
-import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
 import { Button } from '~/components/ui/button'
 import {
   DropdownMenu,
@@ -53,16 +53,13 @@ export function PawketAccountMenu(props: {
           )}
           aria-label="Open account menu"
         >
-          <Avatar
+          <UserAvatar
+            src={props.viewerImage}
+            initials={initials}
             size="lg"
             className="border-ink after:border-ink size-10 shrink-0 border-2 shadow-[2px_2px_0_0_var(--ink)]"
-          >
-            <AvatarImage src={props.viewerImage} alt="" />
-
-            <AvatarFallback className="bg-primary/10 text-primary text-sm font-bold">
-              {initials}
-            </AvatarFallback>
-          </Avatar>
+            fallbackClassName="bg-primary/10 text-primary text-sm font-bold"
+          />
 
           <SwitchOn>
             <Case predicate={layout === 'footer'}>

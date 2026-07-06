@@ -14,6 +14,7 @@ import type { AdminAccountMenuProps } from '~/components/admin/admin-account-men
 import { AppTheme } from '~/components/theme/app-theme'
 import { For } from '~/components/ui/for'
 import { api } from '~/convex/_generated/api'
+import { useMinWidth } from '~/hooks/use-min-width'
 import { useNavTabIndicator } from '~/hooks/use-nav-tab-indicator'
 import { teacherContextQueryArgs } from '~/lib/admin-route-context'
 import { cn } from '~/lib/class-name-merge'
@@ -32,6 +33,7 @@ export function AdminShell(props: { children: ReactNode }) {
   const contextCache = useRef<TeacherClassroomContext | null>(null)
   const classroomsCache = useRef<TeacherClassroomList | null>(null)
   const current = useAdminNavTab()
+  const isDesktop = useMinWidth(768)
 
   if (context !== undefined && context !== null) {
     contextCache.current = context
@@ -57,6 +59,15 @@ export function AdminShell(props: { children: ReactNode }) {
   }
 
   const navParams = { orgSlug }
+  const accountMenu: AdminAccountMenuProps = {
+    viewerEmail: resolvedContext.viewerEmail,
+    viewerName: resolvedContext.viewerName,
+    viewerImage: resolvedContext.viewerImage,
+    classrooms: resolvedClassrooms,
+    currentOrganizationId: resolvedContext.organizationId,
+    currentClassroomId: resolvedContext.classroomId,
+    currentTab: current,
+  }
 
   return (
     <AppTheme
@@ -68,26 +79,14 @@ export function AdminShell(props: { children: ReactNode }) {
           current={current}
           navParams={navParams}
           classroomName={resolvedContext.classroomName}
-          accountMenu={{
-            viewerEmail: resolvedContext.viewerEmail,
-            viewerName: resolvedContext.viewerName,
-            viewerImage: resolvedContext.viewerImage,
-            classrooms: resolvedClassrooms,
-            currentOrganizationId: resolvedContext.organizationId,
-            currentClassroomId: resolvedContext.classroomId,
-            currentTab: current,
-          }}
+          accountMenu={accountMenu}
+          showAccountMenu={isDesktop === true}
         />
 
         <div className="grid min-h-0 grid-rows-[auto_minmax(0,1fr)] @min-[48rem]/admin:grid-rows-1">
           <AdminTopBar
-            viewerEmail={resolvedContext.viewerEmail}
-            viewerName={resolvedContext.viewerName}
-            viewerImage={resolvedContext.viewerImage}
-            classrooms={resolvedClassrooms}
-            currentOrganizationId={resolvedContext.organizationId}
-            currentClassroomId={resolvedContext.classroomId}
-            currentTab={current}
+            showAccountMenu={isDesktop === false}
+            accountMenu={accountMenu}
           />
 
           <div className="min-h-0 overflow-y-auto overscroll-y-contain">
@@ -143,7 +142,10 @@ export function AdminPosFab(props: { className?: string }) {
   )
 }
 export type AdminNavTab = 'roster' | 'absences' | 'store' | 'settings'
-function AdminTopBar(props: AdminAccountMenuProps) {
+function AdminTopBar(props: {
+  showAccountMenu: boolean
+  accountMenu: AdminAccountMenuProps
+}) {
   return (
     <header className="border-ink bg-background shadow-brutal sticky top-0 border-b-2 @min-[48rem]/admin:hidden">
       <div className="mx-auto grid w-full max-w-300 grid-cols-[1fr_auto] items-center gap-4 px-4 py-4">
@@ -151,7 +153,9 @@ function AdminTopBar(props: AdminAccountMenuProps) {
           Teacher Hub
         </h2>
 
-        <AdminAccountMenu {...props} layout="icon" />
+        {props.showAccountMenu ? (
+          <AdminAccountMenu {...props.accountMenu} layout="icon" />
+        ) : null}
       </div>
     </header>
   )
@@ -161,6 +165,7 @@ function AdminSidebar(props: {
   navParams: { orgSlug: string }
   classroomName: string
   accountMenu: AdminAccountMenuProps
+  showAccountMenu: boolean
 }) {
   return (
     <aside className="border-ink bg-background hidden min-h-0 grid-rows-[auto_minmax(0,1fr)_auto] border-r-2 @min-[48rem]/admin:grid">
@@ -179,7 +184,9 @@ function AdminSidebar(props: {
       </div>
 
       <div className="border-ink border-t-2 p-4">
-        <AdminAccountMenu {...props.accountMenu} layout="sidebar" />
+        {props.showAccountMenu ? (
+          <AdminAccountMenu {...props.accountMenu} layout="sidebar" />
+        ) : null}
       </div>
     </aside>
   )
