@@ -30,6 +30,7 @@ import { api } from '~/convex/_generated/api'
 import type { Id } from '~/convex/_generated/dataModel'
 import { teacherContextQueryArgs } from '~/lib/admin-route-context'
 import { inviteRedirectTo } from '~/lib/auth-redirect'
+import { cn } from '~/lib/class-name-merge'
 import { rosterRowDisplayName } from '~/lib/viewer-display'
 
 import type { FunctionReturnType } from 'convex/server'
@@ -229,7 +230,7 @@ function ClassroomRosterTable(props: {
 
       <AlertMessage message={rowActionError} />
 
-      <section className="grid gap-4">
+      <section className="@container/roster grid gap-4">
         <SwitchOn>
           <Case predicate={filteredRoster.length === 0}>
             <p className="text-muted-foreground py-12 text-center">
@@ -238,7 +239,7 @@ function ClassroomRosterTable(props: {
           </Case>
 
           <Case>
-            <div className="grid gap-4 @min-[30rem]/admin:grid-cols-2 @min-[48rem]/admin:grid-cols-3">
+            <div className="flex flex-wrap gap-4">
               <For data={filteredRoster} getKey={row => row.rosterStudentId}>
                 {row => (
                   <RosterStudentCard
@@ -657,25 +658,34 @@ function RosterStudentCard(props: {
     !invitationAccepted && row.invitationStatus === 'pending'
 
   return (
-    <article className={rosterStudentCardVariants({ status: row.status })}>
-      <div className="grid grid-cols-[auto_1fr] items-start gap-4">
-        <div className="border-ink bg-accent text-accent-foreground grid size-12 place-items-center border-2">
+    <article
+      className={cn(
+        rosterStudentCardVariants({ status: row.status }),
+        'w-full max-w-full min-w-[min(100%,17.5rem)] grow basis-[17.5rem]',
+        '@min-[30rem]/roster:w-fit @min-[30rem]/roster:max-w-none @min-[30rem]/roster:grow-0 @min-[30rem]/roster:basis-auto'
+      )}
+    >
+      <div className="flex min-w-0 items-start gap-4">
+        <div className="border-ink bg-accent text-accent-foreground grid size-12 shrink-0 place-items-center border-2">
           <span className="text-lg font-bold">
             {displayName.slice(0, 1).toUpperCase()}
           </span>
         </div>
 
-        <div>
-          <p className="font-heading text-lg font-bold capitalize">
+        <div className="min-w-0 flex-1 @min-[30rem]/roster:flex-none">
+          <p
+            className="font-heading text-lg font-bold capitalize @max-[30rem]/roster:truncate @min-[30rem]/roster:whitespace-nowrap"
+            title={displayName}
+          >
             {displayName}
           </p>
 
-          <p className="text-muted-foreground text-sm font-bold">
+          <p className="text-muted-foreground text-sm font-bold @max-[30rem]/roster:truncate">
             ID: #{row.externalStudentId}
           </p>
 
           {!invitationAccepted ? (
-            <p className="text-muted-foreground mt-1 text-sm font-bold">
+            <p className="text-muted-foreground mt-1 text-sm font-bold @max-[30rem]/roster:truncate">
               {`Invite: ${row.invitationStatus}${row.invitationIsExpired ? ' (expired)' : ''}`}
             </p>
           ) : null}
@@ -685,7 +695,7 @@ function RosterStudentCard(props: {
       <div className="pt-4">
         <SwitchOn>
           <Case predicate={showInviteActions}>
-            <div className="flex items-center gap-3">
+            <div className="flex w-full flex-wrap items-center gap-3 @min-[30rem]/roster:w-fit">
               <RosterCopyInviteLinkButton invitationId={row.invitationId} />
 
               <PendingInvitationActions
@@ -698,7 +708,7 @@ function RosterStudentCard(props: {
           </Case>
 
           <Case predicate={row.status === 'active'}>
-            <div className="flex items-center gap-3">
+            <div className="flex w-full flex-wrap items-center gap-3 @min-[30rem]/roster:w-fit">
               <PayTokenCopyButton payToken={row.payToken} />
 
               <RevealLabelButton
