@@ -1,4 +1,5 @@
 import { getBankAccountForStudent } from '../banking/accounts'
+import { generatePayToken } from '../invitations/payToken'
 
 import type { RosterStatus } from './status'
 import type { Id } from '../../_generated/dataModel'
@@ -70,6 +71,32 @@ export async function provisionStudentBankAccounts(
       balanceCents: 0,
     })
   }
+}
+
+export async function allocatePayTokenForOrganization(
+  ctx: QueryCtx | MutationCtx,
+  organizationId: string,
+  excludeRosterStudentId?: Id<'rosterStudents'>
+): Promise<string> {
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    const payToken = generatePayToken()
+    const existing = await ctx.db
+      .query('rosterStudents')
+      .withIndex('by_org_payToken', q =>
+        q.eq('organizationId', organizationId).eq('payToken', payToken)
+      )
+      .unique()
+
+    if (existing === null) {
+      return payToken
+    }
+
+    if (existing._id === excludeRosterStudentId) {
+      continue
+    }
+  }
+
+  throw new Error('Could not generate a unique pay token.')
 }
 
 export async function insertPendingRosterStudent(

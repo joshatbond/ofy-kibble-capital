@@ -7,7 +7,6 @@ import { optionalDisplayName } from '../lib/displayName'
 import { grade } from '../schema/schemaFields'
 
 import { requireTeacherForOrg } from './auth/teacher'
-import { generatePayToken } from './invitations/payToken'
 import {
   assertOfyOrgEmail,
   emailsMatch,
@@ -15,6 +14,7 @@ import {
   normalizeInviteEmail,
 } from './invitations/policy'
 import {
+  allocatePayTokenForOrganization,
   assertUniqueExternalStudentId,
   deleteNeverActiveRosterStudent,
   getClassroomIdForOrganization,
@@ -92,7 +92,10 @@ export const inviteStudent = mutation({
       args.externalStudentId
     )
 
-    const payToken = generatePayToken()
+    const payToken = await allocatePayTokenForOrganization(
+      ctx,
+      args.organizationId
+    )
     const expiresAt = invitationExpiresAt()
 
     const result = await ctx.runMutation(
@@ -274,7 +277,11 @@ export const rotatePayToken = mutation({
       throw new Error('Student not found on this roster.')
     }
 
-    const payToken = generatePayToken()
+    const payToken = await allocatePayTokenForOrganization(
+      ctx,
+      args.organizationId,
+      args.rosterStudentId
+    )
     await ctx.db.patch('rosterStudents', args.rosterStudentId, { payToken })
 
     return { payToken }
