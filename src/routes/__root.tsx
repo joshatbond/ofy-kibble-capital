@@ -6,7 +6,9 @@ import {
 } from '@tanstack/react-router'
 import * as React from 'react'
 
+import { useDocumentTitle } from '~/hooks/use-document-title'
 import { useMobileButtonHaptics } from '~/hooks/use-mobile-button-haptics'
+import { formatDocumentTitle } from '~/lib/document-title'
 import appCss from '~/styles/app.css?url'
 
 import type { QueryClient } from '@tanstack/react-query'
@@ -24,7 +26,7 @@ export const Route = createRootRouteWithContext<{
         content: 'width=device-width, initial-scale=1, viewport-fit=cover',
       },
       {
-        title: 'TanStack Start Starter',
+        title: formatDocumentTitle('/kibble'),
       },
     ],
     links: [
@@ -55,6 +57,7 @@ export const Route = createRootRouteWithContext<{
 
 function RootComponent() {
   useMobileButtonHaptics()
+  useDocumentTitle()
 
   return (
     <RootDocument>
