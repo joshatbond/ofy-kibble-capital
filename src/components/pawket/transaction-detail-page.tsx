@@ -4,17 +4,21 @@ import { ArrowLeft, History } from 'lucide-react'
 
 import { ActivityLabelIcon } from '~/components/pawket/activity-feed'
 import { Case, SwitchOn } from '~/components/switch-on'
+import { MoneyAmount } from '~/components/money-amount'
 import { Button } from '~/components/ui/button'
 import { api } from '~/convex/_generated/api'
 import type { Id } from '~/convex/_generated/dataModel'
 import { cn } from '~/lib/class-name-merge'
-import { formatCents } from '~/lib/format-money'
 
 import type { FunctionReturnType } from 'convex/server'
 
 export function PawketTransactionDetailPage(props: {
   entryId: Id<'ledgerEntries'>
-  backTo: '/pawket/checking' | '/pawket/savings' | '/pawket'
+  backTo:
+    | '/pawket/checking'
+    | '/pawket/savings'
+    | '/pawket/transfer'
+    | '/pawket'
   backLabel: string
 }) {
   const entry = useQuery(api.features.banking.getMyLedgerEntry, {
@@ -52,7 +56,11 @@ export function PawketTransactionDetailPage(props: {
 }
 function TransactionDetailContent(props: {
   entry: PawketLedgerEntry | null | undefined
-  backTo: '/pawket/checking' | '/pawket/savings' | '/pawket'
+  backTo:
+    | '/pawket/checking'
+    | '/pawket/savings'
+    | '/pawket/transfer'
+    | '/pawket'
 }) {
   if (props.entry == null) {
     return null
@@ -105,18 +113,16 @@ function TransactionDetailContent(props: {
           <div className="flex items-center justify-between gap-4">
             <span className="font-heading text-lg font-bold">Total amount</span>
 
-            <span
+            <MoneyAmount
+              cents={entry.amountCents}
+              sign={entry.direction === 'debit' ? 'minus' : 'plus'}
               className={cn(
                 'font-heading text-2xl font-extrabold',
                 entry.direction === 'debit'
                   ? 'text-destructive'
-                  : 'text-secondary'
+                  : 'text-secondary-30'
               )}
-            >
-              {entry.direction === 'debit' ? '−' : '+'}
-
-              {formatCents(entry.amountCents)}
-            </span>
+            />
           </div>
         </div>
 
@@ -167,7 +173,7 @@ function entryTypeLabel(entryType: string): string {
     case 'sweep_to_checking':
       return 'Sweep to checking'
     case 'internal_transfer':
-      return 'Transfer'
+      return 'Transfer between accounts'
     default:
       return 'Activity'
   }

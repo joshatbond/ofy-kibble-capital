@@ -1,18 +1,13 @@
 import { Link } from '@tanstack/react-router'
-import {
-  ArrowLeftRight,
-  Banknote,
-  ShoppingBag,
-  Utensils,
-  Wallet,
-} from 'lucide-react'
+import { ArrowLeftRight, ShoppingBag, Utensils, Wallet } from 'lucide-react'
 
 import { Case, SwitchOn } from '~/components/switch-on'
+import { MoneyAmount } from '~/components/money-amount'
+import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
 import { For } from '~/components/ui/for'
 import type { api } from '~/convex/_generated/api'
 import { cn } from '~/lib/class-name-merge'
-import { formatCents } from '~/lib/format-money'
 
 import type { FunctionReturnType } from 'convex/server'
 import type { LucideIcon } from 'lucide-react'
@@ -106,7 +101,7 @@ function ActivityRowItem(props: {
   const { row } = props
   const icon = activityIcon(row.entryType)
   const isDebit = row.direction === 'debit'
-  const amountClass = isDebit ? 'text-destructive' : 'text-secondary'
+  const amountClass = isDebit ? 'text-destructive' : 'text-secondary-30'
   const Icon = icon.icon
 
   const content = (
@@ -127,17 +122,23 @@ function ActivityRowItem(props: {
         <div className="min-w-0">
           <p className="truncate text-sm font-bold">{row.label}</p>
 
-          <p className="text-muted-foreground text-xs">
-            {formatActivityWhen(row.createdAt)}
-          </p>
+          <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
+            {props.variant === 'dashboard' ? (
+              <AccountKindBadge accountKind={row.accountKind} />
+            ) : null}
+
+            <p className="text-muted-foreground text-xs">
+              {formatActivityWhen(row.createdAt)}
+            </p>
+          </div>
         </div>
       </div>
 
-      <p className={cn('shrink-0 text-sm font-bold', amountClass)}>
-        {isDebit ? '−' : '+'}
-
-        {formatCents(row.amountCents)}
-      </p>
+      <MoneyAmount
+        cents={row.amountCents}
+        sign={isDebit ? 'minus' : 'plus'}
+        className={cn('shrink-0 text-sm font-bold', amountClass)}
+      />
     </>
   )
 
@@ -146,7 +147,12 @@ function ActivityRowItem(props: {
       <Link
         to={`${props.detailBasePath}/$transactionId`}
         params={{ transactionId: row.entryId }}
-        className="hover:bg-muted/50 flex items-center justify-between gap-4 p-4 transition-colors"
+        className={cn(
+          'hover:bg-muted/50 flex items-center justify-between gap-4 border-l-4 p-4 pl-3 transition-colors',
+          row.accountKind === 'checking'
+            ? 'border-secondary-50'
+            : 'border-tertiary-50'
+        )}
       >
         {content}
       </Link>
@@ -163,6 +169,23 @@ function ActivityRowItem(props: {
     </Link>
   )
 }
+function AccountKindBadge(props: { accountKind: ActivityRow['accountKind'] }) {
+  const isChecking = props.accountKind === 'checking'
+
+  return (
+    <Badge
+      variant="outline"
+      className={cn(
+        'border-ink h-auto rounded-md border-2 px-1.5 py-0 text-[10px] font-bold tracking-wide uppercase',
+        isChecking
+          ? 'bg-secondary-95 text-secondary-20'
+          : 'bg-tertiary-95 text-tertiary-20'
+      )}
+    >
+      {isChecking ? 'Checking' : 'Savings'}
+    </Badge>
+  )
+}
 function activityIcon(entryType: ActivityRow['entryType']): {
   icon: LucideIcon
   chipClass: string
@@ -170,13 +193,13 @@ function activityIcon(entryType: ActivityRow['entryType']): {
   switch (entryType) {
     case 'sweep_to_checking':
       return {
-        icon: ArrowLeftRight,
-        chipClass: 'bg-primary/15 text-primary',
+        icon: Wallet,
+        chipClass: 'bg-muted text-muted-foreground',
       }
     case 'internal_transfer':
       return {
-        icon: Banknote,
-        chipClass: 'bg-secondary/30 text-secondary',
+        icon: ArrowLeftRight,
+        chipClass: 'bg-primary/15 text-primary',
       }
     default:
       return {
