@@ -30,7 +30,6 @@ export function DevPasswordSignInForm(props: {
       <p>
         <label>
           Email
-          
           <input
             type="email"
             value={email}
@@ -44,7 +43,6 @@ export function DevPasswordSignInForm(props: {
       <p>
         <label>
           Password
-          
           <input
             type="password"
             value={password}

@@ -245,6 +245,7 @@ function PendingInviteMain(props: {
           <p role="alert">
             Sign in as <strong>{preview.inviteeIdentifier}</strong> to accept
             this invitation. You are signed in as
+
             <strong>{props.viewerEmail}</strong>.
           </p>
 

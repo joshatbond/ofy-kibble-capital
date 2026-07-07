@@ -27,7 +27,7 @@ export const cleanupNeverActiveRosterStudents = internalMutation({
     let matched = 0
     let removed = 0
     let failed = 0
-    const failures: string[] = []
+    const failures: Array<string> = []
 
     for (const roster of rosterRows) {
       if (!(await shouldRemoveNeverActiveRoster(ctx, roster))) {

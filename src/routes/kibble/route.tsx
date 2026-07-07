@@ -8,7 +8,5 @@ export const Route = createFileRoute('/kibble')({
 })
 
 function KibbleLayout() {
-  return (
-    <AuthGate app="kibble" landingPath={studentAppLandingPath('kibble')} />
-  )
+  return <AuthGate app="kibble" landingPath={studentAppLandingPath('kibble')} />
 }
