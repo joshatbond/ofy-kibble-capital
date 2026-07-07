@@ -35,6 +35,7 @@ import { Route as KibbleAbsenceIdRouteImport } from './routes/kibble/absence/$id
 import { Route as AdminOrgSlugStoreRouteImport } from './routes/admin/$orgSlug/store'
 import { Route as AdminOrgSlugSettingsRouteImport } from './routes/admin/$orgSlug/settings'
 import { Route as AdminOrgSlugPosRouteImport } from './routes/admin/$orgSlug/pos'
+import { Route as AdminOrgSlugActivityRouteImport } from './routes/admin/$orgSlug/activity'
 import { Route as AdminOrgSlugAbsencesRouteImport } from './routes/admin/$orgSlug/absences'
 import { Route as PawketSavingsVaultsIndexRouteImport } from './routes/pawket/savings/vaults/index'
 import { Route as PawketSavingsVaultsVaultIdIndexRouteImport } from './routes/pawket/savings/vaults/$vaultId/index'
@@ -174,6 +175,11 @@ const AdminOrgSlugPosRoute = AdminOrgSlugPosRouteImport.update({
   path: '/$orgSlug/pos',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminOrgSlugActivityRoute = AdminOrgSlugActivityRouteImport.update({
+  id: '/$orgSlug/activity',
+  path: '/$orgSlug/activity',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminOrgSlugAbsencesRoute = AdminOrgSlugAbsencesRouteImport.update({
   id: '/$orgSlug/absences',
   path: '/$orgSlug/absences',
@@ -218,6 +224,7 @@ export interface FileRoutesByFullPath {
   '/kibble/': typeof KibbleIndexRoute
   '/pawket/': typeof PawketIndexRoute
   '/admin/$orgSlug/absences': typeof AdminOrgSlugAbsencesRoute
+  '/admin/$orgSlug/activity': typeof AdminOrgSlugActivityRoute
   '/admin/$orgSlug/pos': typeof AdminOrgSlugPosRoute
   '/admin/$orgSlug/settings': typeof AdminOrgSlugSettingsRoute
   '/admin/$orgSlug/store': typeof AdminOrgSlugStoreRoute
@@ -248,6 +255,7 @@ export interface FileRoutesByTo {
   '/kibble': typeof KibbleIndexRoute
   '/pawket': typeof PawketIndexRoute
   '/admin/$orgSlug/absences': typeof AdminOrgSlugAbsencesRoute
+  '/admin/$orgSlug/activity': typeof AdminOrgSlugActivityRoute
   '/admin/$orgSlug/pos': typeof AdminOrgSlugPosRoute
   '/admin/$orgSlug/settings': typeof AdminOrgSlugSettingsRoute
   '/admin/$orgSlug/store': typeof AdminOrgSlugStoreRoute
@@ -282,6 +290,7 @@ export interface FileRoutesById {
   '/kibble/': typeof KibbleIndexRoute
   '/pawket/': typeof PawketIndexRoute
   '/admin/$orgSlug/absences': typeof AdminOrgSlugAbsencesRoute
+  '/admin/$orgSlug/activity': typeof AdminOrgSlugActivityRoute
   '/admin/$orgSlug/pos': typeof AdminOrgSlugPosRoute
   '/admin/$orgSlug/settings': typeof AdminOrgSlugSettingsRoute
   '/admin/$orgSlug/store': typeof AdminOrgSlugStoreRoute
@@ -317,6 +326,7 @@ export interface FileRouteTypes {
     | '/kibble/'
     | '/pawket/'
     | '/admin/$orgSlug/absences'
+    | '/admin/$orgSlug/activity'
     | '/admin/$orgSlug/pos'
     | '/admin/$orgSlug/settings'
     | '/admin/$orgSlug/store'
@@ -347,6 +357,7 @@ export interface FileRouteTypes {
     | '/kibble'
     | '/pawket'
     | '/admin/$orgSlug/absences'
+    | '/admin/$orgSlug/activity'
     | '/admin/$orgSlug/pos'
     | '/admin/$orgSlug/settings'
     | '/admin/$orgSlug/store'
@@ -380,6 +391,7 @@ export interface FileRouteTypes {
     | '/kibble/'
     | '/pawket/'
     | '/admin/$orgSlug/absences'
+    | '/admin/$orgSlug/activity'
     | '/admin/$orgSlug/pos'
     | '/admin/$orgSlug/settings'
     | '/admin/$orgSlug/store'
@@ -592,6 +604,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminOrgSlugPosRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/$orgSlug/activity': {
+      id: '/admin/$orgSlug/activity'
+      path: '/$orgSlug/activity'
+      fullPath: '/admin/$orgSlug/activity'
+      preLoaderRoute: typeof AdminOrgSlugActivityRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/$orgSlug/absences': {
       id: '/admin/$orgSlug/absences'
       path: '/$orgSlug/absences'
@@ -634,6 +653,7 @@ interface AdminRouteRouteChildren {
   AdminLandingRoute: typeof AdminLandingRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminOrgSlugAbsencesRoute: typeof AdminOrgSlugAbsencesRoute
+  AdminOrgSlugActivityRoute: typeof AdminOrgSlugActivityRoute
   AdminOrgSlugPosRoute: typeof AdminOrgSlugPosRoute
   AdminOrgSlugSettingsRoute: typeof AdminOrgSlugSettingsRoute
   AdminOrgSlugStoreRoute: typeof AdminOrgSlugStoreRoute
@@ -644,6 +664,7 @@ const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminLandingRoute: AdminLandingRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminOrgSlugAbsencesRoute: AdminOrgSlugAbsencesRoute,
+  AdminOrgSlugActivityRoute: AdminOrgSlugActivityRoute,
   AdminOrgSlugPosRoute: AdminOrgSlugPosRoute,
   AdminOrgSlugSettingsRoute: AdminOrgSlugSettingsRoute,
   AdminOrgSlugStoreRoute: AdminOrgSlugStoreRoute,
