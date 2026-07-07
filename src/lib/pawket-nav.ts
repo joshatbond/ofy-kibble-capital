@@ -13,12 +13,21 @@ export function isPawketTransactionDetail(pathname: string): boolean {
     return true
   }
 
+  if (/^\/pawket\/transfer\/[^/]+$/.test(path)) {
+    return true
+  }
+
   const savingsSegment = path.match(/^\/pawket\/savings\/([^/]+)$/)
   if (savingsSegment === null) {
     return false
   }
 
   return !PAWKET_SAVINGS_RESERVED_SEGMENTS.has(savingsSegment[1])
+}
+export function isPawketTransferOverlay(pathname: string): boolean {
+  const path = normalizePawketPathname(pathname)
+
+  return path === '/pawket/transfer'
 }
 export function isPawketVaultRoute(pathname: string): boolean {
   const path = normalizePawketPathname(pathname)
@@ -56,6 +65,10 @@ export function pawketShellTitle(pathname: string): string {
 
   if (path === '/pawket/savings/vaults') {
     return 'Vault goals'
+  }
+
+  if (path === '/pawket/transfer') {
+    return 'Transfer'
   }
 
   if (path.startsWith('/pawket/savings/vaults/')) {
