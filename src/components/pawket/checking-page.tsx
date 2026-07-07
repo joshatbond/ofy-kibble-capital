@@ -1,25 +1,20 @@
 import { Link } from '@tanstack/react-router'
-import { usePaginatedQuery, useQuery } from 'convex/react'
 import { ArrowLeftRight, Building2, Send, Wallet } from 'lucide-react'
 
 import { PawketActivityFeed } from '~/components/pawket/activity-feed'
+import { MoneyAmount } from '~/components/money-amount'
 import { Case, SwitchOn } from '~/components/switch-on'
-import { api } from '~/convex/_generated/api'
-import { formatCentsWithLabel } from '~/lib/format-money'
+import type { api } from '~/convex/_generated/api'
+import { usePawketBankingData } from '~/hooks/use-pawket-banking-data'
 
+import type { FunctionReturnType } from 'convex/server'
 import type { LucideIcon } from 'lucide-react'
 
 export function PawketCheckingPage() {
-  const balances = useQuery(api.features.banking.getMyBalances)
-  const activity = usePaginatedQuery(
-    api.features.banking.listMyActivityHistory,
-    {},
-    { initialNumItems: 20 }
-  )
-
-  const checkingActivity = activity.results.filter(
-    row => row.accountKind === 'checking'
-  )
+  const { isOnline, balances, activity, activityRows } = usePawketBankingData({
+    activityPageSize: 20,
+    accountKind: 'checking',
+  })
 
   return (
     <main className="grid gap-6 px-4 py-6 pb-8">
@@ -35,20 +30,7 @@ export function PawketCheckingPage() {
         </Case>
 
         <Case>
-          {balances !== undefined && balances !== null ? (
-            <section className="border-ink bg-accent shadow-brutal-lg rounded-xl border-2 p-6">
-              <p className="text-accent-foreground/80 text-xs font-bold tracking-wider uppercase">
-                Current balance
-              </p>
-
-              <p className="font-heading text-accent-foreground mt-2 text-4xl font-extrabold">
-                {formatCentsWithLabel(
-                  balances.checkingCents,
-                  balances.currencyLabel
-                )}
-              </p>
-            </section>
-          ) : null}
+          <CheckingBalanceCard balances={balances} />
         </Case>
       </SwitchOn>
 
@@ -96,23 +78,41 @@ export function PawketCheckingPage() {
         </div>
 
         <SwitchOn>
-          <Case predicate={activity.status === 'LoadingFirstPage'}>
+          <Case predicate={activity.status === 'LoadingFirstPage' && isOnline}>
             <p className="text-muted-foreground text-sm">Loading activity…</p>
           </Case>
 
           <Case>
             <PawketActivityFeed
-              rows={checkingActivity}
+              rows={activityRows}
               variant="list"
               detailBasePath="/pawket/checking"
               emptyMessage="No checking activity yet."
-              canLoadMore={activity.status === 'CanLoadMore'}
+              canLoadMore={isOnline && activity.status === 'CanLoadMore'}
               onLoadMore={() => activity.loadMore(20)}
             />
           </Case>
         </SwitchOn>
       </section>
     </main>
+  )
+}
+
+function CheckingBalanceCard(props: {
+  balances: PawketStudentBalances | null | undefined
+}) {
+  if (props.balances == null) return null
+
+  return (
+    <section className="border-ink bg-accent shadow-brutal-lg rounded-xl border-2 p-6">
+      <p className="text-accent-foreground/80 text-xs font-bold tracking-wider uppercase">
+        Current balance
+      </p>
+
+      <p className="font-heading text-accent-foreground mt-2 text-4xl font-extrabold">
+        <MoneyAmount cents={props.balances.checkingCents} />
+      </p>
+    </section>
   )
 }
 
@@ -139,3 +139,7 @@ function QuickAction(props: {
     </Link>
   )
 }
+
+type PawketStudentBalances = NonNullable<
+  FunctionReturnType<typeof api.features.banking.getMyBalances>
+>

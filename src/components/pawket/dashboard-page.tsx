@@ -1,26 +1,27 @@
 import { Link } from '@tanstack/react-router'
-import { usePaginatedQuery, useQuery } from 'convex/react'
+import { useQuery } from 'convex/react'
 import { ChevronDown, PiggyBank, TrendingUp, Wallet } from 'lucide-react'
 import { useState } from 'react'
 
 import { PawketActivityFeed } from '~/components/pawket/activity-feed'
+import { MoneyAmount } from '~/components/money-amount'
 import { Case, SwitchOn } from '~/components/switch-on'
 import { Button } from '~/components/ui/button'
 import { api } from '~/convex/_generated/api'
+import { usePawketBankingData } from '~/hooks/use-pawket-banking-data'
 import { cn } from '~/lib/class-name-merge'
-import { formatCents, formatCentsWithLabel } from '~/lib/format-money'
 import { displayFirstName } from '~/lib/pawket-nav'
 
 import type { FunctionReturnType } from 'convex/server'
 import type { ReactNode } from 'react'
 
 export function PawketDashboardPage() {
-  const balances = useQuery(api.features.banking.getMyBalances)
-  const profile = useQuery(api.features.users.viewerProfile)
-  const activity = usePaginatedQuery(
-    api.features.banking.listMyActivityHistory,
-    {},
-    { initialNumItems: 5 }
+  const { isOnline, balances, activity, activityRows } = usePawketBankingData({
+    activityPageSize: 5,
+  })
+  const profile = useQuery(
+    api.features.users.viewerProfile,
+    isOnline ? {} : 'skip'
   )
   const [checkingOpen, setCheckingOpen] = useState(true)
   const [savingsOpen, setSavingsOpen] = useState(false)
@@ -80,13 +81,13 @@ export function PawketDashboardPage() {
         </div>
 
         <SwitchOn>
-          <Case predicate={activity.status === 'LoadingFirstPage'}>
+          <Case predicate={activity.status === 'LoadingFirstPage' && isOnline}>
             <p className="text-muted-foreground text-sm">Loading activity…</p>
           </Case>
 
           <Case>
             <PawketActivityFeed
-              rows={activity.results}
+              rows={activityRows}
               variant="dashboard"
               emptyMessage="No transactions yet. Pay runs, store purchases, and transfers will appear here."
             />
@@ -114,7 +115,7 @@ function DashboardBalancesSections(props: {
       <section className="grid gap-3">
         <AccountAccordion
           title="Checking Account"
-          amount={formatCents(balances.checkingCents)}
+          amount={<MoneyAmount cents={balances.checkingCents} />}
           icon={Wallet}
           iconClass="text-secondary"
           summaryClass="bg-secondary/20"
@@ -125,13 +126,15 @@ function DashboardBalancesSections(props: {
             <div className="text-muted-foreground flex justify-between">
               <span>Available balance</span>
 
-              <span>{formatCents(balances.checkingCents)}</span>
+              <span>
+                <MoneyAmount cents={balances.checkingCents} />
+              </span>
             </div>
 
             <div className="text-muted-foreground flex justify-between">
               <span>Pending transfers</span>
 
-              <span>−$0.00</span>
+              <MoneyAmount cents={0} sign="minus" />
             </div>
 
             <Button
@@ -146,7 +149,7 @@ function DashboardBalancesSections(props: {
 
         <AccountAccordion
           title="Savings Account"
-          amount={formatCents(balances.savingsCents)}
+          amount={<MoneyAmount cents={balances.savingsCents} />}
           icon={PiggyBank}
           iconClass="text-accent-foreground"
           summaryClass="bg-accent/30"
@@ -176,10 +179,11 @@ function DashboardBalancesSections(props: {
         <div className="flex gap-4 overflow-x-auto pb-2">
           <InsightCard
             label="Net worth"
-            value={formatCentsWithLabel(
-              balances.checkingCents + balances.savingsCents,
-              balances.currencyLabel
-            )}
+            value={
+              <MoneyAmount
+                cents={balances.checkingCents + balances.savingsCents}
+              />
+            }
             className="bg-primary text-primary-foreground min-w-60"
           />
 
@@ -201,7 +205,7 @@ function DashboardBalancesSections(props: {
 }
 function AccountAccordion(props: {
   title: string
-  amount: string
+  amount: ReactNode
   icon: typeof Wallet
   iconClass: string
   summaryClass: string
@@ -249,7 +253,7 @@ function AccountAccordion(props: {
 }
 function InsightCard(props: {
   label: string
-  value: string
+  value: ReactNode
   className: string
   footer?: ReactNode
 }) {

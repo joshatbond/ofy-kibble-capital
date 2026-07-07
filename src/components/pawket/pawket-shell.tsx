@@ -2,14 +2,17 @@ import { Link, useRouterState } from '@tanstack/react-router'
 import { useQuery } from 'convex/react'
 import { Bell, Home, PiggyBank, Wallet } from 'lucide-react'
 
+import { PawketOfflineBanner } from '~/components/pawket/offline-banner'
 import { PawketAccountMenu } from '~/components/pawket/pawket-account-menu'
 import { AppTheme } from '~/components/theme/app-theme'
 import { For } from '~/components/ui/for'
 import { api } from '~/convex/_generated/api'
 import { useNavTabIndicator } from '~/hooks/use-nav-tab-indicator'
+import { useOnlineStatus } from '~/hooks/use-online-status'
 import { cn } from '~/lib/class-name-merge'
 import {
   isPawketTransactionDetail,
+  isPawketTransferOverlay,
   pawketNavTab,
   pawketShellTitle,
 } from '~/lib/pawket-nav'
@@ -23,22 +26,33 @@ export function PawketShell(props: { children: ReactNode }) {
     select: state => state.location.pathname,
   })
   const currentTab = pawketNavTab(pathname)
-  const hideBottomNav = isPawketTransactionDetail(pathname)
+  const hideBottomNav =
+    isPawketTransactionDetail(pathname) || isPawketTransferOverlay(pathname)
+  const hideTopBar = isPawketTransferOverlay(pathname)
   const profile = useQuery(api.features.users.viewerProfile)
   const accountMenu = profileToAccountMenu(profile)
+  const isOnline = useOnlineStatus()
 
   return (
     <AppTheme
       theme="pawket"
       className="bg-background text-foreground min-h-dvh pb-24"
     >
-      <PawketTopBar
-        title={pawketShellTitle(pathname)}
-        accountMenu={accountMenu}
-        accountMenuPending={profile === undefined}
-      />
+      <PawketOfflineBanner isOnline={isOnline} />
 
-      <div className="mx-auto w-full max-w-2xl">{props.children}</div>
+      {hideTopBar ? null : (
+        <PawketTopBar
+          title={pawketShellTitle(pathname)}
+          accountMenu={accountMenu}
+          accountMenuPending={profile === undefined}
+        />
+      )}
+
+      <div
+        className={cn('mx-auto w-full max-w-2xl', hideTopBar && 'max-w-none')}
+      >
+        {props.children}
+      </div>
 
       {hideBottomNav ? null : (
         <PawketBottomNav current={currentTab ?? 'home'} />

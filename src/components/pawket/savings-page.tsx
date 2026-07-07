@@ -1,25 +1,19 @@
 import { Link } from '@tanstack/react-router'
-import { usePaginatedQuery, useQuery } from 'convex/react'
 import { ArrowLeftRight, CreditCard, PiggyBank } from 'lucide-react'
 
 import { PawketActivityFeed } from '~/components/pawket/activity-feed'
+import { MoneyAmount } from '~/components/money-amount'
 import { Case, SwitchOn } from '~/components/switch-on'
-import { api } from '~/convex/_generated/api'
-import { formatCents, formatCentsWithLabel } from '~/lib/format-money'
+import type { api } from '~/convex/_generated/api'
+import { usePawketBankingData } from '~/hooks/use-pawket-banking-data'
 
 import type { FunctionReturnType } from 'convex/server'
 
 export function PawketSavingsPage() {
-  const balances = useQuery(api.features.banking.getMyBalances)
-  const activity = usePaginatedQuery(
-    api.features.banking.listMyActivityHistory,
-    {},
-    { initialNumItems: 20 }
-  )
-
-  const savingsActivity = activity.results.filter(
-    row => row.accountKind === 'savings'
-  )
+  const { isOnline, balances, activity, activityRows } = usePawketBankingData({
+    activityPageSize: 20,
+    accountKind: 'savings',
+  })
 
   return (
     <main className="grid gap-6 px-4 py-6 pb-8">
@@ -79,17 +73,17 @@ export function PawketSavingsPage() {
         <h3 className="font-heading text-lg font-bold">Activity</h3>
 
         <SwitchOn>
-          <Case predicate={activity.status === 'LoadingFirstPage'}>
+          <Case predicate={activity.status === 'LoadingFirstPage' && isOnline}>
             <p className="text-muted-foreground text-sm">Loading activity…</p>
           </Case>
 
           <Case>
             <PawketActivityFeed
-              rows={savingsActivity}
+              rows={activityRows}
               variant="list"
               detailBasePath="/pawket/savings"
               emptyMessage="No savings activity yet."
-              canLoadMore={activity.status === 'CanLoadMore'}
+              canLoadMore={isOnline && activity.status === 'CanLoadMore'}
               onLoadMore={() => activity.loadMore(20)}
             />
           </Case>
@@ -116,7 +110,7 @@ function SavingsBalancesSections(props: {
         </p>
 
         <h2 className="font-heading text-4xl font-extrabold">
-          {formatCentsWithLabel(balances.savingsCents, balances.currencyLabel)}
+          <MoneyAmount cents={balances.savingsCents} />
         </h2>
       </section>
 
@@ -137,7 +131,7 @@ function SavingsBalancesSections(props: {
             </p>
 
             <p className="font-heading text-xl font-bold">
-              {formatCents(balances.savingsCents)}
+              <MoneyAmount cents={balances.savingsCents} />
             </p>
           </div>
 
@@ -146,7 +140,9 @@ function SavingsBalancesSections(props: {
               Total in vaults
             </p>
 
-            <p className="font-heading text-xl font-bold">$0.00</p>
+            <p className="font-heading text-xl font-bold">
+              <MoneyAmount cents={0} />
+            </p>
           </div>
         </div>
       </section>
