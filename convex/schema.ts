@@ -59,5 +59,10 @@ export default defineSchema({
     .index('by_organizationId', ['organizationId']),
   ledgerEntries: defineTable(ledgerEntriesTableFields)
     .index('by_rosterStudent_createdAt', ['rosterStudentId', 'createdAt'])
+    .index('by_rosterStudent_accountKind_createdAt', [
+      'rosterStudentId',
+      'accountKind',
+      'createdAt',
+    ])
     .index('by_organizationId_createdAt', ['organizationId', 'createdAt']),
 })

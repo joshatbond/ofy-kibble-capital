@@ -5,15 +5,19 @@ import {
 } from 'convex/server'
 import { v } from 'convex/values'
 
-import { mutation, query } from '../_generated/server'
+import { internalMutation, mutation, query } from '../_generated/server'
 import {
   bankAccountKindValidator,
   ledgerEntryTypeValidator,
 } from '../schema/schemaFields'
 
-import { requireBankAccountForStudent } from './banking/accounts'
-import { getStudentBalances, postLedgerEntry } from './banking/ledger'
+import { getStudentBalances } from './banking/ledger'
 import { getActiveRosterStudentForUser } from './banking/student'
+import {
+  moveBetweenStudentAccounts,
+  transferDirectionMeta,
+  transferDirectionValidator,
+} from './banking/transfers'
 
 const balancesValidator = v.object({
   checkingCents: v.number(),
@@ -63,7 +67,10 @@ export const getMyBalances = query({
 })
 
 export const listMyActivityHistory = query({
-  args: { paginationOpts: paginationOptsValidator },
+  args: {
+    accountKind: v.optional(bankAccountKindValidator),
+    paginationOpts: paginationOptsValidator,
+  },
   returns: paginationResultValidator(activityRowValidator),
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx)
@@ -76,13 +83,25 @@ export const listMyActivityHistory = query({
       return { page: [], isDone: true, continueCursor: '' }
     }
 
-    const results = await ctx.db
-      .query('ledgerEntries')
-      .withIndex('by_rosterStudent_createdAt', q =>
-        q.eq('rosterStudentId', roster._id)
-      )
-      .order('desc')
-      .paginate(args.paginationOpts)
+    let results
+    if (args.accountKind === undefined) {
+      results = await ctx.db
+        .query('ledgerEntries')
+        .withIndex('by_rosterStudent_createdAt', q =>
+          q.eq('rosterStudentId', roster._id)
+        )
+        .order('desc')
+        .paginate(args.paginationOpts)
+    } else {
+      const accountKind = args.accountKind
+      results = await ctx.db
+        .query('ledgerEntries')
+        .withIndex('by_rosterStudent_accountKind_createdAt', q =>
+          q.eq('rosterStudentId', roster._id).eq('accountKind', accountKind)
+        )
+        .order('desc')
+        .paginate(args.paginationOpts)
+    }
 
     return {
       page: results.page.map(entry => ({
@@ -131,8 +150,11 @@ export const getMyLedgerEntry = query({
   },
 })
 
-export const sweepToChecking = mutation({
-  args: { amountCents: v.number() },
+export const transferBetweenAccounts = mutation({
+  args: {
+    direction: transferDirectionValidator,
+    amountCents: v.number(),
+  },
   returns: v.object({
     checkingCents: v.number(),
     savingsCents: v.number(),
@@ -152,46 +174,49 @@ export const sweepToChecking = mutation({
       throw new Error('Amount must be a positive integer number of cents.')
     }
 
-    const savings = await requireBankAccountForStudent(
-      ctx,
-      roster._id,
-      'savings'
-    )
-    const checking = await requireBankAccountForStudent(
-      ctx,
-      roster._id,
-      'checking'
-    )
+    const meta = transferDirectionMeta(args.direction)
 
-    if (savings.balanceCents < args.amountCents) {
-      throw new Error('Insufficient unallocated savings.')
-    }
-
-    const createdAt = Date.now()
-    const label = 'Sweep to checking'
-
-    await postLedgerEntry(ctx, {
-      organizationId: roster.organizationId,
-      rosterStudentId: roster._id,
-      bankAccountId: savings._id,
-      accountKind: 'savings',
-      direction: 'debit',
+    await moveBetweenStudentAccounts(ctx, {
+      roster,
+      fromKind: meta.fromKind,
+      toKind: meta.toKind,
       amountCents: args.amountCents,
-      entryType: 'sweep_to_checking',
-      label,
-      createdAt,
+      entryType: 'internal_transfer',
+      label: meta.label,
+      createdAt: Date.now(),
+      insufficientFundsMessage: meta.insufficientFundsMessage,
     })
 
-    await postLedgerEntry(ctx, {
-      organizationId: roster.organizationId,
-      rosterStudentId: roster._id,
-      bankAccountId: checking._id,
-      accountKind: 'checking',
-      direction: 'credit',
+    return await getStudentBalances(ctx, roster)
+  },
+})
+
+/** POS / spend pipeline only — moves unallocated savings when checking is short. */
+export const sweepToChecking = internalMutation({
+  args: { amountCents: v.number(), rosterStudentId: v.id('rosterStudents') },
+  returns: v.object({
+    checkingCents: v.number(),
+    savingsCents: v.number(),
+  }),
+  handler: async (ctx, args) => {
+    if (!Number.isInteger(args.amountCents) || args.amountCents <= 0) {
+      throw new Error('Amount must be a positive integer number of cents.')
+    }
+
+    const roster = await ctx.db.get('rosterStudents', args.rosterStudentId)
+    if (roster === null || roster.status !== 'active') {
+      throw new Error('Active student account required.')
+    }
+
+    await moveBetweenStudentAccounts(ctx, {
+      roster,
+      fromKind: 'savings',
+      toKind: 'checking',
       amountCents: args.amountCents,
       entryType: 'sweep_to_checking',
-      label,
-      createdAt,
+      label: 'Sweep to checking',
+      createdAt: Date.now(),
+      insufficientFundsMessage: 'Insufficient unallocated savings.',
     })
 
     return await getStudentBalances(ctx, roster)
