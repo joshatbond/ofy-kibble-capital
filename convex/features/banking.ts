@@ -11,6 +11,7 @@ import {
   ledgerEntryTypeValidator,
 } from '../schema/schemaFields'
 
+import { requireTeacherForOrg } from './auth/teacher'
 import { getStudentBalances } from './banking/ledger'
 import { getActiveRosterStudentForUser } from './banking/student'
 import {
@@ -28,6 +29,18 @@ const balancesValidator = v.object({
 
 const activityRowValidator = v.object({
   entryId: v.id('ledgerEntries'),
+  accountKind: bankAccountKindValidator,
+  direction: v.union(v.literal('credit'), v.literal('debit')),
+  amountCents: v.number(),
+  entryType: ledgerEntryTypeValidator,
+  label: v.string(),
+  createdAt: v.number(),
+})
+
+const classroomActivityRowValidator = v.object({
+  entryId: v.id('ledgerEntries'),
+  rosterStudentId: v.id('rosterStudents'),
+  studentDisplayName: v.string(),
   accountKind: bankAccountKindValidator,
   direction: v.union(v.literal('credit'), v.literal('debit')),
   amountCents: v.number(),
@@ -106,6 +119,63 @@ export const listMyActivityHistory = query({
     return {
       page: results.page.map(entry => ({
         entryId: entry._id,
+        accountKind: entry.accountKind,
+        direction: entry.direction,
+        amountCents: entry.amountCents,
+        entryType: entry.entryType,
+        label: entry.label,
+        createdAt: entry.createdAt,
+      })),
+      isDone: results.isDone,
+      continueCursor: results.continueCursor,
+    }
+  },
+})
+
+export const listClassroomActivityHistory = query({
+  args: {
+    organizationId: v.string(),
+    paginationOpts: paginationOptsValidator,
+  },
+  returns: paginationResultValidator(classroomActivityRowValidator),
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx)
+    if (userId === null) {
+      throw new Error('Not authenticated')
+    }
+
+    await requireTeacherForOrg(ctx, userId, args.organizationId, 'members:list')
+
+    const results = await ctx.db
+      .query('ledgerEntries')
+      .withIndex('by_organizationId_createdAt', q =>
+        q.eq('organizationId', args.organizationId)
+      )
+      .order('desc')
+      .paginate(args.paginationOpts)
+
+    const rosterStudentIds = [
+      ...new Set(results.page.map(entry => entry.rosterStudentId)),
+    ]
+    const rosterStudents = await Promise.all(
+      rosterStudentIds.map(rosterStudentId =>
+        ctx.db.get('rosterStudents', rosterStudentId)
+      )
+    )
+    const displayNameByRosterId = new Map(
+      rosterStudents
+        .filter(
+          (roster): roster is NonNullable<typeof roster> => roster !== null
+        )
+        .map(roster => [roster._id, roster.displayName] as const)
+    )
+
+    return {
+      page: results.page.map(entry => ({
+        entryId: entry._id,
+        rosterStudentId: entry.rosterStudentId,
+        studentDisplayName:
+          displayNameByRosterId.get(entry.rosterStudentId) ?? 'Student',
         accountKind: entry.accountKind,
         direction: entry.direction,
         amountCents: entry.amountCents,

@@ -5,6 +5,7 @@ import {
   Ban,
   CopyIcon,
   Filter,
+  History,
   Link2,
   RefreshCw,
   RotateCw,
@@ -119,16 +120,27 @@ function AdminClassRosterContent() {
       title="Student roster"
       description="Manage classroom accounts, monitor balances, and distribute Kibble."
       action={
-        <Button
-          type="button"
-          variant="brutal"
-          className="h-auto w-fit gap-2 px-6 py-4 text-sm font-bold uppercase"
-          onClick={() => setShowInvites(current => !current)}
-        >
-          <UserPlus className="size-4" aria-hidden />
+        <div className="flex flex-wrap items-center gap-3">
+          <Link
+            to="/admin/$orgSlug/activity"
+            params={params}
+            className="border-ink bg-card shadow-brutal hover:bg-muted/40 inline-flex items-center gap-2 rounded-xl border-2 px-4 py-3 text-sm font-bold transition-all active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+          >
+            <History className="size-4" aria-hidden />
+            Classroom activity
+          </Link>
 
-          {showInvites ? 'Hide invites' : 'Create account'}
-        </Button>
+          <Button
+            type="button"
+            variant="brutal"
+            className="h-auto w-fit gap-2 px-6 py-4 text-sm font-bold uppercase"
+            onClick={() => setShowInvites(current => !current)}
+          >
+            <UserPlus className="size-4" aria-hidden />
+
+            {showInvites ? 'Hide invites' : 'Create account'}
+          </Button>
+        </div>
       }
     >
       <ClassroomRosterTable

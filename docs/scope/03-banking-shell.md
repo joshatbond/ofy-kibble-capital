@@ -19,7 +19,7 @@ Append-only ledger and PawKet UI for balances and **Activity history** — no pa
 
 ## Acceptance criteria
 
-- [x] **Student** sees only own **Activity history**; **Teacher** sees all in classroom (student path shipped; teacher classroom feed deferred)
+- [x] **Student** sees only own **Activity history**; **Teacher** sees all in classroom
 - [x] All amounts in **Cents**; display formatted dollars
 - [x] No negative balances at layer (mutations reject)
 
