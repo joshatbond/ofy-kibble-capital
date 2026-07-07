@@ -1,14 +1,23 @@
-/** Format integer cents as a USD display string for wireframe admin pages. */
-export function formatCents(cents: number): string {
-  return `$${(cents / 100).toFixed(2)}`
+/** Numeric portion of a money display (no currency symbol). */
+export function formatCentsAmount(cents: number): string {
+  return (Math.abs(cents) / 100).toFixed(2)
 }
 
-/** Format integer cents with a classroom currency label (e.g. Kibbles). */
+/**
+ * @deprecated Prefer `<MoneyAmount cents={…} />` in UI. Kept for non-React call sites.
+ */
+export function formatCents(cents: number): string {
+  return formatCentsAmount(cents)
+}
+
+/**
+ * @deprecated The Bark Buck symbol replaces inline currency labels in UI.
+ */
 export function formatCentsWithLabel(
   cents: number,
-  currencyLabel: string
+  _currencyLabel: string
 ): string {
-  return `${formatCents(cents)} ${currencyLabel}`
+  return formatCentsAmount(cents)
 }
 
 export function formatPaySchedule(schedule: {

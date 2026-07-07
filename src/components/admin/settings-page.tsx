@@ -3,6 +3,7 @@ import { Percent, Wallet } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
 import { AdminPage } from '~/components/admin/admin-shell'
+import { BarkBuckSymbol } from '~/components/brand/bark-buck-symbol'
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
 import { api } from '~/convex/_generated/api'
@@ -81,7 +82,7 @@ export function AdminSettingsPage(props: {
               <p className="font-heading text-xl font-bold">Default pay rate</p>
 
               <p className="text-muted-foreground mt-1 text-sm">
-                Base hourly {draft.currencyLabel} wage for student tasks.
+                Base hourly wage for student tasks.
               </p>
             </div>
           </div>
@@ -415,9 +416,7 @@ function MoneySettingRow(props: {
           onEdit={props.onEdit}
           onChangeCents={props.onChangeCents}
           prefix={
-            <span className="font-heading text-primary pointer-events-none absolute top-1/2 left-4 z-10 -translate-y-1/2 text-xl font-bold">
-              $
-            </span>
+            <BarkBuckSymbol className="text-primary pointer-events-none absolute top-1/2 left-4 z-10 size-5 -translate-y-1/2" />
           }
           className="border-ink font-heading shadow-brutal h-11 border-2 pl-10 text-lg"
         />
