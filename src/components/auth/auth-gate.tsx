@@ -79,7 +79,7 @@ function AuthGateWithConvex(props: {
     }
 
     if (intentApplied) {
-      phaseAssign('completing')
+      phaseAssign(current => (current === 'ready' ? current : 'completing'))
       return
     }
 
