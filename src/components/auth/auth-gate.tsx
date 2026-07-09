@@ -4,6 +4,7 @@ import { useMutation, useQuery } from 'convex/react'
 import { useEffect, useState } from 'react'
 
 import { KibbleLoadingScreen } from '~/components/loading/kibble-loader'
+import { PawketLoadingScreen } from '~/components/loading/pawket-loader'
 import { Case, SwitchOn } from '~/components/switch-on'
 import { api } from '~/convex/_generated/api'
 import { protectedRouteReturnTo, studentAppHomePath } from '~/lib/auth-redirect'
@@ -111,6 +112,9 @@ function AuthGateWithConvex(props: {
   const loaderReady =
     !isRedirecting && phase === 'completing' && isAuthed && intentApplied
 
+  const LoadingScreen =
+    props.app === 'pawket' ? PawketLoadingScreen : KibbleLoadingScreen
+
   return (
     <SwitchOn>
       <Case
@@ -118,7 +122,7 @@ function AuthGateWithConvex(props: {
           isLanding && (authPending || (isAuthenticated && !signedOut))
         }
       >
-        <KibbleLoadingScreen
+        <LoadingScreen
           label={isAuthenticated ? 'Redirecting…' : 'Loading…'}
           isReady={false}
           onComplete={() => {}}
@@ -139,7 +143,7 @@ function AuthGateWithConvex(props: {
       </Case>
 
       <Case>
-        <KibbleLoadingScreen
+        <LoadingScreen
           label={loaderLabel}
           isReady={loaderReady}
           onComplete={() => phaseAssign('ready')}
