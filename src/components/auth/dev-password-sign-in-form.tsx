@@ -1,10 +1,11 @@
 import { useAuthActions } from '@convex-dev/auth/react'
 import { useEffect, useState } from 'react'
 
+import { PawketBrutalButton } from '~/components/pawket/landing/pawket-brutal-button'
+
 export function DevPasswordSignInForm(props: {
   email?: string
   emailReadOnly?: boolean
-  className?: string
 }) {
   const { signIn } = useAuthActions()
   const emailReadOnly = props.emailReadOnly ?? props.email !== undefined
@@ -21,30 +22,34 @@ export function DevPasswordSignInForm(props: {
 
   return (
     <form
-      className={props.className}
+      className="space-y-2"
       onSubmit={event => {
         event.preventDefault()
         void handleSubmit()
       }}
     >
-      <p>
-        <label>
-          Email
+      <fieldset>
+        <label className="space-x-2">
+          <span>Email</span>
+
           <input
             type="email"
+            className="bg-background rounded px-2 py-1"
             value={email}
             onChange={event => setEmail(event.target.value)}
             readOnly={emailReadOnly}
             required
           />
         </label>
-      </p>
+      </fieldset>
 
-      <p>
-        <label>
-          Password
+      <fieldset>
+        <label className="space-x-2">
+          <span>Password</span>
+
           <input
             type="password"
+            className="bg-background rounded px-2 py-1"
             value={password}
             onChange={event => setPassword(event.target.value)}
             autoComplete="current-password"
@@ -52,15 +57,19 @@ export function DevPasswordSignInForm(props: {
             required
           />
         </label>
-      </p>
+      </fieldset>
 
       <p>Local dev only — creates a test account if one does not exist yet.</p>
 
       {error !== null ? <p role="alert">{error}</p> : null}
 
-      <button type="submit" disabled={pending}>
+      <PawketBrutalButton
+        type="submit"
+        disabled={pending}
+        className="bg-primary text-primary-foreground w-full sm:w-auto"
+      >
         {pending ? 'Signing in…' : 'Sign in with password'}
-      </button>
+      </PawketBrutalButton>
     </form>
   )
 

@@ -13,7 +13,7 @@ const buttonVariants = cva(
       variant: {
         default: 'bg-primary text-primary-foreground [a]:hover:bg-primary/80',
         brutal:
-          'rounded-lg border-2 border-ink bg-primary text-primary-foreground shadow-brutal transition-all active:translate-x-0.5 active:translate-y-0.5 active:shadow-none [a]:hover:bg-primary/90',
+          'rounded-lg border-2 border-ink bg-primary text-primary-foreground shadow-brutal transition-all hover:bg-primary/90 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none',
         'brutal-outline':
           'rounded-lg border-2 border-ink bg-background text-foreground shadow-brutal transition-all hover:bg-muted hover:text-foreground active:translate-x-0.5 active:translate-y-0.5 active:shadow-none aria-expanded:bg-muted aria-expanded:text-foreground',
         outline:

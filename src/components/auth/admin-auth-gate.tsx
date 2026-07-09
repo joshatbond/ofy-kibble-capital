@@ -13,6 +13,7 @@ import { Case, SwitchOn } from '~/components/switch-on'
 import { api } from '~/convex/_generated/api'
 import { isScopedAdminPath } from '~/lib/admin-route-context'
 import { adminAppHomePath, adminAppLandingPath } from '~/lib/auth-redirect'
+import { protectedAdminRouteReturnTo } from '~/lib/admin-auth-redirect'
 
 export function AdminAuthGate() {
   if (!import.meta.env.VITE_CONVEX_URL) return <Outlet />
@@ -25,6 +26,20 @@ function AdminAuthGateWithConvex() {
   const navigate = useNavigate()
   const pathname = useRouterState({
     select: state => state.location.pathname,
+  })
+  const signedOut = useRouterState({
+    select: state => {
+      const value = state.location.search.signedOut
+
+      return value === true || (typeof value === 'string' && value === 'true')
+    },
+  })
+  const accessDenied = useRouterState({
+    select: state => {
+      const value = state.location.search.accessDenied
+
+      return value === true || (typeof value === 'string' && value === 'true')
+    },
   })
   const landingPath = adminAppLandingPath()
   const homePath = adminAppHomePath()
@@ -43,13 +58,20 @@ function AdminAuthGateWithConvex() {
   useEffect(() => {
     if (isLoading) return
 
-    if (isLanding && isAuthenticated) {
+    if (isLanding && isAuthenticated && !signedOut) {
       if (teacherContext === undefined) {
         return
       }
 
       if (teacherContext === null) {
-        void navigate({ to: homePath, replace: true })
+        if (!accessDenied) {
+          void navigate({
+            to: landingPath,
+            search: { accessDenied: true },
+            replace: true,
+          })
+        }
+
         return
       }
 
@@ -64,7 +86,27 @@ function AdminAuthGateWithConvex() {
     }
 
     if (!isLanding && !isAuthenticated) {
-      void navigate({ to: landingPath, replace: true })
+      void navigate({
+        to: landingPath,
+        search: {
+          returnTo: protectedAdminRouteReturnTo(pathname),
+        },
+        replace: true,
+      })
+      return
+    }
+
+    if (
+      !isLanding &&
+      isAuthenticated &&
+      teacherContext === null &&
+      !teacherContextPending
+    ) {
+      void navigate({
+        to: landingPath,
+        search: { accessDenied: true },
+        replace: true,
+      })
     }
   }, [
     homePath,
@@ -73,7 +115,11 @@ function AdminAuthGateWithConvex() {
     isLoading,
     landingPath,
     navigate,
+    accessDenied,
+    pathname,
+    signedOut,
     teacherContext,
+    teacherContextPending,
   ])
 
   return (
@@ -81,7 +127,10 @@ function AdminAuthGateWithConvex() {
       <Case predicate={isLanding}>
         <SwitchOn>
           <Case
-            predicate={isLoading || (isAuthenticated && teacherContextPending)}
+            predicate={
+              isLoading ||
+              (isAuthenticated && teacherContextPending && !signedOut)
+            }
           >
             <p>{isAuthenticated ? 'Redirecting…' : 'Loading…'}</p>
           </Case>

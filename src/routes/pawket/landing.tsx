@@ -1,21 +1,25 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { StudentLandingSignIn } from '~/components/auth/student-landing-sign-in'
+import { PawketLandingPage } from '~/components/pawket/landing/pawket-landing-page'
+import { parseStudentLandingSearch } from '~/lib/auth-redirect'
 
 export const Route = createFileRoute('/pawket/landing')({
-  component: PawketLandingPage,
+  validateSearch: parseStudentLandingSearch,
+  head: () => ({
+    meta: [
+      { title: 'PawKet Exchange — Master Your Money Like a Pro' },
+      {
+        name: 'description',
+        content:
+          'The fun, game-inspired way for students to save, spend, and learn financial skills.',
+      },
+    ],
+  }),
+  component: PawketLandingRoute,
 })
 
-function PawketLandingPage() {
-  return (
-    <main>
-      <h1>Pawket — Landing</h1>
+function PawketLandingRoute() {
+  const search = Route.useSearch()
 
-      <p>Unauthenticated marketing page (stub).</p>
-
-      <nav>
-        <StudentLandingSignIn app="pawket" />
-      </nav>
-    </main>
-  )
+  return <PawketLandingPage returnTo={search.returnTo} />
 }

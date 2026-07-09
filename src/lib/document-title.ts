@@ -1,5 +1,4 @@
 import { isPawketTransactionDetail } from '~/lib/pawket-nav'
-import { appThemes } from '~/lib/themes'
 
 const ADMIN_APP_NAME = 'Kibble Admin'
 
@@ -57,10 +56,10 @@ function adminSectionTitle(path: string): string | null {
 
 function appNameForPathname(pathname: string): string {
   if (pathname.startsWith('/pawket')) {
-    return appThemes.pawket
+    return 'PawKet Exchange'
   }
 
-  return appThemes.kibble
+  return 'Kibble Capital'
 }
 
 function pageTitleForPathname(pathname: string): string {

@@ -25,8 +25,8 @@ export function SignOutButton(props: {
     setPending(true)
 
     try {
+      void navigate({ to: props.landingTo, search: { signedOut: true } })
       await signOut()
-      void navigate({ to: props.landingTo })
     } finally {
       setPending(false)
     }

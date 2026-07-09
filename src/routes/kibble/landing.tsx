@@ -1,21 +1,25 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { StudentLandingSignIn } from '~/components/auth/student-landing-sign-in'
+import { KibbleLandingPage } from '~/components/kibble/landing/kibble-landing-page'
+import { parseStudentLandingSearch } from '~/lib/auth-redirect'
 
 export const Route = createFileRoute('/kibble/landing')({
-  component: KibbleLandingPage,
+  validateSearch: parseStudentLandingSearch,
+  head: () => ({
+    meta: [
+      { title: 'Kibble Capital — Your Professional Earnings Start Here' },
+      {
+        name: 'description',
+        content:
+          'Clock in, track hours, and understand your school-based earnings with transparent pay stubs and a unified student dashboard.',
+      },
+    ],
+  }),
+  component: KibbleLandingRoute,
 })
 
-function KibbleLandingPage() {
-  return (
-    <main>
-      <h1>Kibble — Landing</h1>
+function KibbleLandingRoute() {
+  const search = Route.useSearch()
 
-      <p>Unauthenticated marketing page (stub).</p>
-
-      <nav>
-        <StudentLandingSignIn app="kibble" />
-      </nav>
-    </main>
-  )
+  return <KibbleLandingPage returnTo={search.returnTo} />
 }

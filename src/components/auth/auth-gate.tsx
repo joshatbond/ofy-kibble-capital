@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react'
 import { KibbleLoadingScreen } from '~/components/loading/kibble-loader'
 import { Case, SwitchOn } from '~/components/switch-on'
 import { api } from '~/convex/_generated/api'
-import { studentAppHomePath } from '~/lib/auth-redirect'
+import { protectedRouteReturnTo, studentAppHomePath } from '~/lib/auth-redirect'
 import type { StudentApp } from '~/lib/auth-redirect'
 
 import type { ReactNode } from 'react'
@@ -35,6 +35,13 @@ function AuthGateWithConvex(props: {
   const pathname = useRouterState({
     select: state => state.location.pathname,
   })
+  const signedOut = useRouterState({
+    select: state => {
+      const value = state.location.search.signedOut
+
+      return value === true || (typeof value === 'string' && value === 'true')
+    },
+  })
   const [phase, phaseAssign] = useState<'checking' | 'completing' | 'ready'>(
     'checking'
   )
@@ -51,13 +58,22 @@ function AuthGateWithConvex(props: {
       return
     }
 
-    if (isLanding && isAuthenticated) {
-      void navigate({ to: homePath, replace: true })
+    if (isLanding) {
+      if (isAuthenticated && !signedOut) {
+        void navigate({ to: homePath, replace: true })
+      }
+
       return
     }
 
-    if (!isLanding && !isAuthenticated) {
-      void navigate({ to: props.landingPath, replace: true })
+    if (!isAuthenticated) {
+      void navigate({
+        to: props.landingPath,
+        search: {
+          returnTo: protectedRouteReturnTo(props.app, pathname),
+        },
+        replace: true,
+      })
       return
     }
 
@@ -80,7 +96,10 @@ function AuthGateWithConvex(props: {
     isAuthenticated,
     isLanding,
     navigate,
+    pathname,
+    props.app,
     props.landingPath,
+    signedOut,
   ])
 
   const isRedirecting = !isAuthenticated && !authPending
@@ -94,7 +113,11 @@ function AuthGateWithConvex(props: {
 
   return (
     <SwitchOn>
-      <Case predicate={isLanding && (authPending || isAuthenticated)}>
+      <Case
+        predicate={
+          isLanding && (authPending || (isAuthenticated && !signedOut))
+        }
+      >
         <KibbleLoadingScreen
           label={isAuthenticated ? 'Redirecting…' : 'Loading…'}
           isReady={false}
