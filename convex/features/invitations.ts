@@ -1,13 +1,12 @@
 import { getAuthUserId } from '@convex-dev/auth/server'
-import { orgScope } from '@djpanda/convex-tenants'
 import { v } from 'convex/values'
 
 import { api, components } from '../_generated/api'
 import { mutation, query } from '../_generated/server'
+import { optionalDisplayName } from '../lib/displayName'
 import { grade } from '../schema/schemaFields'
 
-import { authz } from './auth/authz'
-import { generatePayToken } from './invitations/payToken'
+import { requireTeacherForOrg } from './auth/teacher'
 import {
   assertOfyOrgEmail,
   emailsMatch,
@@ -15,7 +14,9 @@ import {
   normalizeInviteEmail,
 } from './invitations/policy'
 import {
+  allocatePayTokenForOrganization,
   assertUniqueExternalStudentId,
+  deleteNeverActiveRosterStudent,
   getClassroomIdForOrganization,
   getRosterByInvitationId,
   insertPendingRosterStudent,
@@ -35,6 +36,8 @@ const invitationResultValidator = v.object({
 const rosterRowValidator = v.object({
   rosterStudentId: v.id('rosterStudents'),
   email: v.string(),
+  displayName: v.optional(v.string()),
+  resolvedName: v.optional(v.string()),
   externalStudentId: v.number(),
   grade,
   status: rosterStatusValidator,
@@ -58,6 +61,7 @@ export const inviteStudent = mutation({
   args: {
     organizationId: v.string(),
     email: v.string(),
+    displayName: v.optional(v.string()),
     externalStudentId: v.number(),
     grade,
   },
@@ -76,6 +80,7 @@ export const inviteStudent = mutation({
     )
 
     const email = assertOfyOrgEmail(args.email)
+    const displayName = optionalDisplayName(args.displayName)
     const classroomId = await getClassroomIdForOrganization(
       ctx,
       args.organizationId
@@ -87,7 +92,10 @@ export const inviteStudent = mutation({
       args.externalStudentId
     )
 
-    const payToken = generatePayToken()
+    const payToken = await allocatePayTokenForOrganization(
+      ctx,
+      args.organizationId
+    )
     const expiresAt = invitationExpiresAt()
 
     const result = await ctx.runMutation(
@@ -107,6 +115,7 @@ export const inviteStudent = mutation({
       classroomId,
       invitationId: result.invitationId,
       email,
+      displayName,
       externalStudentId: args.externalStudentId,
       grade: args.grade,
       payToken,
@@ -234,7 +243,11 @@ export const revokeClassroomInvitation = mutation({
 
     const roster = await getRosterByInvitationId(ctx, args.invitationId)
     if (roster !== null) {
-      await setRosterStatus(ctx, roster._id, 'revoked')
+      if (roster.userId !== undefined || roster.status === 'active') {
+        await setRosterStatus(ctx, roster._id, 'revoked')
+      } else {
+        await deleteNeverActiveRosterStudent(ctx, roster._id)
+      }
     }
 
     return null
@@ -264,7 +277,11 @@ export const rotatePayToken = mutation({
       throw new Error('Student not found on this roster.')
     }
 
-    const payToken = generatePayToken()
+    const payToken = await allocatePayTokenForOrganization(
+      ctx,
+      args.organizationId,
+      args.rosterStudentId
+    )
     await ctx.db.patch('rosterStudents', args.rosterStudentId, { payToken })
 
     return { payToken }
@@ -412,9 +429,19 @@ export const listClassroomRoster = query({
         continue
       }
 
+      let resolvedName = roster.displayName
+      if (roster.userId !== undefined) {
+        const linkedUser = await ctx.db.get('users', roster.userId)
+        if (linkedUser?.name !== undefined && linkedUser.name.trim() !== '') {
+          resolvedName = linkedUser.name.trim()
+        }
+      }
+
       rows.push({
         rosterStudentId: roster._id,
         email: roster.email,
+        displayName: roster.displayName,
+        resolvedName,
         externalStudentId: roster.externalStudentId,
         grade: roster.grade,
         status: roster.status,
@@ -432,14 +459,6 @@ export const listClassroomRoster = query({
     return rows
   },
 })
-async function requireTeacherForOrg(
-  ctx: Parameters<typeof authz.require>[0],
-  userId: string,
-  organizationId: string,
-  permission: string
-): Promise<void> {
-  await authz.require(ctx, userId, permission, orgScope(organizationId))
-}
 async function getInviterName(
   ctx: MutationCtx,
   userId: Id<'users'>

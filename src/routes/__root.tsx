@@ -6,6 +6,11 @@ import {
 } from '@tanstack/react-router'
 import * as React from 'react'
 
+import { useDocumentTitle } from '~/hooks/use-document-title'
+import { useFavicon } from '~/hooks/use-favicon'
+import { useMobileButtonHaptics } from '~/hooks/use-mobile-button-haptics'
+import { formatDocumentTitle } from '~/lib/document-title'
+import { faviconHrefForPathname } from '~/lib/favicon'
 import appCss from '~/styles/app.css?url'
 
 import type { QueryClient } from '@tanstack/react-query'
@@ -20,32 +25,23 @@ export const Route = createRootRouteWithContext<{
       },
       {
         name: 'viewport',
-        content: 'width=device-width, initial-scale=1',
+        content: 'width=device-width, initial-scale=1, viewport-fit=cover',
       },
       {
-        title: 'TanStack Start Starter',
+        title: formatDocumentTitle('/kibble'),
       },
     ],
     links: [
       { rel: 'stylesheet', href: appCss },
       {
+        rel: 'icon',
+        type: 'image/svg+xml',
+        href: faviconHrefForPathname('/kibble'),
+      },
+      {
         rel: 'apple-touch-icon',
-        sizes: '180x180',
-        href: '/apple-touch-icon.png',
+        href: faviconHrefForPathname('/kibble'),
       },
-      {
-        rel: 'icon',
-        type: 'image/png',
-        sizes: '32x32',
-        href: '/favicon-32x32.png',
-      },
-      {
-        rel: 'icon',
-        type: 'image/png',
-        sizes: '16x16',
-        href: '/favicon-16x16.png',
-      },
-      { rel: 'icon', href: '/favicon.ico' },
     ],
   }),
   notFoundComponent: () => <div>Route not found</div>,
@@ -53,6 +49,10 @@ export const Route = createRootRouteWithContext<{
 })
 
 function RootComponent() {
+  useMobileButtonHaptics()
+  useDocumentTitle()
+  useFavicon()
+
   return (
     <RootDocument>
       <Outlet />
@@ -62,12 +62,12 @@ function RootComponent() {
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html>
+    <html suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>
 
-      <body>
+      <body suppressHydrationWarning>
         {children}
 
         <Scripts />

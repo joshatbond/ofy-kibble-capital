@@ -19,9 +19,10 @@ export function PawketBrutalButton({
       size="lg"
       {...props}
       className={cn(
+        'transition-all hover:-translate-x-0.5 hover:-translate-y-0.5',
         large
           ? 'shadow-brutal-lg active:shadow-brutal h-auto px-10 py-3 text-xl font-bold'
-          : 'h-auto px-6 py-3 text-sm font-semibold',
+          : 'hover:shadow-brutal-lg h-auto px-6 py-3 text-sm font-semibold',
         className
       )}
     >

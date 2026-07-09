@@ -38,6 +38,8 @@ Convex registers **every** `convex/**/*.ts` module in the generated `api`. Only 
 | Catalog            | —                               | `features/catalog/siteSlug.ts`                           |
 | Organizations      | `api.features.organizations`    | —                                                        |
 | Users              | `api.features.users`            | —                                                        |
+| Admin context      | `api.features.admin.context`    | `features/admin/context.ts`                              |
+| Banking            | `api.features.banking`          | `features/banking/` (slice 3)                            |
 
 **Sign-in** stays `api.auth.*` (`convex/auth.ts` at root).
 

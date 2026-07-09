@@ -66,10 +66,10 @@ export const linkDevTeacherByEmail = internalMutation({
     const organizationId = classroom.organizationId
     const role = args.role ?? 'owner'
 
-    const existing = await ctx.runQuery(
-      components.tenants.members.getMember,
-      { organizationId, userId: user._id }
-    )
+    const existing = await ctx.runQuery(components.tenants.members.getMember, {
+      organizationId,
+      userId: user._id,
+    })
 
     if (!existing) {
       await ctx.runMutation(components.tenants.members.addMember, {

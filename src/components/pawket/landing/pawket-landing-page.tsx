@@ -1,7 +1,9 @@
 import { Rocket, Shield, TrendingUp } from 'lucide-react'
 
+import { LandingDevSignIn } from '~/components/auth/landing-dev-sign-in'
 import { StudentSignInButton } from '~/components/auth/student-sign-in-button'
 import { BrandLogo } from '~/components/brand/brand-logo'
+import { For } from '~/components/ui/for'
 import { cn } from '~/lib/class-name-merge'
 
 import { PawketBrutalButton } from './pawket-brutal-button'
@@ -19,6 +21,10 @@ export function PawketLandingPage(props: { returnTo?: string }) {
         <LandingFeatures />
 
         <LandingCta />
+
+        <div className="max-md:col-start-2 md:px-0">
+          <LandingDevSignIn />
+        </div>
       </main>
 
       <LandingFooter />
@@ -236,7 +242,6 @@ function LandingFooter() {
               title="Connect"
               className="col-span-2 sm:col-span-1"
               links={[]}
-              social
             />
           </div>
         </div>
@@ -267,28 +272,16 @@ function FooterLinkGroup(props: {
         {props.title}
       </span>
 
-      {props.social ? (
-        <div className="mt-1 flex gap-3">
-          {(['FB', 'IG', 'TW'] as const).map(network => (
-            <div
-              key={network}
-              className="border-background hover:bg-background hover:text-ink flex size-10 cursor-pointer items-center justify-center border-2 text-xs font-bold transition-colors"
-            >
-              {network}
-            </div>
-          ))}
-        </div>
-      ) : (
-        props.links.map(link => (
+      <For data={props.links} getKey={link => link.label}>
+        {link => (
           <a
-            key={link.label}
             href={link.href}
             className="hover:text-secondary text-sm transition-colors"
           >
             {link.label}
           </a>
-        ))
-      )}
+        )}
+      </For>
     </div>
   )
 }

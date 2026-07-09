@@ -21,7 +21,6 @@ import type { ThemeTones } from '../src/lib/theme-tones'
 
 const repoRoot = join(import.meta.dirname, '..')
 const themesDir = join(repoRoot, 'src', 'styles', 'themes')
-
 const toneSteps = [
   '000',
   '010',
@@ -36,18 +35,16 @@ const toneSteps = [
   '095',
   '100',
 ] as const
-
+await main()
 function cssVarName(role: string, step: (typeof toneSteps)[number]): string {
   return `--${role}-${toneStepToSuffix(step)}`
 }
-
 function tailwindColorName(
   role: string,
   step: (typeof toneSteps)[number]
 ): string {
   return `${role}-${toneStepToSuffix(step)}`
 }
-
 function generateToneBlock(
   dataTheme: string,
   label: string,
@@ -69,7 +66,6 @@ function generateToneBlock(
   lines.push('}')
   return lines.join('\n')
 }
-
 function generateProductThemeFile(options: {
   dataTheme: string
   label: string
@@ -114,7 +110,6 @@ ${cssVarBlock(semanticVars).join('\n')}
 }
 `
 }
-
 function generateTailwindThemeBridge(): string {
   const lines: Array<string> = [
     '/** Tailwind color utilities for Stitch tonal steps (generated) */',
@@ -131,7 +126,6 @@ function generateTailwindThemeBridge(): string {
   lines.push('}')
   return lines.join('\n')
 }
-
 async function main() {
   const kibbleTones = generateToneBlock(
     'kibble',
@@ -191,5 +185,3 @@ async function main() {
     'Wrote oklch theme CSS to src/styles/themes/ (tones + product themes)'
   )
 }
-
-await main()

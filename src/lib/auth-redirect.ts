@@ -1,12 +1,20 @@
+/**
+ * Client post-OAuth redirect helpers. Paths must stay aligned with
+ * `convex/features/auth/redirect.ts` allowlist.
+ */
+
 const STUDENT_APP_BASE_PATH: Record<StudentApp, `/${string}`> = {
   kibble: '/kibble',
   pawket: '/pawket',
 }
+const ALLOWED_APP_BASE_PATHS = [
+  '/kibble',
+  '/pawket',
+  '/admin',
+  '/invite',
+] as const
 export function studentAppLandingPath(app: StudentApp): string {
   return `${STUDENT_APP_BASE_PATH[app]}/landing`
-}
-export function studentAppLoadingPath(app: StudentApp): string {
-  return `${STUDENT_APP_BASE_PATH[app]}/loading`
 }
 export function studentAppHomePath(app: StudentApp): string {
   return `${STUDENT_APP_BASE_PATH[app]}/`
@@ -32,6 +40,11 @@ export function isAllowedStudentAppRedirect(redirectTo: string): boolean {
 
   return studentAppFromPathname(path) !== null
 }
+export function isAllowedAppPath(pathname: string): boolean {
+  return ALLOWED_APP_BASE_PATHS.some(
+    base => pathname === base || pathname.startsWith(`${base}/`)
+  )
+}
 export function resolvePostAuthRedirect(
   app: StudentApp,
   returnTo?: string
@@ -56,16 +69,7 @@ export function resolveStudentSignInRedirect(
   app: StudentApp,
   returnTo?: string
 ): string {
-  const finalDest = resolvePostAuthRedirect(app, returnTo)
-  const loadingPath = studentAppLoadingPath(app)
-  const homePath = studentAppHomePath(app)
-
-  // If the final destination is just the app home, no `returnTo` is needed —
-  // `/loading` defaults to the app home anyway.
-  const path =
-    finalDest === homePath
-      ? loadingPath
-      : `${loadingPath}?returnTo=${encodeURIComponent(finalDest)}`
+  const path = resolvePostAuthRedirect(app, returnTo)
 
   if (typeof window === 'undefined') {
     return path
@@ -101,44 +105,47 @@ export function parseStudentLandingSearch(
 
   return result
 }
-export function parseStudentLoadingSearch(
-  search: Record<string, unknown>
-): StudentLoadingSearch {
-  const result: StudentLoadingSearch = {}
-
-  const returnTo =
-    typeof search.returnTo === 'string' ? search.returnTo : undefined
-
-  if (returnTo !== undefined && isAllowedStudentAppRedirect(returnTo)) {
-    const app = studentAppFromPathname(pathnameOfRedirect(returnTo))
-
-    if (app !== null) {
-      result.returnTo = resolvePostAuthRedirect(app, returnTo)
-    }
-  }
-
-  if (typeof search.code === 'string' && search.code.length > 0) {
-    result.code = search.code
-  }
-
-  return result
+export function studentAppRedirectTo(app: StudentApp): string {
+  return resolveStudentSignInRedirect(app)
 }
-export type StudentApp = 'kibble' | 'pawket'
-export type StudentLandingSearch = {
+export function adminAppHomePath(): string {
+  return '/admin'
+}
+export function adminAppLandingPath(): string {
+  return '/admin/landing'
+}
+export function adminAppRedirectTo(): string {
+  const path = adminAppHomePath()
+
+  if (typeof window === 'undefined') {
+    return path
+  }
+
+  return `${window.location.origin}${path}`
+}
+export function invitePath(invitationId: string): string {
+  return `/invite/${invitationId}`
+}
+export function inviteRedirectTo(invitationId: string): string {
+  const path = invitePath(invitationId)
+
+  if (typeof window === 'undefined') {
+    return path
+  }
+
+  return `${window.location.origin}${path}`
+}
+export type { StudentApp, StudentLandingSearch }
+function isStudentAppLandingPath(pathname: string, app: StudentApp): boolean {
+  return pathname === studentAppLandingPath(app)
+}
+type StudentApp = 'kibble' | 'pawket'
+type StudentLandingSearch = {
   returnTo?: string
   /**
-   * Set by the sign-out flow so the landing route's `beforeLoad` skips its
+   * Set by the sign-out flow so the landing route skips its
    * "you're authenticated, redirect to the dashboard" check for the brief
    * window between `navigate(landing)` and `signOut()` finishing.
    */
   signedOut?: boolean
-}
-export type StudentLoadingSearch = {
-  /** Where to send the user once auth + session have resolved. */
-  returnTo?: string
-  /** OAuth code, present when arriving here from a provider callback. */
-  code?: string
-}
-function isStudentAppLandingPath(pathname: string, app: StudentApp): boolean {
-  return pathname === studentAppLandingPath(app)
 }

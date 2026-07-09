@@ -1,6 +1,9 @@
-import { Outlet, createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 
+import { AuthGate } from '~/components/auth/auth-gate'
+import { PawketShell } from '~/components/pawket/pawket-shell'
 import { AppTheme } from '~/components/theme/app-theme'
+import { studentAppLandingPath } from '~/lib/auth-redirect'
 import { pwaManifests } from '~/lib/pwa-manifests'
 import { appThemes } from '~/lib/themes'
 
@@ -25,7 +28,11 @@ export const Route = createFileRoute('/pawket')({
 function PawketLayout() {
   return (
     <AppTheme theme="pawket">
-      <Outlet />
+      <AuthGate
+        app="pawket"
+        landingPath={studentAppLandingPath('pawket')}
+        authenticatedShell={children => <PawketShell>{children}</PawketShell>}
+      />
     </AppTheme>
   )
 }

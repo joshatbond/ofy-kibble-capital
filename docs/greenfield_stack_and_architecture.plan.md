@@ -16,18 +16,25 @@ todos:
     status: in_progress
   - id: routes_shells
     content: >-
-      `/kibble` and `/pawket` theme layouts + preview routes (done). Remaining: `/admin`, dual PWA manifests,
-      nav shells, role-based redirects.
+      `/kibble` and `/pawket` theme layouts + preview routes (done). `/admin` teacher hub shell,
+      auth gate, roster, settings (done). Remaining: dual PWA manifests, student nav shells,
+      role-based post-login redirects for all surfaces.
     status: in_progress
   - id: auth_tenants
-    content: Integrate Convex Auth; register @djpanda/convex-tenants + @djpanda/convex-authz; invitation-only onboarding (mirror ms-engage-v2 convex); teacher/student roles; no public signup
-    status: pending
+    content: >-
+      Convex Auth + Google OAuth; @djpanda/convex-tenants + @djpanda/convex-authz; invitation-only
+      onboarding; teacher/student roles; dev password provider for local testing (done). Remaining:
+      audit all public functions for getAuthUserId + authz.
+    status: in_progress
   - id: ssr_scope
-    content: 'SSR only: Kibble + PawKet marketing landing routes; all other routes (auth, dashboards, admin, POS) client-first / no SSR for Convex Auth'
-    status: pending
+    content: >-
+      SSR for Kibble + PawKet marketing landings (done). All other routes client-first.
+    status: completed
   - id: schema_v1
-    content: Author initial convex/schema.ts for paystubs, accounts/ledger, vaults, store POS, absences with indexes
-    status: pending
+    content: >-
+      Initial schema: regions/sites/classrooms, classSettings, rosterStudents, bankAccounts (done).
+      Remaining: ledgerEntries, paystubs, vaults, store POS, absences.
+    status: in_progress
   - id: vertical_slices
     content: Implement earnings, savings, and economy loops as thin end-to-end slices before deep UI polish
     status: pending

@@ -1,7 +1,6 @@
 import { cva } from 'class-variance-authority'
 import * as React from 'react'
 
-import { brutalBorder, brutalBorderLg } from '~/lib/brutal-chrome'
 import { cn } from '~/lib/class-name-merge'
 
 import type { VariantProps } from 'class-variance-authority'
@@ -12,8 +11,8 @@ const cardVariants = cva(
     variants: {
       variant: {
         default: 'ring-foreground/10 ring-1',
-        brutal: brutalBorder,
-        'brutal-lg': brutalBorderLg,
+        brutal: 'rounded-lg border-2 border-ink shadow-brutal',
+        'brutal-lg': 'rounded-lg border-2 border-ink shadow-brutal-lg',
       },
       size: {
         default: '',

@@ -5,10 +5,10 @@ Iteration plan for **ofy-kibble-capital**, derived from the grill session ([`CON
 ## Build order
 
 | #   | Slice                       | Doc                                                                      |
-| --- | --------------------------- | ------------------------------------------------------------------------ |
+| --- | --------------------------- | ------------------------------------------------------------------------ | ----------------------------------------------------------------------------- |
 | 1   | Foundation                  | [01-foundation.md](./01-foundation.md)                                   |
 | 2   | Roster & invites            | [02-roster-and-invites.md](./02-roster-and-invites.md)                   |
-| 3   | Banking shell               | [03-banking-shell.md](./03-banking-shell.md)                             |
+| 3   | Banking shell               | [03-banking-shell.md](./03-banking-shell.md)                             | **Done** — ledger, balances, activity, sweep, offline read-only, teacher feed |
 | 4   | Vaults & pay split          | [04-vaults-and-pay-split.md](./04-vaults-and-pay-split.md)               |
 | 5   | ms-engage attendance import | [05-ms-engage-attendance-import.md](./05-ms-engage-attendance-import.md) |
 | 6   | Payroll engine              | [06-payroll-engine.md](./06-payroll-engine.md)                           |

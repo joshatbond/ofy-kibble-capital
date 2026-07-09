@@ -1,13 +1,10 @@
-import { useAction, useMutation } from 'convex/react'
+import { useAuthActions } from '@convex-dev/auth/react'
+import { useState } from 'react'
 
 import { PawketBrutalButton } from '~/components/pawket/landing/pawket-brutal-button'
 import { resolveStudentSignInRedirect } from '~/lib/auth-redirect'
 import type { StudentApp } from '~/lib/auth-redirect'
-import { beginGoogleOAuthSignIn } from '~/lib/begin-google-oauth-sign-in'
 
-import { api } from '../../../convex/_generated/api'
-
-import type { Id } from '../../../convex/_generated/dataModel'
 import type { ComponentProps } from 'react'
 
 export function StudentSignInButton(props: {
@@ -18,10 +15,8 @@ export function StudentSignInButton(props: {
   returnTo?: string
   variant?: ComponentProps<typeof PawketBrutalButton>['variant']
 }) {
-  const signIn = useAction(api.auth.signIn)
-  const recordOAuthStudentApp = useMutation(
-    api.features.auth.studentAuth.recordOAuthStudentApp
-  )
+  const { signIn } = useAuthActions()
+  const [pending, setPending] = useState(false)
 
   return (
     <PawketBrutalButton
@@ -29,27 +24,22 @@ export function StudentSignInButton(props: {
       variant={props.variant}
       large={props.large}
       className={props.className}
-      onClick={() => {
-        void (async () => {
-          const redirectTo = resolveStudentSignInRedirect(
-            props.app,
-            props.returnTo
-          )
-
-          await beginGoogleOAuthSignIn({
-            signIn,
-            redirectTo,
-            afterVerifierCreated: async verifierId => {
-              await recordOAuthStudentApp({
-                verifierId: verifierId as Id<'authVerifiers'>,
-                redirectTo,
-              })
-            },
-          })
-        })()
-      }}
+      disabled={pending}
+      onClick={() => void handleClick()}
     >
-      {props.children}
+      {pending ? 'Signing in…' : props.children}
     </PawketBrutalButton>
   )
+
+  async function handleClick() {
+    setPending(true)
+
+    try {
+      await signIn('google', {
+        redirectTo: resolveStudentSignInRedirect(props.app, props.returnTo),
+      })
+    } finally {
+      setPending(false)
+    }
+  }
 }

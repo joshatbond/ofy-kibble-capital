@@ -87,7 +87,20 @@ const tenantsAPI = makeTypedTenantsAPI(
         return
       }
 
-      await activateRosterStudent(ctx, roster._id, data.userId as Id<'users'>)
+      const userId = data.userId as Id<'users'>
+      const user = await ctx.db.get('users', userId)
+      const rosterDisplayName = roster.displayName?.trim()
+
+      if (
+        user !== null &&
+        (user.name === undefined || user.name.trim() === '') &&
+        rosterDisplayName !== undefined &&
+        rosterDisplayName !== ''
+      ) {
+        await ctx.db.patch('users', userId, { name: rosterDisplayName })
+      }
+
+      await activateRosterStudent(ctx, roster._id, userId)
     },
 
     onBeforeUpdateMemberRole: async (ctx, { organizationId, memberUserId }) => {

@@ -1,10 +1,10 @@
-import { useAction } from 'convex/react'
+import { useAuthActions } from '@convex-dev/auth/react'
+import { useState } from 'react'
 
+import { GoogleLogo } from '~/components/auth/google-logo'
 import { PawketBrutalButton } from '~/components/pawket/landing/pawket-brutal-button'
 import { resolveTeacherSignInRedirect } from '~/lib/admin-auth-redirect'
-import { beginGoogleOAuthSignIn } from '~/lib/begin-google-oauth-sign-in'
-
-import { api } from '../../../convex/_generated/api'
+import { cn } from '~/lib/class-name-merge'
 
 import type { ComponentProps } from 'react'
 
@@ -15,22 +15,42 @@ export function TeacherSignInButton(props: {
   returnTo?: string
   variant?: ComponentProps<typeof PawketBrutalButton>['variant']
 }) {
-  const signIn = useAction(api.auth.signIn)
+  const { signIn } = useAuthActions()
+  const [pending, setPending] = useState(false)
 
   return (
     <PawketBrutalButton
       type="button"
       variant={props.variant}
       large={props.large}
-      className={props.className}
-      onClick={() => {
-        void beginGoogleOAuthSignIn({
-          signIn,
-          redirectTo: resolveTeacherSignInRedirect(props.returnTo),
-        })
-      }}
+      className={cn(
+        'group inline-flex items-center justify-center gap-2.5',
+        props.className
+      )}
+      disabled={pending}
+      onClick={() => void handleClick()}
     >
-      {props.children}
+      {pending ? (
+        'Signing in…'
+      ) : (
+        <>
+          <GoogleLogo className="transition-transform group-hover:scale-110 group-active:scale-95" />
+
+          {props.children}
+        </>
+      )}
     </PawketBrutalButton>
   )
+
+  async function handleClick() {
+    setPending(true)
+
+    try {
+      await signIn('google', {
+        redirectTo: resolveTeacherSignInRedirect(props.returnTo),
+      })
+    } finally {
+      setPending(false)
+    }
+  }
 }

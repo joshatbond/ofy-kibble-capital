@@ -1,6 +1,11 @@
 import { v } from 'convex/values'
 
 const bankAccountKind = v.union(v.literal('checking'), v.literal('savings'))
+const ledgerDirection = v.union(v.literal('credit'), v.literal('debit'))
+const ledgerEntryType = v.union(
+  v.literal('sweep_to_checking'),
+  v.literal('internal_transfer')
+)
 const rosterStatus = v.union(
   v.literal('pending'),
   v.literal('active'),
@@ -129,6 +134,8 @@ export const rosterStudentsTableFields = {
   organizationId: v.string(),
   /** Set when the student accepts and links their user row. */
   userId: v.optional(v.id('users')),
+  /** Teacher-provided label until the student links a Google profile name. */
+  displayName: v.optional(v.string()),
   /** Invite email; must match OAuth email on accept. */
   email: v.string(),
   /** School SIS / roster id unique within the organization. */
@@ -147,6 +154,22 @@ export const bankAccountsTableFields = {
   balanceCents: v.number(),
   kind: bankAccountKind,
 }
+export const ledgerEntriesTableFields = {
+  organizationId: v.string(),
+  rosterStudentId: v.id('rosterStudents'),
+  bankAccountId: v.id('bankAccounts'),
+  accountKind: bankAccountKind,
+  direction: ledgerDirection,
+  /** Always positive; direction determines credit vs debit. */
+  amountCents: v.number(),
+  entryType: ledgerEntryType,
+  /** Short label for activity history. */
+  label: v.string(),
+  /** Unix ms when the entry was recorded. */
+  createdAt: v.number(),
+}
+export const bankAccountKindValidator = bankAccountKind
+export const ledgerEntryTypeValidator = ledgerEntryType
 export const rosterStatusValidator = rosterStatus
 export const studentAppValidator = studentApp
 export { payScheduleValidator, weekdayValidator }

@@ -1,21 +1,21 @@
 import { cn } from '~/lib/class-name-merge'
 import type { AppThemeId } from '~/lib/themes'
 
-export function AppTheme(props: AppThemeProps) {
+import type { ComponentProps, ReactNode, Ref } from 'react'
+
+export function AppTheme(
+  props: {
+    theme: AppThemeId
+    children: ReactNode
+    className?: string
+    ref?: Ref<HTMLDivElement>
+  } & Omit<ComponentProps<'div'>, 'children' | 'className'>
+) {
+  const { theme, children, className, ref, ...divProps } = props
+
   return (
-    <div
-      data-theme={props.theme}
-      className={cn(
-        'bg-background text-foreground min-h-dvh font-sans',
-        props.className
-      )}
-    >
-      {props.children}
+    <div ref={ref} data-theme={theme} className={cn(className)} {...divProps}>
+      {children}
     </div>
   )
-}
-type AppThemeProps = {
-  theme: AppThemeId
-  children: React.ReactNode
-  className?: string
 }

@@ -1,5 +1,5 @@
 import { mergeSettingsLayers } from './merge'
-import { settingsValuesValidator } from './values'
+import { pickSettingsValues, settingsValuesValidator } from './values'
 
 import type { SettingsValues } from './values'
 import type { Doc, Id } from '../../_generated/dataModel'
@@ -78,10 +78,12 @@ export async function resolveEffectiveSettings(
   const stack = await loadSettingsStackForClassroom(ctx, classroom)
 
   if (stack.classSettings) {
-    return stack.classSettings
+    return pickSettingsValues(stack.classSettings)
   }
 
-  return mergeSettingsLayers(stack.regionSettings, stack.siteSettings, {})
+  return pickSettingsValues(
+    mergeSettingsLayers(stack.regionSettings, stack.siteSettings, {})
+  )
 }
 
 export async function ensureClassSettingsSnapshot(

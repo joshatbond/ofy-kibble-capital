@@ -1,60 +1,53 @@
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import { Navigate, createFileRoute } from '@tanstack/react-router'
+import { useQuery } from 'convex/react'
 
-import { ClassroomRosterPanel } from '~/components/admin/classroom-roster-panel'
-import { RequireTeacherAuth } from '~/components/auth/require-teacher-auth'
-import { AdminAppShell } from '~/components/shell/admin-app-shell'
 import { Case, SwitchOn } from '~/components/switch-on'
-import { usePrimaryClassroomOrg } from '~/hooks/use-primary-classroom-org'
-import { adminLandingPath } from '~/lib/admin-auth-redirect'
-import { hasConvexAuthToken } from '~/lib/convex-auth-storage'
+import { api } from '~/convex/_generated/api'
 
 export const Route = createFileRoute('/admin/')({
-  beforeLoad: () => {
-    if (!hasConvexAuthToken()) {
-      throw redirect({
-        to: adminLandingPath(),
-        replace: true,
-      })
-    }
-  },
-  head: () => ({
-    meta: [{ title: 'Teacher admin' }],
-  }),
-  component: AdminHomePage,
+  component: AdminIndexPage,
 })
 
-function AdminHomePage() {
-  const { organizationId, organizationName, isLoading } =
-    usePrimaryClassroomOrg()
+function AdminIndexPage() {
+  const context = useQuery(
+    api.features.admin.context.getTeacherClassroomContext,
+    {}
+  )
 
   return (
-    <RequireTeacherAuth>
-      <AdminAppShell
-        title="Teacher administration"
-        subtitle={
-          organizationName !== undefined ? organizationName : 'Classroom hub'
-        }
-      >
-        <SwitchOn>
-          <Case predicate={isLoading}>
-            <p className="text-muted-foreground text-base leading-relaxed">
-              Loading classroom…
-            </p>
-          </Case>
+    <SwitchOn>
+      <Case predicate={context === undefined}>
+        <p className="p-8">Loading your classroom…</p>
+      </Case>
 
-          <Case predicate={!isLoading && organizationId === undefined}>
-            <p className="text-muted-foreground text-base leading-relaxed">
-              No classroom organization is linked to your account yet. Accept a
-              teacher invitation or ask an operator to add you to the dev
-              classroom seed.
-            </p>
-          </Case>
+      <Case predicate={context === null}>
+        <p className="p-8">No classroom found for your account.</p>
+      </Case>
 
-          <Case predicate={!isLoading && organizationId !== undefined}>
-            <ClassroomRosterPanel organizationId={organizationId!} />
-          </Case>
-        </SwitchOn>
-      </AdminAppShell>
-    </RequireTeacherAuth>
+      <Case>
+        <AdminIndexRedirect />
+      </Case>
+    </SwitchOn>
+  )
+}
+
+function AdminIndexRedirect() {
+  const context = useQuery(
+    api.features.admin.context.getTeacherClassroomContext,
+    {}
+  )
+
+  if (context === undefined || context === null) {
+    return null
+  }
+
+  return (
+    <Navigate
+      to="/admin/$orgSlug"
+      params={{
+        orgSlug: context.orgSlug,
+      }}
+      replace
+    />
   )
 }

@@ -57,6 +57,17 @@ Optional role (default `owner`): `"role":"teacher"`.
 
 Do **not** expect a row in `regions` alone to unlock `/admin/`.
 
+### Dev: password test accounts (local only)
+
+When the Convex **Development** deployment has `SITE_URL=http://localhost:3000`, password sign-in is enabled alongside Google OAuth. Use it on `/invite/:id` to accept invites for alias or personal test emails without Workspace Google sign-in.
+
+1. Teacher invites the test address (e.g. `you+student1@ofy.org`) from the classroom roster, or use any email on `/kibble/landing` or `/pawket/landing`.
+2. Open the invite link locally.
+3. Enter any password (4+ characters). The account is created on first sign-in if needed.
+4. Accept redirects to Kibble or admin as usual.
+
+Production deployments register Google OAuth only. Opt in elsewhere with `DEV_PASSWORD_AUTH=true` on the Convex deployment.
+
 ### Effective settings (dev)
 
 After seeding, inspect merged settings for the dev classroom org (use the `organizationId` from seed output):

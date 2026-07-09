@@ -1,12 +1,6 @@
 import { converter, parse } from 'culori'
 
 const toOklch = converter('oklch')
-
-function formatChannel(value: number, decimals: number): string {
-  return value.toFixed(decimals)
-}
-
-/** Convert a hex (or css) color to `oklch(L C H)` for theme tokens. */
 export function hexToOklch(color: string): string {
   const parsed = parse(color)
   if (!parsed) {
@@ -24,9 +18,11 @@ export function hexToOklch(color: string): string {
 
   return `oklch(${l} ${c} ${formatChannel(h, 1)})`
 }
-
 export function cssVarBlock(vars: Record<string, string>): Array<string> {
   return Object.entries(vars).map(
     ([name, hex]) => `  --${name}: ${hexToOklch(hex)};`
   )
+}
+function formatChannel(value: number, decimals: number): string {
+  return value.toFixed(decimals)
 }

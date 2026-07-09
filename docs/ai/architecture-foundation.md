@@ -9,7 +9,7 @@ Baseline architecture and contributor constraints for **ofy-kibble-capital**.
 - Language/UI: TypeScript + React + Tailwind CSS v4
 - Backend: Convex (`@convex-dev/react-query` on the client)
 - Deploy: Netlify — `@netlify/vite-plugin-tanstack-start` loaded only on `vite build` (dynamic import in `vite.config.ts`)
-- Auth (planned): Convex Auth + `@djpanda/convex-tenants` + `@djpanda/convex-authz`, invitation-only — see [`auth.md`](auth.md)
+- Auth (implemented): Convex Auth + `@djpanda/convex-tenants` + `@djpanda/convex-authz`, invitation-only — see [`auth.md`](auth.md)
 - Design (planned): shadcn (Base UI), PRD tokens, Google Stitch → shared `src/components/ui/`
 - UI fidelity across slices: [`../scope/README.md`](../scope/README.md#ui-build-policy) — Storybook in slice 1; slices 2–10 functional wireframe UI (not unstyled); Stitch polish in slice 11
 
@@ -24,7 +24,7 @@ Keep route components thin; put reusable logic in typed helpers or Convex functi
 
 ## SSR and client-only code
 
-- **SSR only** for the two student **marketing landing** routes (Kibble and PawKet) once implemented.
+- **SSR only** for the two student **marketing landing** routes (`/kibble/landing`, `/pawket/landing`).
 - **Client-first** for signed-in apps, Convex Auth, dashboards, admin, and store POS.
 - Do not import browser-only or auth-session code from root layouts that must SSR marketing pages unless split by route.
 

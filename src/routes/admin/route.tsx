@@ -1,5 +1,6 @@
-import { Outlet, createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 
+import { AdminAuthGate } from '~/components/auth/admin-auth-gate'
 import { AppTheme } from '~/components/theme/app-theme'
 import { appThemes } from '~/lib/themes'
 
@@ -8,7 +9,7 @@ export const Route = createFileRoute('/admin')({
     meta: [
       {
         name: 'theme-color',
-        content: appThemes.admin.themeColor,
+        content: appThemes.kibble.themeColor,
       },
     ],
   }),
@@ -17,8 +18,8 @@ export const Route = createFileRoute('/admin')({
 
 function AdminLayout() {
   return (
-    <AppTheme theme="admin">
-      <Outlet />
+    <AppTheme theme="kibble">
+      <AdminAuthGate />
     </AppTheme>
   )
 }
