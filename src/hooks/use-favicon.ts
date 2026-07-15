@@ -20,10 +20,13 @@ function setBrandIconLink(rel: 'icon' | 'apple-touch-icon', href: string) {
       ? 'link[rel="icon"][type="image/svg+xml"]'
       : 'link[rel="apple-touch-icon"]'
 
-  let link = document.querySelector(selector)
+  const existing = document.querySelector(selector)
+  const link =
+    existing instanceof HTMLLinkElement
+      ? existing
+      : document.createElement('link')
 
-  if (!(link instanceof HTMLLinkElement)) {
-    link = document.createElement('link')
+  if (!(existing instanceof HTMLLinkElement)) {
     link.rel = rel
     if (rel === 'icon') {
       link.type = 'image/svg+xml'
