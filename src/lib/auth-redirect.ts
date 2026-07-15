@@ -1,35 +1,29 @@
-export type StudentApp = 'kibble' | 'pawket'
+/**
+ * Client post-OAuth redirect helpers. Paths must stay aligned with
+ * `convex/features/auth/redirect.ts` allowlist.
+ */
 
 const STUDENT_APP_BASE_PATH: Record<StudentApp, `/${string}`> = {
   kibble: '/kibble',
   pawket: '/pawket',
 }
-
-/** Public marketing landing for a student surface. */
+const ALLOWED_APP_BASE_PATHS = [
+  '/kibble',
+  '/pawket',
+  '/admin',
+  '/invite',
+] as const
 export function studentAppLandingPath(app: StudentApp): string {
   return `${STUDENT_APP_BASE_PATH[app]}/landing`
 }
-
-/**
- * Bridge route between sign-in and the protected app — shows the branded
- * loader while auth + session bind, then navigates to `returnTo` (or the
- * app home).
- */
-export function studentAppLoadingPath(app: StudentApp): string {
-  return `${STUDENT_APP_BASE_PATH[app]}/loading`
-}
-
-/** Protected app home — trailing slash matches TanStack index routes (`/pawket/`). */
 export function studentAppHomePath(app: StudentApp): string {
   return `${STUDENT_APP_BASE_PATH[app]}/`
 }
-
 export function pathnameOfRedirect(redirectTo: string): string {
   return redirectTo.startsWith('http')
     ? new URL(redirectTo).pathname
     : (redirectTo.split('?')[0] ?? redirectTo)
 }
-
 export function studentAppFromPathname(pathname: string): StudentApp | null {
   if (pathname === '/pawket' || pathname.startsWith('/pawket/')) {
     return 'pawket'
@@ -41,18 +35,16 @@ export function studentAppFromPathname(pathname: string): StudentApp | null {
 
   return null
 }
-
 export function isAllowedStudentAppRedirect(redirectTo: string): boolean {
   const path = pathnameOfRedirect(redirectTo)
 
   return studentAppFromPathname(path) !== null
 }
-
-function isStudentAppLandingPath(pathname: string, app: StudentApp): boolean {
-  return pathname === studentAppLandingPath(app)
+export function isAllowedAppPath(pathname: string): boolean {
+  return ALLOWED_APP_BASE_PATHS.some(
+    base => pathname === base || pathname.startsWith(`${base}/`)
+  )
 }
-
-/** Where OAuth / sign-in should send the user after auth completes. */
 export function resolvePostAuthRedirect(
   app: StudentApp,
   returnTo?: string
@@ -73,29 +65,11 @@ export function resolvePostAuthRedirect(
 
   return returnTo
 }
-
-/**
- * OAuth `redirectTo` — absolute URL of `/{app}/loading?returnTo=<final>`.
- *
- * Routing every sign-in through the `/loading` bridge gives us one place to
- * wait for auth + session to fully resolve before landing the user inside
- * the protected app, instead of having every protected screen learn how to
- * handle a half-resolved session.
- */
 export function resolveStudentSignInRedirect(
   app: StudentApp,
   returnTo?: string
 ): string {
-  const finalDest = resolvePostAuthRedirect(app, returnTo)
-  const loadingPath = studentAppLoadingPath(app)
-  const homePath = studentAppHomePath(app)
-
-  // If the final destination is just the app home, no `returnTo` is needed —
-  // `/loading` defaults to the app home anyway.
-  const path =
-    finalDest === homePath
-      ? loadingPath
-      : `${loadingPath}?returnTo=${encodeURIComponent(finalDest)}`
+  const path = resolvePostAuthRedirect(app, returnTo)
 
   if (typeof window === 'undefined') {
     return path
@@ -103,25 +77,12 @@ export function resolveStudentSignInRedirect(
 
   return new URL(path, window.location.origin).href
 }
-
-/** `returnTo` stored when bouncing unauthenticated users to a landing page. */
 export function protectedRouteReturnTo(
   app: StudentApp,
   pathname: string
 ): string {
   return resolvePostAuthRedirect(app, pathname)
 }
-
-export type StudentLandingSearch = {
-  returnTo?: string
-  /**
-   * Set by the sign-out flow so the landing route's `beforeLoad` skips its
-   * "you're authenticated, redirect to the dashboard" check for the brief
-   * window between `navigate(landing)` and `signOut()` finishing.
-   */
-  signedOut?: boolean
-}
-
 export function parseStudentLandingSearch(
   search: Record<string, unknown>
 ): StudentLandingSearch {
@@ -144,33 +105,47 @@ export function parseStudentLandingSearch(
 
   return result
 }
-
-export type StudentLoadingSearch = {
-  /** Where to send the user once auth + session have resolved. */
-  returnTo?: string
-  /** OAuth code, present when arriving here from a provider callback. */
-  code?: string
+export function studentAppRedirectTo(app: StudentApp): string {
+  return resolveStudentSignInRedirect(app)
 }
+export function adminAppHomePath(): string {
+  return '/admin'
+}
+export function adminAppLandingPath(): string {
+  return '/admin/landing'
+}
+export function adminAppRedirectTo(): string {
+  const path = adminAppHomePath()
 
-export function parseStudentLoadingSearch(
-  search: Record<string, unknown>
-): StudentLoadingSearch {
-  const result: StudentLoadingSearch = {}
-
-  const returnTo =
-    typeof search.returnTo === 'string' ? search.returnTo : undefined
-
-  if (returnTo !== undefined && isAllowedStudentAppRedirect(returnTo)) {
-    const app = studentAppFromPathname(pathnameOfRedirect(returnTo))
-
-    if (app !== null) {
-      result.returnTo = resolvePostAuthRedirect(app, returnTo)
-    }
+  if (typeof window === 'undefined') {
+    return path
   }
 
-  if (typeof search.code === 'string' && search.code.length > 0) {
-    result.code = search.code
+  return `${window.location.origin}${path}`
+}
+export function invitePath(invitationId: string): string {
+  return `/invite/${invitationId}`
+}
+export function inviteRedirectTo(invitationId: string): string {
+  const path = invitePath(invitationId)
+
+  if (typeof window === 'undefined') {
+    return path
   }
 
-  return result
+  return `${window.location.origin}${path}`
+}
+export type { StudentApp, StudentLandingSearch }
+function isStudentAppLandingPath(pathname: string, app: StudentApp): boolean {
+  return pathname === studentAppLandingPath(app)
+}
+type StudentApp = 'kibble' | 'pawket'
+type StudentLandingSearch = {
+  returnTo?: string
+  /**
+   * Set by the sign-out flow so the landing route skips its
+   * "you're authenticated, redirect to the dashboard" check for the brief
+   * window between `navigate(landing)` and `signOut()` finishing.
+   */
+  signedOut?: boolean
 }

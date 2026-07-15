@@ -16,6 +16,11 @@ export const appThemes = {
     label: 'Vibrant Scholar',
     themeColor: '#2d5bff',
   },
+  admin: {
+    id: 'admin',
+    label: 'Teacher admin',
+    themeColor: '#1a1a1a',
+  },
 } as const
 
 export type AppThemeId = keyof typeof appThemes

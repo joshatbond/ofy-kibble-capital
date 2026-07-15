@@ -11,22 +11,30 @@ todos:
   - id: ui_stack
     content: >-
       Tailwind v4 + shadcn (theme-builder preset); Kibble/PawKet oklch semantic tokens + Stitch T0–T100 ramps
-      (`bun run theme:tones`). Remaining: core shadcn primitives, Stitch screens → composed shells.
+      (`bun run theme:tones`). Storybook bootstrap (slice 1, before slice 3). Remaining: core shadcn primitives,
+      Stitch screens → composed shells; feature slices 2–10 wireframe UI, polish in slice 11.
     status: in_progress
   - id: routes_shells
     content: >-
-      `/kibble` and `/pawket` theme layouts + preview routes (done). Remaining: `/admin`, dual PWA manifests,
-      nav shells, role-based redirects.
+      `/kibble` and `/pawket` theme layouts + preview routes (done). `/admin` teacher hub shell,
+      auth gate, roster, settings (done). Remaining: dual PWA manifests, student nav shells,
+      role-based post-login redirects for all surfaces.
     status: in_progress
   - id: auth_tenants
-    content: Integrate Convex Auth; register @djpanda/convex-tenants + @djpanda/convex-authz; invitation-only onboarding (mirror ms-engage-v2 convex); teacher/student roles; no public signup
-    status: pending
+    content: >-
+      Convex Auth + Google OAuth; @djpanda/convex-tenants + @djpanda/convex-authz; invitation-only
+      onboarding; teacher/student roles; dev password provider for local testing (done). Remaining:
+      audit all public functions for getAuthUserId + authz.
+    status: in_progress
   - id: ssr_scope
-    content: 'SSR only: Kibble + PawKet marketing landing routes; all other routes (auth, dashboards, admin, POS) client-first / no SSR for Convex Auth'
-    status: pending
+    content: >-
+      SSR for Kibble + PawKet marketing landings (done). All other routes client-first.
+    status: completed
   - id: schema_v1
-    content: Author initial convex/schema.ts for paystubs, accounts/ledger, vaults, store POS, absences with indexes
-    status: pending
+    content: >-
+      Initial schema: regions/sites/classrooms, classSettings, rosterStudents, bankAccounts (done).
+      Remaining: ledgerEntries, paystubs, vaults, store POS, absences.
+    status: in_progress
   - id: vertical_slices
     content: Implement earnings, savings, and economy loops as thin end-to-end slices before deep UI polish
     status: pending
@@ -160,7 +168,7 @@ Design **flat, relational** tables with indexes (Convex rules: avoid deep nestin
 3. **Earnings loop (minimal)**: teacher logs hours → `paystub` generated from settings → student sees paystub in `/kibble`.
 4. **Savings loop (minimal)**: “transfer net to bank” mutation creates checking balance + optional vault allocation in `/pawket`.
 5. **Economy loop (minimal)**: teacher creates store item → POS debit against student checking.
-6. **Polish**: Stitch-aligned screens where templates exist; notifications list, charts (pick one chart lib later), PWA offline behavior scoped to safe read-only views if feasible.
+6. **Polish**: Stitch-aligned screens where templates exist; expand **Storybook** and close layout debt from slices 2–10 (bootstrap is slice 1 — see [`docs/scope/README.md`](scope/README.md#ui-build-policy)); notifications list, charts (pick one chart lib later), PWA offline behavior scoped to safe read-only views if feasible.
 
 ## Files and folders to expect at repo root (new)
 

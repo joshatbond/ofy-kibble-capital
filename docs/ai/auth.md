@@ -1,6 +1,6 @@
 # Auth (AI contributors)
 
-**Planned:** [Convex Auth](https://docs.convex.dev/auth/convex-auth) (`@convex-dev/auth`) with **invitation-only** onboarding — no public sign-up. Multi-tenant classrooms via `@djpanda/convex-tenants` and RBAC via `@djpanda/convex-authz` (see greenfield plan).
+**Implemented:** [Convex Auth](https://docs.convex.dev/auth/convex-auth) (`@convex-dev/auth`) with **invitation-only** onboarding — no public sign-up. Multi-tenant classrooms via `@djpanda/convex-tenants` and RBAC via `@djpanda/convex-authz`.
 
 Do **not** use Clerk unless the project explicitly switches auth providers.
 
@@ -35,9 +35,19 @@ Do **not** port ms-engage’s domain-specific `afterUserCreatedOrUpdated` allowl
 
 ## Product-specific notes
 
-- **Teacher admin** creates/manages classroom tenants and invitations.
+- **Display names** — Google OAuth syncs `users.name` and `users.image` on every sign-in (Convex Auth default). Teachers may optionally set a **student name** at invite time (`rosterStudents.displayName`); if the student has no Google name yet, that value is copied to `users.name` on invite accept. Signed-in users can edit their name via `api.features.users.updateViewerProfile` (account menu).
+- **Google Workspace** — OAuth client is **Internal**; only `@ofy.org` accounts complete Google sign-in. **Accept** enforces invitee email match only (domain is implied by OAuth). **`assertOfyOrgEmail`** runs on invite create (`invitations.ts`, `tenants.validateInvitationCreate`) so teachers cannot invite off-domain addresses.
+- **Teacher admin** creates/manages classroom tenants and invitations (`/admin/*`, `AdminAuthGate`).
 - **Students** access Kibble and/or PawKet only within their tenant after accept.
 - Store POS and payroll mutations must enforce teacher role (or finer scopes) server-side.
+
+## Teacher admin auth
+
+- Layout route `src/routes/admin/route.tsx` wraps all `/admin/*` children in `AdminAuthGate`.
+- Unauthenticated users on protected admin paths redirect to `/admin/landing`.
+- Authenticated non-teachers see "Teacher access required" (no roster data).
+- Teachers resolve classroom context via `api.features.admin.context.getTeacherClassroomContext`.
+- Local dev may use the dev-password provider in addition to Google OAuth (see `convex/features/auth/devPassword.ts`).
 
 ## Setup checklist (when implementing)
 
@@ -45,18 +55,18 @@ Do **not** port ms-engage’s domain-specific `afterUserCreatedOrUpdated` allowl
 - [x] `authTables` in `convex/schema.ts`
 - [x] Google OAuth in `convex/auth.ts` (`AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET` on deployment)
 - [x] `ConvexAuthProvider` in `src/router.tsx`
-- [x] Post-OAuth redirect: `signIn('google', { redirectTo: '/kibble' | '/pawket' })` + `callbacks.redirect` in `convex/auth.ts` / `convex/lib/authRedirect.ts`
-- [ ] Register tenants + authz components in `convex/convex.config.ts`
-- [ ] Invitation mutations/queries and `/invite/$invitationId` (or equivalent)
+- [x] Post-OAuth redirect: `signIn('google', { redirectTo: '/kibble' | '/pawket' })` + `callbacks.redirect` in `convex/auth.ts` / `convex/features/auth/redirect.ts`
+- [x] Register tenants + authz components in `convex/convex.config.ts`
+- [x] Invitation mutations/queries and `/invite/$invitationId` (see `convex/invitations.ts`, `src/routes/invite/`)
 - [ ] `getAuthUserId` (and authz) on all public functions that touch user or classroom data
 
 ### Dual-surface redirect
 
-Marketing sign-in uses `StudentSignInButton` with `app="kibble"` or `app="pawket"`. Public landings live at `/kibble/landing` and `/pawket/landing`; protected app homes are `/kibble` and `/pawket`. OAuth `redirectTo` keeps users on the surface they signed in from.
+Marketing sign-in uses `GoogleSignInButton` with `redirectTo={studentAppRedirectTo(app)}` on student landings (`app` is `"kibble"` or `"pawket"`). Public landings live at `/kibble/landing` and `/pawket/landing`; protected app homes are `/kibble` and `/pawket`. OAuth `redirectTo` keeps users on the surface they signed in from.
 
 ### Multi-host redirects (local / Netlify / production)
 
-Post-OAuth URLs are built in `convex/lib/authRedirect.ts`. The client sends an **absolute** `redirectTo` (`window.location.origin` + path). The server keeps that origin only if it is allowlisted on that Convex deployment.
+Post-OAuth URLs are built in `convex/features/auth/redirect.ts`. The client sends an **absolute** `redirectTo` (`window.location.origin` + path). The server keeps that origin only if it is allowlisted on that Convex deployment.
 
 This project uses **two Convex deployments** (Development + Production), not three. Map frontends like this:
 

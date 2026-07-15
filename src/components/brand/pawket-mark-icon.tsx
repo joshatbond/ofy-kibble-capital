@@ -1,25 +1,5 @@
 import { cn } from '~/lib/class-name-merge'
 
-type PawketMarkIconProps = {
-  className?: string
-  /** Extra classes for the `<g>` wrapping the cup outline + teal accent. */
-  cupClassName?: string
-  /** Extra classes for the `<g>` wrapping the navy paw + gold pads. */
-  pawClassName?: string
-}
-
-/**
- * Vectorised PawKet Exchange brand mark (icon only — no wordmark).
- *
- * Paths come from `src/assets/pawket_exchange.svg`. The mark is split into
- * stable hook classes so loaders can target individual parts:
- *
- * - `.pawket-cup-outline` — navy cup silhouette
- * - `.pawket-cup-liquid`  — teal accent across the cup's base
- * - `.pawket-paw-outer`   — navy outer paw silhouette
- * - `.pawket-paw-pad`     — gold central pad
- * - `.pawket-paw-toe`     — four gold toe pads (also keyed `-1` … `-4`)
- */
 export function PawketMarkIcon(props: PawketMarkIconProps) {
   return (
     <svg
@@ -109,4 +89,11 @@ export function PawketMarkIcon(props: PawketMarkIconProps) {
       </g>
     </svg>
   )
+}
+type PawketMarkIconProps = {
+  className?: string
+  /** Extra classes for the `<g>` wrapping the cup outline + teal accent. */
+  cupClassName?: string
+  /** Extra classes for the `<g>` wrapping the navy paw + gold pads. */
+  pawClassName?: string
 }

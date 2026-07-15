@@ -1,38 +1,37 @@
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import { Link, createFileRoute } from '@tanstack/react-router'
 
-import { RequireStudentAuth } from '~/components/auth/require-student-auth'
-import { StudentAppShell } from '~/components/shell/student-app-shell'
-import { studentAppLandingPath } from '~/lib/auth-redirect'
-import { hasConvexAuthToken } from '~/lib/convex-auth-storage'
+import { SignOutButton } from '~/components/auth/sign-out-button'
 
 export const Route = createFileRoute('/kibble/')({
-  beforeLoad: () => {
-    if (!hasConvexAuthToken()) {
-      throw redirect({
-        to: studentAppLandingPath('kibble'),
-        replace: true,
-      })
-    }
-  },
-  head: () => ({
-    meta: [{ title: 'Kibble Capital' }],
-  }),
-  component: KibbleAppPage,
+  component: KibbleIndexPage,
 })
 
-function KibbleAppPage() {
+function KibbleIndexPage() {
   return (
-    <RequireStudentAuth app="kibble">
-      <StudentAppShell
-        app="kibble"
-        title="Kibble Capital"
-        subtitle="Student payroll dashboard (stub)."
-      >
-        <p className="text-muted-foreground text-base leading-relaxed">
-          Protected app routes will live here — timekeeping, pay stubs, and your
-          unified dashboard.
-        </p>
-      </StudentAppShell>
-    </RequireStudentAuth>
+    <main>
+      <h1>Kibble — Dashboard</h1>
+
+      <p>Overview of recent activity (stub).</p>
+
+      <nav>
+        <ul>
+          <li>
+            <SignOutButton landingTo="/kibble/landing" />
+          </li>
+
+          <li>
+            <Link to="/kibble/time">Time</Link>
+          </li>
+
+          <li>
+            <Link to="/kibble/pay">Pay</Link>
+          </li>
+
+          <li>
+            <Link to="/kibble/absence">Absence</Link>
+          </li>
+        </ul>
+      </nav>
+    </main>
   )
 }

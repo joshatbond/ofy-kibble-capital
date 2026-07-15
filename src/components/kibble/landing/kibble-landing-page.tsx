@@ -6,6 +6,7 @@ import {
   Wallet,
 } from 'lucide-react'
 
+import { LandingDevSignIn } from '~/components/auth/landing-dev-sign-in'
 import { StudentSignInButton } from '~/components/auth/student-sign-in-button'
 import { BrandLogo } from '~/components/brand/brand-logo'
 import { PawketBrutalButton } from '~/components/pawket/landing/pawket-brutal-button'
@@ -17,12 +18,14 @@ export function KibbleLandingPage(props: { returnTo?: string }) {
     <div className="bg-background text-foreground min-h-dvh min-w-0">
       <LandingHeader returnTo={props.returnTo} />
 
-      <main className="mx-auto flex max-w-[1200px] min-w-0 flex-col gap-0 px-4 pt-18 pb-0 md:px-12 md:pt-28">
+      <main className="mx-auto flex max-w-[1200px] min-w-0 flex-col gap-0 px-4 py-18 md:px-12 md:pt-28">
         <LandingHero returnTo={props.returnTo} />
 
         <LandingFeatures />
 
         <LandingCta />
+
+        <LandingDevSignIn />
       </main>
 
       <LandingFooter />

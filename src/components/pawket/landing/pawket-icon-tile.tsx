@@ -1,10 +1,5 @@
 import { cn } from '~/lib/class-name-merge'
 
-type PawketIconTileProps = {
-  children: React.ReactNode
-  className?: string
-}
-
 export function PawketIconTile(props: PawketIconTileProps) {
   return (
     <div
@@ -17,4 +12,8 @@ export function PawketIconTile(props: PawketIconTileProps) {
       {props.children}
     </div>
   )
+}
+type PawketIconTileProps = {
+  children: React.ReactNode
+  className?: string
 }

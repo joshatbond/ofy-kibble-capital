@@ -1,23 +1,68 @@
 import { authTables } from '@convex-dev/auth/server'
 import { defineSchema, defineTable } from 'convex/server'
-import { v } from 'convex/values'
 
-import { studentAppValidator } from './lib/studentApp'
+import {
+  authSessionsTableFields,
+  bankAccountsTableFields,
+  classSettingsTableFields,
+  classroomsTableFields,
+  ledgerEntriesTableFields,
+  regionSettingsTableFields,
+  regionsTableFields,
+  rosterStudentsTableFields,
+  schoolSiteSettingsTableFields,
+  schoolSitesTableFields,
+  studentOAuthIntentsTableFields,
+  usersTableFields,
+} from './schema/schemaFields'
 
 export default defineSchema({
   ...authTables,
-  authSessions: defineTable({
-    userId: v.id('users'),
-    expirationTime: v.number(),
-    /** Which student app this session was opened from (set at OAuth sign-in). */
-    studentApp: v.optional(studentAppValidator),
-  }).index('userId', ['userId']),
-  studentOAuthIntents: defineTable({
-    verifierId: v.id('authVerifiers'),
-    studentApp: studentAppValidator,
-    expirationTime: v.number(),
-  }).index('by_verifier', ['verifierId']),
-  numbers: defineTable({
-    value: v.number(),
-  }),
+  users: defineTable(usersTableFields)
+    .index('email', ['email'])
+    .index('phone', ['phone'])
+    .index('is_active', ['inactiveDate']),
+  regions: defineTable(regionsTableFields).index('by_slug', ['slug']),
+  schoolSites: defineTable(schoolSitesTableFields)
+    .index('by_siteSlug', ['siteSlug'])
+    .index('by_regionId', ['regionId']),
+  classrooms: defineTable(classroomsTableFields)
+    .index('by_organizationId', ['organizationId'])
+    .index('by_siteSlug', ['siteSlug'])
+    .index('by_orgSlug', ['orgSlug']),
+  regionSettings: defineTable(regionSettingsTableFields).index('by_regionId', [
+    'regionId',
+  ]),
+  schoolSiteSettings: defineTable(schoolSiteSettingsTableFields).index(
+    'by_schoolSiteId',
+    ['schoolSiteId']
+  ),
+  classSettings: defineTable(classSettingsTableFields).index(
+    'by_organizationId',
+    ['organizationId']
+  ),
+  authSessions: defineTable(authSessionsTableFields).index('userId', [
+    'userId',
+  ]),
+  studentOAuthIntents: defineTable(studentOAuthIntentsTableFields).index(
+    'by_verifier',
+    ['verifierId']
+  ),
+  rosterStudents: defineTable(rosterStudentsTableFields)
+    .index('by_organizationId', ['organizationId'])
+    .index('by_invitationId', ['invitationId'])
+    .index('by_org_payToken', ['organizationId', 'payToken'])
+    .index('by_org_externalStudentId', ['organizationId', 'externalStudentId'])
+    .index('by_userId', ['userId']),
+  bankAccounts: defineTable(bankAccountsTableFields)
+    .index('by_rosterStudent_kind', ['rosterStudentId', 'kind'])
+    .index('by_organizationId', ['organizationId']),
+  ledgerEntries: defineTable(ledgerEntriesTableFields)
+    .index('by_rosterStudent_createdAt', ['rosterStudentId', 'createdAt'])
+    .index('by_rosterStudent_accountKind_createdAt', [
+      'rosterStudentId',
+      'accountKind',
+      'createdAt',
+    ])
+    .index('by_organizationId_createdAt', ['organizationId', 'createdAt']),
 })

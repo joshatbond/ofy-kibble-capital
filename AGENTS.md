@@ -47,3 +47,6 @@ When working on Convex code, **always read
 | TanStack Intent skills     | [`docs/ai/tanstack-intent-skills.md`](docs/ai/tanstack-intent-skills.md)                           |
 | Skill bootstrap order      | [`docs/ai/skill-bootstrap.md`](docs/ai/skill-bootstrap.md)                                         |
 | Git branches & releases    | [`docs/ai/git-workflow.md`](docs/ai/git-workflow.md)                                               |
+| Domain glossary            | [`CONTEXT.md`](CONTEXT.md)                                                                         |
+| ADRs                       | [`docs/adr/`](docs/adr/)                                                                           |
+| Scoped work slices         | [`docs/scope/`](docs/scope/)                                                                       |

@@ -1,16 +1,10 @@
-import { useAction, useMutation } from 'convex/react'
+import { useAuthActions } from '@convex-dev/auth/react'
+import { useState } from 'react'
 
 import { PawketBrutalButton } from '~/components/pawket/landing/pawket-brutal-button'
 import { resolveStudentSignInRedirect } from '~/lib/auth-redirect'
 import type { StudentApp } from '~/lib/auth-redirect'
-import {
-  writeConvexOAuthVerifierId,
-  writePendingOAuthRedirectTo,
-} from '~/lib/convex-auth-storage'
 
-import { api } from '../../../convex/_generated/api'
-
-import type { Id } from '../../../convex/_generated/dataModel'
 import type { ComponentProps } from 'react'
 
 export function StudentSignInButton(props: {
@@ -21,10 +15,8 @@ export function StudentSignInButton(props: {
   returnTo?: string
   variant?: ComponentProps<typeof PawketBrutalButton>['variant']
 }) {
-  const signIn = useAction(api.auth.signIn)
-  const recordOAuthStudentApp = useMutation(
-    api.studentAuth.recordOAuthStudentApp
-  )
+  const { signIn } = useAuthActions()
+  const [pending, setPending] = useState(false)
 
   return (
     <PawketBrutalButton
@@ -32,37 +24,22 @@ export function StudentSignInButton(props: {
       variant={props.variant}
       large={props.large}
       className={props.className}
-      onClick={() => {
-        void (async () => {
-          const redirectTo = resolveStudentSignInRedirect(
-            props.app,
-            props.returnTo
-          )
-
-          writePendingOAuthRedirectTo(redirectTo)
-
-          const result = await signIn({
-            provider: 'google',
-            params: { redirectTo },
-          })
-
-          if (result.redirect === undefined) {
-            return
-          }
-
-          if (result.verifier !== undefined) {
-            writeConvexOAuthVerifierId(result.verifier)
-            await recordOAuthStudentApp({
-              verifierId: result.verifier as Id<'authVerifiers'>,
-              redirectTo,
-            })
-          }
-
-          window.location.href = result.redirect
-        })()
-      }}
+      disabled={pending}
+      onClick={() => void handleClick()}
     >
-      {props.children}
+      {pending ? 'Signing in…' : props.children}
     </PawketBrutalButton>
   )
+
+  async function handleClick() {
+    setPending(true)
+
+    try {
+      await signIn('google', {
+        redirectTo: resolveStudentSignInRedirect(props.app, props.returnTo),
+      })
+    } finally {
+      setPending(false)
+    }
+  }
 }

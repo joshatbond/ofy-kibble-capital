@@ -3,8 +3,6 @@ import { PawketExchangeLogo } from '~/components/brand/pawket-exchange-logo'
 
 import type { FC, SVGProps } from 'react'
 
-export type BrandLogoComponent = FC<SVGProps<SVGSVGElement>>
-
 export const brandLogos = {
   kibble: {
     Component: KibbleCapitalLogo,
@@ -15,5 +13,5 @@ export const brandLogos = {
     alt: 'PawKet Exchange',
   },
 } as const
-
+export type BrandLogoComponent = FC<SVGProps<SVGSVGElement>>
 export type BrandKey = keyof typeof brandLogos
