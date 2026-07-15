@@ -58,7 +58,7 @@ export function AdminLandingPage(props: {
             <span>&nbsp;or&nbsp;</span>
 
             <Link to="/pawket/landing" className="text-foreground underline">
-              PawKet Exchange
+              PawKet Change
             </Link>
 
             <span>&nbsp;instead.</span>

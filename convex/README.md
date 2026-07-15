@@ -1,6 +1,6 @@
 # Convex backend
 
-Classroom financial data for Kibble Capital, PawKet Exchange, and Teacher admin.
+Classroom financial data for Kibble Capital, PawKet Change, and Teacher admin.
 
 ## Local development
 

@@ -17,7 +17,7 @@ Student financial literacy platform: payroll/earnings, banking/vaults, and teach
 | Surface         | Path prefix | Role                                  |
 | --------------- | ----------- | ------------------------------------- |
 | Kibble Capital  | `/kibble/*` | Accounting-style student PWA          |
-| PawKet Exchange | `/pawket/*` | Banking-style student PWA             |
+| PawKet Change | `/pawket/*` | Banking-style student PWA             |
 | Teacher admin   | `/admin/*`  | Classrooms, payroll inputs, store POS |
 
 Dual PWA manifests (scoped `start_url` / `theme_color` per app) on one origin — see the greenfield plan.

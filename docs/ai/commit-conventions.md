@@ -28,7 +28,7 @@ Examples:
 Use a short scope when it improves clarity. Common scopes for this project:
 
 - `kibble` — Kibble Capital routes and UI
-- `pawket` — PawKet Exchange routes and UI
+- `pawket` — PawKet Change routes and UI
 - `admin` — teacher administration hub
 - `convex` — schema, functions, backend
 - `auth` — Convex Auth, invitations, tenants, authz

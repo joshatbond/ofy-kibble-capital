@@ -28,7 +28,7 @@ Storybook **bootstrap** is slice 1 ([`01-foundation.md`](./01-foundation.md)); s
 
 Product-led **guided tour** (step overlay or coach marks — pick library e.g. driver.js, react-joyride, or custom) — **separate tour per installed PWA**, no cross-app links (v1).
 
-#### PawKet Exchange (primary)
+#### PawKet Change (primary)
 
 Suggested steps after first accept + accounts exist:
 
@@ -77,7 +77,7 @@ Persist `kibbleTourCompletedAt`.
 
 ## Domain refs
 
-- **Kibble Capital**, **PawKet Exchange**, **Offline read-only**, **Interest accrual**, **Pay split**, **Vault setup**
+- **Kibble Capital**, **PawKet Change**, **Offline read-only**, **Interest accrual**, **Pay split**, **Vault setup**
 
 ## Out of scope
 

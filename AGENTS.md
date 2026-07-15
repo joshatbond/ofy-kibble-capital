@@ -4,7 +4,7 @@ Tool-agnostic entry point for AI contributors (Cursor, Codex, Claude Code, etc.)
 
 ## Project intent
 
-Student financial literacy ecosystem: **Kibble Capital** (accounting-style PWA), **PawKet Exchange** (banking-style PWA), and **teacher admin** — one TanStack Start app, one Convex backend. See [`docs/Architecture.md`](docs/Architecture.md) and the greenfield plan [`docs/greenfield_stack_and_architecture.plan.md`](docs/greenfield_stack_and_architecture.plan.md).
+Student financial literacy ecosystem: **Kibble Capital** (accounting-style PWA), **PawKet Change** (banking-style PWA), and **teacher admin** — one TanStack Start app, one Convex backend. See [`docs/Architecture.md`](docs/Architecture.md) and the greenfield plan [`docs/greenfield_stack_and_architecture.plan.md`](docs/greenfield_stack_and_architecture.plan.md).
 
 ## Collaboration rules
 

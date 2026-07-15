@@ -74,7 +74,7 @@ function LandingHero() {
         <div className="bg-accent border-ink relative w-[95%] rotate-2 rounded-xl border-4 p-4 shadow-[12px_12px_0_0_var(--ink)] md:w-full">
           <img
             src="/brand/pawket-hero.png"
-            alt="PawKet Exchange app on a phone"
+            alt="PawKet Change app on a phone"
             className="border-ink h-auto w-full rounded-lg border-2"
           />
 
@@ -146,7 +146,7 @@ function LandingFeatures() {
           </h3>
 
           <p className="text-lg leading-relaxed">
-            PawKet Exchange was built by students, for students. We believe
+            PawKet Change was built by students, for students. We believe
             financial literacy shouldn&apos;t be a chore. Through our gamified
             exchange system, you&apos;ll learn how to budget for your
             &apos;Wants&apos;, &apos;Needs&apos;, and &apos;Big Dreams&apos;
@@ -211,7 +211,7 @@ function LandingFooter() {
               <div className="bg-accent border-background size-8 rounded-full border-2" />
 
               <h4 className="font-heading text-accent text-xl font-bold tracking-wider uppercase">
-                PawKet Exchange
+                PawKet Change
               </h4>
             </div>
 
@@ -248,7 +248,7 @@ function LandingFooter() {
 
         <div className="border-background/30 mt-12 flex flex-col items-center justify-between gap-4 border-t-2 pt-6 md:flex-row">
           <p className="text-primary-80 text-xs">
-            © 2024 PawKet Exchange. Built for students.
+            © 2024 PawKet Change. Built for students.
           </p>
 
           <p className="text-primary-80 text-xs">

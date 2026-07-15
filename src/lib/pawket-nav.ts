@@ -75,7 +75,7 @@ export function pawketShellTitle(pathname: string): string {
     return 'Vault goal'
   }
 
-  return 'PawKet Exchange'
+  return 'PawKet Change'
 }
 export function displayFirstName(
   profile: {
