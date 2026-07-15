@@ -7,7 +7,7 @@ export const Route = createFileRoute('/pawket/landing')({
   validateSearch: parseStudentLandingSearch,
   head: () => ({
     meta: [
-      { title: 'PawKet Exchange — Master Your Money Like a Pro' },
+      { title: 'PawKet Change — Master Your Money Like a Pro' },
       {
         name: 'description',
         content:

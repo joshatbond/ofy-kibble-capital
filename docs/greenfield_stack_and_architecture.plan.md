@@ -55,7 +55,7 @@ isProject: false
 Use **one TanStack Start application** with three top-level route trees (example paths):
 
 - `/kibble/*` — Kibble Capital (red/black/white theme, accounting UX)
-- `/pawket/*` — PawKet Exchange (blue/green/yellow theme, consumer banking UX)
+- `/pawket/*` — PawKet Change (blue/green/yellow theme, consumer banking UX)
 - `/admin/*` — Teacher Administration Hub (can reuse either design system or a neutral third theme)
 
 **Dual PWA install surfaces** on the same origin: ship **two Web App Manifests** with different `name`, `start_url`, `scope`, `theme_color`, and icons (e.g. `public/manifest-kibble.webmanifest` scoped to `/kibble/`, `public/manifest-pawket.webmanifest` scoped to `/pawket/`). Each layout route injects the correct `<link rel="manifest" />` and meta theme color. Service worker registration should respect scopes (typically one SW per scope or a root SW that caches by path — validate during implementation).
@@ -83,7 +83,7 @@ flowchart TB
 
 ## Design handoff (Google Stitch)
 
-- **Source of truth for v1 visuals**: Connect **[Google Stitch](https://stitch.withgoogle.com/)** (or your Stitch → export workflow) so **Kibble Capital**, **PawKet Exchange**, and **Teacher admin** screens match your existing **v1 templates** before pixel-tweaking in code.
+- **Source of truth for v1 visuals**: Connect **[Google Stitch](https://stitch.withgoogle.com/)** (or your Stitch → export workflow) so **Kibble Capital**, **PawKet Change**, and **Teacher admin** screens match your existing **v1 templates** before pixel-tweaking in code.
 - **Translation layer**: Treat Stitch output as **reference**, then implement in **React + Tailwind v4 + shadcn (Base UI)** — shared primitives in `src/components/ui/`, app-specific layout and marketing in `src/components/kibble/`, `src/components/pawket/`, `src/components/admin/` (or similar). Prefer **semantic tokens** (spacing, radius, elevation) mapped to Tailwind `@theme` / CSS variables so **Kinetic Ledger** and **Vibrant Scholar** stay consistent with the PRD palette.
 - **Guardrails**: If a Stitch artifact conflicts with **accessibility**, **PWA/mobile touch targets**, or **data from Convex** (real paystubs vs placeholder numbers), adjust the layout while preserving the intended hierarchy and brand feel.
 - **Landings vs app chrome**: Stitch likely covers both; remember **SSR is only** for the two **public marketing landings** — keep Stitch-driven hero/marketing on those routes; signed-in dashboards from the same template library stay **client-only** as already decided.
@@ -107,7 +107,7 @@ flowchart TB
 
 - Add **Convex Auth** per [Convex Auth setup](https://labs.convex.dev/auth/setup) and [product docs](https://docs.convex.dev/auth/convex-auth) (`@convex-dev/auth` / `@auth/core` patterns as documented there).
 - **No public sign-up**: Onboarding is **invitation-only**. There is no `/signup` or open self-serve registration; new users enter through **tenant invitations** (email/identifier flow) and **Convex Auth** sign-in after they have a valid invite, mirroring the pattern in the reference codebase below.
-- **Rendering strategy (decided)**: This is a **PWA-first** product; the signed-in experience is **client-only** end-to-end (no reliance on SSR for session, Convex queries, or money-moving UI). **SSR is intentionally narrow**: only the **public marketing landing pages** for **Kibble Capital** and **PawKet Exchange** (e.g. index routes under `/kibble` and `/pawket` that pitch install / sign-in). Everything else—including auth flows, student dashboards, teacher admin, store/POS—stays **client-rendered** so Convex Auth matches the deployment model and avoids SSR/cookie bridging complexity (see [convex-auth TanStack Start discussion](https://github.com/get-convex/convex-auth/issues/126) for context; we are not pursuing SSR for those surfaces in v1).
+- **Rendering strategy (decided)**: This is a **PWA-first** product; the signed-in experience is **client-only** end-to-end (no reliance on SSR for session, Convex queries, or money-moving UI). **SSR is intentionally narrow**: only the **public marketing landing pages** for **Kibble Capital** and **PawKet Change** (e.g. index routes under `/kibble` and `/pawket` that pitch install / sign-in). Everything else—including auth flows, student dashboards, teacher admin, store/POS—stays **client-rendered** so Convex Auth matches the deployment model and avoids SSR/cookie bridging complexity (see [convex-auth TanStack Start discussion](https://github.com/get-convex/convex-auth/issues/126) for context; we are not pursuing SSR for those surfaces in v1).
 
 ### Invitation-only pattern (reference: ms-engage-v2)
 

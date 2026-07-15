@@ -153,7 +153,7 @@ async function main() {
 
   const pawketTheme = generateProductThemeFile({
     dataTheme: 'pawket',
-    label: 'PawKet Exchange — Vibrant Scholar',
+    label: 'PawKet Change — Vibrant Scholar',
     stitchPath: 'design/stitch/student-payroll-tracker/vibrant-scholar',
     tonesImport: './vibrant-scholar-tones.css',
     tones: vibrantScholarTones,

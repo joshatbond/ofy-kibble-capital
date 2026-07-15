@@ -9,7 +9,7 @@ import {
 } from './use-loader-progress'
 
 /**
- * The animated PawKet Exchange mark — no progress bar, no layout.
+ * The animated PawKet Change mark — no progress bar, no layout.
  * Use when you just need an inline spinner.
  */
 export function PawketLoader(props: {
@@ -40,7 +40,7 @@ export function PawketLoadingScreen(props: {
   isReady?: boolean
   /** Status text rendered under the bar. */
   label?: string
-  /** Show the "PawKet Exchange" wordmark above the icon. Default: true. */
+  /** Show the "PawKet Change" wordmark above the icon. Default: true. */
   showWordmark?: boolean
   /**
    * When `true` (default), the screen fills the viewport (`min-h-dvh`).
@@ -82,7 +82,7 @@ export function PawketLoadingScreen(props: {
 
             <span className="text-(--logo-navy-deep)">Ket</span>
 
-            <span className="text-(--logo-navy-deep)"> Exchange</span>
+            <span className="text-(--logo-navy-deep)"> Change</span>
           </div>
         ) : null}
 

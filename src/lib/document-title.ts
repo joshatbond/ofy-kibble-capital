@@ -56,7 +56,7 @@ function adminSectionTitle(path: string): string | null {
 
 function appNameForPathname(pathname: string): string {
   if (pathname.startsWith('/pawket')) {
-    return 'PawKet Exchange'
+    return 'PawKet Change'
   }
 
   return 'Kibble Capital'

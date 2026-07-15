@@ -3,7 +3,7 @@ import type { SVGProps } from 'react'
 /**
  * Bark Bucks currency mark.
  *
- * Source: `src/assets/bark_bucks.svg`. Inlined for SSR — see `PawketExchangeLogo`.
+ * Source: `src/assets/bark_bucks.svg`. Inlined for SSR — see `PawketChangeLogo`.
  * Path data is kept identical to the asset; only `stroke` uses `currentColor`.
  */
 export function BarkBuckSymbol(props: SVGProps<SVGSVGElement>) {

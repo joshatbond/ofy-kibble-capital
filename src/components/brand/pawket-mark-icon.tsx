@@ -5,7 +5,7 @@ export function PawketMarkIcon(props: PawketMarkIconProps) {
     <svg
       viewBox="0 0 356 343"
       role="img"
-      aria-label="PawKet Exchange"
+      aria-label="PawKet Change"
       className={cn('block h-full w-full overflow-visible', props.className)}
     >
       <g transform="translate(-0.1308028,-0.28308317)">

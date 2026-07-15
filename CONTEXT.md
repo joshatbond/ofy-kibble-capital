@@ -73,7 +73,7 @@ A second (or further) **Teacher** on the same **Organization**; same permissions
 _Avoid_: Assistant teacher, aide (implies reduced permissions)
 
 **Student**:
-An authenticated user invited into exactly one **Classroom** **Organization** for the simulation; always has access to both **Kibble Capital** and **PawKet Exchange** within that org (no per-app lockout in v1). Roster includes **Grade** (7 or 8), required at **Invitation**.
+An authenticated user invited into exactly one **Classroom** **Organization** for the simulation; always has access to both **Kibble Capital** and **PawKet Change** within that org (no per-app lockout in v1). Roster includes **Grade** (7 or 8), required at **Invitation**.
 _Avoid_: User (too generic), learner
 
 **Grade**:
@@ -83,23 +83,23 @@ _Avoid_: Year (ambiguous), class year
 ### Student apps (product names)
 
 **Kibble Capital**:
-The accounting-style student PWA for paystubs, deductions, earnings, **Pay split**, and **PTO request** status — used infrequently as an educational surface. New **Posted paystub**: **In-app badge** only (no push). **PTO decision notification** is the exception: **PWA notification** and/or **In-app badge** on **Kibble** when **Teacher** approves or denies **PTO request** (not **PawKet Exchange**). No in-app cross-links to **PawKet** in v1 — separate install / home screen. **Guided tour** in v1 (slice 11).
+The accounting-style student PWA for paystubs, deductions, earnings, **Pay split**, and **PTO request** status — used infrequently as an educational surface. New **Posted paystub**: **In-app badge** only (no push). **PTO decision notification** is the exception: **PWA notification** and/or **In-app badge** on **Kibble** when **Teacher** approves or denies **PTO request** (not **PawKet Change**). No in-app cross-links to **PawKet** in v1 — separate install / home screen. **Guided tour** in v1 (slice 11).
 _Avoid_: Kinetic Ledger (Stitch/design alias only)
 
-**PawKet Exchange**:
+**PawKet Change**:
 The banking-style student PWA students use routinely — balances, vaults, transfers, and **Student store** purchases; primary day-to-day student surface. **Net pay** arrival triggers a **Paycheck notification** (**PWA notification**). No in-app cross-links to **Kibble** in v1 — separate install / home screen. First-time **Student** **Guided tour** in v1 (slice 11).
 _Avoid_: Vibrant Scholar (Stitch/design alias only)
 
 **Guided tour**:
-Step-by-step onboarding overlay in each student PWA separately (**PawKet Exchange** primary, **Kibble Capital** after pay-split wizard); skippable and replayable; no cross-app links.
+Step-by-step onboarding overlay in each student PWA separately (**PawKet Change** primary, **Kibble Capital** after pay-split wizard); skippable and replayable; no cross-app links.
 _Avoid_: Tutorial (generic), product tour (marketing)
 
 **Student store**:
-The teacher-run in-class economy where **Students** spend simulated funds from **PawKet Exchange**, not from **Kibble Capital** directly.
+The teacher-run in-class economy where **Students** spend simulated funds from **PawKet Change**, not from **Kibble Capital** directly.
 _Avoid_: Shop, marketplace
 
 **POS**:
-Point-of-sale in **Teacher admin** — **Teacher** runs checkout, scans a **Student pay code**, selects items, and posts a debit. **Pay token** may exist before **Invitation** accept, but **POS** debits only **active** roster **Students** (invite accepted). Declines if **Checking** plus available **Sweep to checking** funds cannot cover the total (no negative balances). **Student** receives a **PWA notification** on **PawKet Exchange** when charged.
+Point-of-sale in **Teacher admin** — **Teacher** runs checkout, scans a **Student pay code**, selects items, and posts a debit. **Pay token** may exist before **Invitation** accept, but **POS** debits only **active** roster **Students** (invite accepted). Declines if **Checking** plus available **Sweep to checking** funds cannot cover the total (no negative balances). **Student** receives a **PWA notification** on **PawKet Change** when charged.
 _Avoid_: Checkout, register
 
 **Student pay code**:
@@ -127,7 +127,7 @@ Mark a **Catalog item** inactive (not sold at **POS**) without deleting past tra
 _Avoid_: Delete, archive (acceptable UI copy)
 
 **Peer transfer**:
-A **Student**-initiated send of simulated funds to another **Student** in the same **Classroom** **Organization** (v1 allowed; no cross-class sends). Limited only by spendable balance (no per-transfer or daily caps in v1). **Student** must pick a **Transfer reason** from a **Classroom** preset list (no free-text memo in v1). Recipient picker shows roster names only — not classmates’ balances. Recipients get a **PWA notification** on **PawKet Exchange** when funds arrive.
+A **Student**-initiated send of simulated funds to another **Student** in the same **Classroom** **Organization** (v1 allowed; no cross-class sends). Limited only by spendable balance (no per-transfer or daily caps in v1). **Student** must pick a **Transfer reason** from a **Classroom** preset list (no free-text memo in v1). Recipient picker shows roster names only — not classmates’ balances. Recipients get a **PWA notification** on **PawKet Change** when funds arrive.
 _Avoid_: P2P, Zelle (brand), payment (generic)
 
 **Transfer reason**:
@@ -165,7 +165,7 @@ When a **Student** submits **PTO request**: **PWA notification**, **Email alert*
 _Avoid_: Approval request (generic)
 
 **PTO decision notification**:
-**PWA notification** and/or **In-app badge** on **Kibble Capital** when a **PTO request** is approved or denied — the rare student alert on the earnings app (not **PawKet Exchange**).
+**PWA notification** and/or **In-app badge** on **Kibble Capital** when a **PTO request** is approved or denied — the rare student alert on the earnings app (not **PawKet Change**).
 _Avoid_: PTO alert (generic)
 
 **Approved PTO**:
@@ -249,7 +249,7 @@ California State Disability Insurance **Withholding line**.
 _Avoid_: SDI (ambiguous), disability tax (verbose)
 
 **Net pay**:
-**Gross pay** minus **Pre-tax deduction** and all **Withholding line** amounts; credited to **PawKet Exchange** on **Pay run**.
+**Gross pay** minus **Pre-tax deduction** and all **Withholding line** amounts; credited to **PawKet Change** on **Pay run**.
 
 **Paystub**:
 The **Kibble Capital** earnings statement for one **Student** and **Pay period**, with gross, **Pre-tax deduction**, **Withholding line**, and **Net pay** lines. **Posted paystub** records are immutable in v1 — fixes use a later **Pay run** (e.g. true-up line), not editing the original.
@@ -266,7 +266,7 @@ _Avoid_: True-up (colloquial), amend (IRS tone)
 ### PawKet (banking)
 
 **Checking**:
-The **Student** spending account in **PawKet Exchange** — **Student store** debits and peer sends pull from here first.
+The **Student** spending account in **PawKet Change** — **Student store** debits and peer sends pull from here first.
 _Avoid_: Checking account (verbose in definitions), primary account
 
 **Savings**:
@@ -290,7 +290,7 @@ A **Student**-defined savings goal inside **Savings**, created through **Vault s
 _Avoid_: Envelope, pot, sub-account (implementation)
 
 **Vault setup**:
-Student wizard in **PawKet Exchange**: (1) what they are saving for — pick from product-wide **Common vault goal** presets or custom label + icon/emoji; (2) optional **Savings goal** dollar target (uncapped if omitted); (3) how to fund — maps to **Vault funding mode**.
+Student wizard in **PawKet Change**: (1) what they are saving for — pick from product-wide **Common vault goal** presets or custom label + icon/emoji; (2) optional **Savings goal** dollar target (uncapped if omitted); (3) how to fund — maps to **Vault funding mode**.
 _Avoid_: Create vault (UI copy)
 
 **Common vault goal**:
@@ -326,11 +326,11 @@ Per **Vault** with **On deposit** mode: share of **Net pay** (percent or fixed *
 _Avoid_: Auto-save percent (alone)
 
 **Recurring vault transfer**:
-**Scheduled** moves from unallocated **Savings** into a **Vault** on a student-chosen cadence: weekly, bi-weekly, or monthly (v1). If funds are insufficient, the transfer is skipped and the **Student** sees an in-session notice in **PawKet Exchange** only (no **PWA notification**, no home-screen icon badge).
+**Scheduled** moves from unallocated **Savings** into a **Vault** on a student-chosen cadence: weekly, bi-weekly, or monthly (v1). If funds are insufficient, the transfer is skipped and the **Student** sees an in-session notice in **PawKet Change** only (no **PWA notification**, no home-screen icon badge).
 _Avoid_: Standing order (UK tone)
 
 **Transfer skipped notice**:
-In-app-only message in **PawKet Exchange** when a **Recurring vault transfer** could not run due to low unallocated **Savings**.
+In-app-only message in **PawKet Change** when a **Recurring vault transfer** could not run due to low unallocated **Savings**.
 _Avoid_: Failed transfer push, alert (generic)
 
 **Pay split**:
@@ -338,7 +338,7 @@ _Avoid_: Failed transfer push, alert (generic)
 _Avoid_: Allocation, split (alone)
 
 **PawKet automation**:
-Rules in **PawKet Exchange** triggered on events (e.g. paycheck received) — moving funds between **Checking**, **Savings**, and **Vaults** according to **Vault funding mode** and student choices.
+Rules in **PawKet Change** triggered on events (e.g. paycheck received) — moving funds between **Checking**, **Savings**, and **Vaults** according to **Vault funding mode** and student choices.
 _Avoid_: Rule, workflow (implementation)
 
 **Paycheck allocation**:
@@ -403,7 +403,7 @@ Calendar date anchor (1–28/29/30/31 — product must define handling of short 
 _Avoid_: Date (implies full calendar date with month)
 
 **Pay run**:
-A classroom-wide batch that finalizes earnings for a **Pay period**, produces paystubs in **Kibble Capital**, and credits net pay to **PawKet Exchange** for every roster **Student** — normally triggered by automation. At most **one successful Pay run** per **Pay period** (idempotent; retries only after failure or **Blocked** state, not after success). If the **Attendance platform** import fails or any active **Student** lacks data for the period, the **Pay run** is **Blocked** (no partial pay in v1).
+A classroom-wide batch that finalizes earnings for a **Pay period**, produces paystubs in **Kibble Capital**, and credits net pay to **PawKet Change** for every roster **Student** — normally triggered by automation. At most **one successful Pay run** per **Pay period** (idempotent; retries only after failure or **Blocked** state, not after success). If the **Attendance platform** import fails or any active **Student** lacks data for the period, the **Pay run** is **Blocked** (no partial pay in v1).
 _Avoid_: Payroll run (verbose), batch (alone)
 
 **Blocked pay run**:
@@ -443,7 +443,7 @@ Transactional email via Resend for time-sensitive events (e.g. **Payday notice**
 _Avoid_: Newsletter, marketing email
 
 **Paycheck notification**:
-**PWA notification** to **Students** on **PawKet Exchange** when **Net pay** lands from a **Pay run** (e.g. “Paycheck received”).
+**PWA notification** to **Students** on **PawKet Change** when **Net pay** lands from a **Pay run** (e.g. “Paycheck received”).
 _Avoid_: Payment alert (generic)
 
 **In-app badge**:
@@ -471,7 +471,7 @@ The teacher-facing hub for classroom setup, payroll inputs, **POS**, and invitat
 _Avoid_: Admin app (ambiguous with system administration)
 
 **Sign-in surface**:
-Which student PWA the user authenticated from (**Kibble Capital** or **PawKet Exchange** marketing/install path). After OAuth, **Students** land on that app’s signed-in home. Unknown surface after **Invitation** accept defaults to **Kibble Capital**.
+Which student PWA the user authenticated from (**Kibble Capital** or **PawKet Change** marketing/install path). After OAuth, **Students** land on that app’s signed-in home. Unknown surface after **Invitation** accept defaults to **Kibble Capital**.
 _Avoid_: Last-used app (deferred), deep link (implementation)
 
 ## Engineering
@@ -492,7 +492,7 @@ _Avoid_: Feature slices that invent one-off CSS outside the design system; treat
 
 ### Component catalog (Storybook)
 
-A **Storybook** workshop for React UI — not shipped yet. Use it to render components in isolation, force props and states (loading, empty, error, wizard steps), and preview **Kibble Capital** vs **PawKet Exchange** styling under `AppTheme` without signing in or routing through the full app.
+A **Storybook** workshop for React UI — not shipped yet. Use it to render components in isolation, force props and states (loading, empty, error, wizard steps), and preview **Kibble Capital** vs **PawKet Change** styling under `AppTheme` without signing in or routing through the full app.
 
 **Why Storybook (not a big component test suite):** Layout, loaders, landings, and theme tokens are easier to review and iterate in a catalog than with React Testing Library or route-level clicks. **Money and rules** (**Paycheck pipeline**, **Withholding line**, **Cents**, ADR-0001 bracket fixtures) belong in unit/integration tests, not stories.
 
@@ -544,7 +544,7 @@ _(none)_
 
 **Dev:** "Do students need two accounts?"
 
-**Expert:** "One **Student**, one **Organization** — two apps. **Kibble Capital** when a paystub lands; **PawKet Exchange** most days for the **Student store** and moving money."
+**Expert:** "One **Student**, one **Organization** — two apps. **Kibble Capital** when a paystub lands; **PawKet Change** most days for the **Student store** and moving money."
 
 **Dev:** "Can a kid join with a random Gmail?"
 

@@ -1,5 +1,5 @@
 import { KibbleCapitalLogo } from '~/components/brand/kibble-capital-logo'
-import { PawketExchangeLogo } from '~/components/brand/pawket-exchange-logo'
+import { PawketChangeLogo } from '~/components/brand/pawket-change-logo'
 
 import type { FC, SVGProps } from 'react'
 
@@ -9,8 +9,8 @@ export const brandLogos = {
     alt: 'Kibble Capital',
   },
   pawket: {
-    Component: PawketExchangeLogo,
-    alt: 'PawKet Exchange',
+    Component: PawketChangeLogo,
+    alt: 'PawKet Change',
   },
 } as const
 export type BrandLogoComponent = FC<SVGProps<SVGSVGElement>>
