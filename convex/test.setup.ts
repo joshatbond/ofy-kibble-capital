@@ -66,3 +66,34 @@ export async function asAuthedUser(
 export async function seedV1Catalog(t: ConvexTest) {
   return await t.mutation(internal.seed.index.seedV1Catalog, {})
 }
+
+/**
+ * Seed the v1 catalog and link a signed-in teacher into the dev classroom.
+ * Default role is `teacher` (has invitations:create).
+ */
+export async function setupDevTeacherClassroom(
+  t: ConvexTest,
+  options: {
+    email?: string
+    name?: string
+    role?: 'owner' | 'admin' | 'teacher'
+  } = {}
+) {
+  const email = options.email ?? 'teacher@ofy.org'
+  const seeded = await seedV1Catalog(t)
+  const teacher = await asAuthedUser(t, {
+    email,
+    name: options.name ?? 'Dev Teacher',
+  })
+
+  const linked = await t.mutation(internal.seed.index.linkDevTeacherByEmail, {
+    email,
+    role: options.role ?? 'teacher',
+  })
+
+  return {
+    ...seeded,
+    teacher,
+    organizationId: linked.organizationId,
+  }
+}
