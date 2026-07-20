@@ -12,6 +12,10 @@
     "lint": "eslint",
     "format": "prettier --write . && eslint --fix",
     "check": "prettier --write . && eslint --fix",
+    "test": "vitest",
+    "test:once": "vitest run",
+    "test:debug": "vitest --inspect-brk --no-file-parallelism",
+    "test:coverage": "vitest run --coverage --coverage.reporter=text",
     "test:eslint-plugin": "node --test eslint/plugins/module-ordering-plugin.test.mjs",
     "typecheck": "tsc --noEmit",
     "theme:tones": "bun scripts/generate-theme-tone-css.ts",
@@ -46,6 +50,7 @@
   },
   "devDependencies": {
     "@convex-dev/eslint-plugin": "^1.2.2",
+    "@edge-runtime/vm": "^5.0.0",
     "@netlify/vite-plugin-tanstack-start": "^1.3.12",
     "@storybook/addon-essentials": "8.6.18",
     "@storybook/addon-interactions": "8.6.18",
@@ -62,6 +67,7 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.2.0",
+    "convex-test": "^0.0.54",
     "culori": "^4.0.2",
     "eslint-plugin-react": "^7.37.5",
     "netlify-cli": "^26.0.1",
@@ -70,7 +76,8 @@
     "storybook": "8.6.18",
     "tailwindcss": "^4.2.2",
     "typescript": "^6.0.3",
-    "vite": "^8.0.9"
+    "vite": "^8.0.9",
+    "vitest": "^4.1.10"
   },
   "overrides": {
     "@storybook/csf-plugin": "8.6.18",
