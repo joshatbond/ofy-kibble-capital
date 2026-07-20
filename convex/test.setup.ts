@@ -3,6 +3,7 @@ import authzTest from '@djpanda/convex-authz/test'
 import tenantsTest from '@djpanda/convex-tenants/test'
 import { convexTest } from 'convex-test'
 
+import { internal } from './_generated/api'
 import schema from './schema'
 
 import type { Id } from './_generated/dataModel'
@@ -59,4 +60,9 @@ export async function asAuthedUser(
       subject: `${userId}|${sessionId}`,
     }),
   }
+}
+
+/** Idempotent v1 region / sites / settings / dev classroom bootstrap. */
+export async function seedV1Catalog(t: ConvexTest) {
+  return await t.mutation(internal.seed.index.seedV1Catalog, {})
 }

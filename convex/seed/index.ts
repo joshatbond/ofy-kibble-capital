@@ -78,17 +78,23 @@ export const linkDevTeacherByEmail = internalMutation({
         memberUserId: user._id,
         role,
       })
+
+      await authz.assignRole(
+        ctx,
+        user._id,
+        role,
+        orgScope(organizationId),
+        undefined,
+        operatorUserId
+      )
+
+      return { organizationId, userId: user._id, role }
     }
 
-    await authz.assignRole(
-      ctx,
-      user._id,
-      role,
-      orgScope(organizationId),
-      undefined,
-      operatorUserId
-    )
-
-    return { organizationId, userId: user._id, role }
+    return {
+      organizationId,
+      userId: user._id,
+      role: existing.role as typeof role,
+    }
   },
 })

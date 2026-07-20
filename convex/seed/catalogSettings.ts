@@ -2,7 +2,10 @@ import {
   V1_REGION_SETTINGS,
   V1_SCHOOL_SITE_SETTINGS,
 } from '../features/settings/defaults'
-import { assertPaydayNoticeLeadDays } from '../features/settings/values'
+import {
+  assertPaydayNoticeLeadDays,
+  pickSettingsValues,
+} from '../features/settings/values'
 
 import type { Id } from '../_generated/dataModel'
 import type { MutationCtx } from '../_generated/server'
@@ -61,7 +64,7 @@ export async function ensureSchoolSiteSettings(
     throw new Error('Region settings must exist before school site settings.')
   }
 
-  const regionValues = regionSettings
+  const regionValues = pickSettingsValues(regionSettings)
   const sitePartial = V1_SCHOOL_SITE_SETTINGS[siteSlug] ?? {}
   const values: SettingsValues = { ...regionValues, ...sitePartial }
   assertCatalogSettings(values)

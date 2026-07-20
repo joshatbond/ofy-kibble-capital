@@ -111,10 +111,12 @@ export async function ensureClassSettingsSnapshot(
   }
 
   const stack = await loadSettingsStackForClassroom(ctx, classroom)
-  const snapshot = mergeSettingsLayers(
-    stack.regionSettings,
-    stack.siteSettings,
-    {}
+  const snapshot = pickSettingsValues(
+    mergeSettingsLayers(
+      pickSettingsValues(stack.regionSettings),
+      pickSettingsValues(stack.siteSettings),
+      {}
+    )
   )
 
   return await ctx.db.insert('classSettings', {
