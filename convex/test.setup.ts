@@ -31,12 +31,16 @@ export async function asAuthedUser(
     email?: string
     name?: string
     studentApp?: StudentApp
+    canCreateOrganization?: boolean
   } = {}
 ) {
   const { userId, sessionId } = await t.run(async ctx => {
     const userId = await ctx.db.insert('users', {
       email: options.email ?? 'student@ofy.org',
       name: options.name ?? 'Test Student',
+      ...(options.canCreateOrganization === true
+        ? { canCreateOrganization: true }
+        : {}),
     })
     const sessionId = await ctx.db.insert('authSessions', {
       userId,
