@@ -22,9 +22,18 @@ import {
 
 const balancesValidator = v.object({
   checkingCents: v.number(),
+  savingsUnallocatedCents: v.number(),
+  vaultsTotalCents: v.number(),
   savingsCents: v.number(),
   currencyLabel: v.string(),
   savingsApyPercent: v.number(),
+})
+
+const balancesOnlyValidator = v.object({
+  checkingCents: v.number(),
+  savingsUnallocatedCents: v.number(),
+  vaultsTotalCents: v.number(),
+  savingsCents: v.number(),
 })
 
 const activityRowValidator = v.object({
@@ -225,10 +234,7 @@ export const transferBetweenAccounts = mutation({
     direction: transferDirectionValidator,
     amountCents: v.number(),
   },
-  returns: v.object({
-    checkingCents: v.number(),
-    savingsCents: v.number(),
-  }),
+  returns: balancesOnlyValidator,
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx)
     if (userId === null) {
@@ -264,10 +270,7 @@ export const transferBetweenAccounts = mutation({
 /** POS / spend pipeline only — moves unallocated savings when checking is short. */
 export const sweepToChecking = internalMutation({
   args: { amountCents: v.number(), rosterStudentId: v.id('rosterStudents') },
-  returns: v.object({
-    checkingCents: v.number(),
-    savingsCents: v.number(),
-  }),
+  returns: balancesOnlyValidator,
   handler: async (ctx, args) => {
     if (!Number.isInteger(args.amountCents) || args.amountCents <= 0) {
       throw new Error('Amount must be a positive integer number of cents.')

@@ -6,6 +6,16 @@ import type {
 } from '../../schema/schemaFields'
 import type { Infer } from 'convex/values'
 
+export type StudentBalances = {
+  checkingCents: number
+  /** Balance of the savings bank account only (not in vaults). */
+  savingsUnallocatedCents: number
+  /** Sum of active + complete vault balances (excludes closed). */
+  vaultsTotalCents: number
+  /** Unallocated + vaults — dashboard savings total. */
+  savingsCents: number
+}
+
 export async function postLedgerEntry(
   ctx: MutationCtx,
   args: {
@@ -18,6 +28,7 @@ export async function postLedgerEntry(
     entryType: LedgerEntryType
     label: string
     createdAt: number
+    vaultId?: Id<'vaults'>
   }
 ): Promise<Id<'ledgerEntries'>> {
   if (!Number.isInteger(args.amountCents) || args.amountCents <= 0) {
@@ -57,12 +68,39 @@ export async function postLedgerEntry(
     entryType: args.entryType,
     label: args.label,
     createdAt: args.createdAt,
+    ...(args.vaultId !== undefined ? { vaultId: args.vaultId } : {}),
   })
 }
+
+export async function sumOpenVaultBalances(
+  ctx: QueryCtx | MutationCtx,
+  rosterStudentId: Id<'rosterStudents'>
+): Promise<number> {
+  const [active, complete] = await Promise.all([
+    ctx.db
+      .query('vaults')
+      .withIndex('by_rosterStudent_status', q =>
+        q.eq('rosterStudentId', rosterStudentId).eq('status', 'active')
+      )
+      .collect(),
+    ctx.db
+      .query('vaults')
+      .withIndex('by_rosterStudent_status', q =>
+        q.eq('rosterStudentId', rosterStudentId).eq('status', 'complete')
+      )
+      .collect(),
+  ])
+
+  return [...active, ...complete].reduce(
+    (sum, vault) => sum + vault.balanceCents,
+    0
+  )
+}
+
 export async function getStudentBalances(
   ctx: QueryCtx | MutationCtx,
   rosterStudent: Doc<'rosterStudents'>
-): Promise<{ checkingCents: number; savingsCents: number }> {
+): Promise<StudentBalances> {
   const checking = await ctx.db
     .query('bankAccounts')
     .withIndex('by_rosterStudent_kind', q =>
@@ -76,11 +114,17 @@ export async function getStudentBalances(
     )
     .unique()
 
+  const savingsUnallocatedCents = savings?.balanceCents ?? 0
+  const vaultsTotalCents = await sumOpenVaultBalances(ctx, rosterStudent._id)
+
   return {
     checkingCents: checking?.balanceCents ?? 0,
-    savingsCents: savings?.balanceCents ?? 0,
+    savingsUnallocatedCents,
+    vaultsTotalCents,
+    savingsCents: savingsUnallocatedCents + vaultsTotalCents,
   }
 }
+
 type BankAccountKind = Infer<typeof bankAccountKindValidator>
 type LedgerEntryType = Infer<typeof ledgerEntryTypeValidator>
 type LedgerDirection = 'credit' | 'debit'

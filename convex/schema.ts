@@ -7,6 +7,8 @@ import {
   classSettingsTableFields,
   classroomsTableFields,
   ledgerEntriesTableFields,
+  notificationsTableFields,
+  paySplitsTableFields,
   regionSettingsTableFields,
   regionsTableFields,
   rosterStudentsTableFields,
@@ -14,6 +16,7 @@ import {
   schoolSitesTableFields,
   studentOAuthIntentsTableFields,
   usersTableFields,
+  vaultsTableFields,
 } from './schema/schemaFields'
 
 export default defineSchema({
@@ -64,5 +67,16 @@ export default defineSchema({
       'accountKind',
       'createdAt',
     ])
-    .index('by_organizationId_createdAt', ['organizationId', 'createdAt']),
+    .index('by_organizationId_createdAt', ['organizationId', 'createdAt'])
+    .index('by_vaultId_createdAt', ['vaultId', 'createdAt']),
+  paySplits: defineTable(paySplitsTableFields)
+    .index('by_rosterStudentId', ['rosterStudentId'])
+    .index('by_organizationId', ['organizationId']),
+  vaults: defineTable(vaultsTableFields)
+    .index('by_rosterStudent_status', ['rosterStudentId', 'status'])
+    .index('by_rosterStudentId', ['rosterStudentId'])
+    .index('by_nextRunAt', ['nextRunAt']),
+  notifications: defineTable(notificationsTableFields)
+    .index('by_user_createdAt', ['userId', 'createdAt'])
+    .index('by_user_readAt_createdAt', ['userId', 'readAt', 'createdAt']),
 })

@@ -158,8 +158,9 @@ function DashboardBalancesSections(props: {
         >
           <div className="grid gap-3 text-sm">
             <p className="text-muted-foreground">
-              Vault goals arrive in a future update — for now, all savings stay
-              unallocated.
+              Unallocated{' '}
+              <MoneyAmount cents={balances.savingsUnallocatedCents} /> · Vaults{' '}
+              <MoneyAmount cents={balances.vaultsTotalCents} />
             </p>
 
             <Button

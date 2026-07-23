@@ -52,6 +52,8 @@ describe('getMyBalances', () => {
       await student.client.query(api.features.banking.getMyBalances, {})
     ).toEqual({
       checkingCents: 0,
+      savingsUnallocatedCents: 0,
+      vaultsTotalCents: 0,
       savingsCents: 0,
       currencyLabel: 'Bark Bucks',
       savingsApyPercent: 3.3,
@@ -104,6 +106,8 @@ describe('transferBetweenAccounts', () => {
       )
     ).toEqual({
       checkingCents: 600,
+      savingsUnallocatedCents: 400,
+      vaultsTotalCents: 0,
       savingsCents: 400,
     })
 
@@ -117,6 +121,8 @@ describe('transferBetweenAccounts', () => {
       )
     ).toEqual({
       checkingCents: 750,
+      savingsUnallocatedCents: 250,
+      vaultsTotalCents: 0,
       savingsCents: 250,
     })
 
@@ -296,6 +302,8 @@ describe('sweepToChecking', () => {
       })
     ).toEqual({
       checkingCents: 300,
+      savingsUnallocatedCents: 500,
+      vaultsTotalCents: 0,
       savingsCents: 500,
     })
 

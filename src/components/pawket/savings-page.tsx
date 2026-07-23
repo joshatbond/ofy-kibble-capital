@@ -131,7 +131,7 @@ function SavingsBalancesSections(props: {
             </p>
 
             <p className="font-heading text-xl font-bold">
-              <MoneyAmount cents={balances.savingsCents} />
+              <MoneyAmount cents={balances.savingsUnallocatedCents} />
             </p>
           </div>
 
@@ -141,7 +141,7 @@ function SavingsBalancesSections(props: {
             </p>
 
             <p className="font-heading text-xl font-bold">
-              <MoneyAmount cents={0} />
+              <MoneyAmount cents={balances.vaultsTotalCents} />
             </p>
           </div>
         </div>

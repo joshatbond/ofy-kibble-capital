@@ -4,8 +4,40 @@ const bankAccountKind = v.union(v.literal('checking'), v.literal('savings'))
 const ledgerDirection = v.union(v.literal('credit'), v.literal('debit'))
 const ledgerEntryType = v.union(
   v.literal('sweep_to_checking'),
-  v.literal('internal_transfer')
+  v.literal('internal_transfer'),
+  v.literal('net_pay'),
+  v.literal('pay_split'),
+  v.literal('vault_on_deposit'),
+  v.literal('vault_scheduled'),
+  v.literal('vault_manual'),
+  v.literal('vault_close')
 )
+const vaultFundingMode = v.union(
+  v.literal('on_deposit'),
+  v.literal('scheduled'),
+  v.literal('manual')
+)
+const vaultStatus = v.union(
+  v.literal('active'),
+  v.literal('complete'),
+  v.literal('closed')
+)
+const vaultScheduleCadence = v.union(
+  v.literal('weekly'),
+  v.literal('biweekly'),
+  v.literal('monthly')
+)
+const vaultOnDepositRule = v.union(
+  v.object({
+    kind: v.literal('percent'),
+    percent: v.number(),
+  }),
+  v.object({
+    kind: v.literal('fixed'),
+    amountCents: v.number(),
+  })
+)
+const notificationKind = v.union(v.literal('transfer_skipped'))
 const rosterStatus = v.union(
   v.literal('pending'),
   v.literal('active'),
@@ -167,9 +199,60 @@ export const ledgerEntriesTableFields = {
   label: v.string(),
   /** Unix ms when the entry was recorded. */
   createdAt: v.number(),
+  /** Set when the line is tied to a vault movement. */
+  vaultId: v.optional(v.id('vaults')),
+}
+export const paySplitsTableFields = {
+  organizationId: v.string(),
+  rosterStudentId: v.id('rosterStudents'),
+  /** Percent of post-vault Net pay remainder to Savings (0–100). */
+  savingsPercent: v.number(),
+  /** Complement of savingsPercent (0–100). */
+  checkingPercent: v.number(),
+  /** Unix ms when the split was last set. */
+  updatedAt: v.number(),
+}
+export const vaultsTableFields = {
+  rosterStudentId: v.id('rosterStudents'),
+  name: v.string(),
+  /** Emoji or icon key chosen in Vault setup. */
+  icon: v.string(),
+  /** Optional Savings goal in cents; uncapped when omitted. */
+  goalCents: v.optional(v.number()),
+  balanceCents: v.number(),
+  fundingMode: vaultFundingMode,
+  /** Required when fundingMode is on_deposit. */
+  onDepositRule: v.optional(vaultOnDepositRule),
+  /** Required when fundingMode is scheduled — cents moved each run. */
+  scheduledAmountCents: v.optional(v.number()),
+  /** Required when fundingMode is scheduled. */
+  scheduleCadence: v.optional(vaultScheduleCadence),
+  /** Next due run (ms) for scheduled vaults. */
+  nextRunAt: v.optional(v.number()),
+  status: vaultStatus,
+  createdAt: v.number(),
+  updatedAt: v.number(),
+  closedAt: v.optional(v.number()),
+}
+export const notificationsTableFields = {
+  userId: v.id('users'),
+  rosterStudentId: v.id('rosterStudents'),
+  kind: notificationKind,
+  title: v.string(),
+  body: v.string(),
+  /** Unix ms when marked read; omitted while unread. */
+  readAt: v.optional(v.number()),
+  createdAt: v.number(),
+  /** Optional vault that triggered the notice. */
+  vaultId: v.optional(v.id('vaults')),
 }
 export const bankAccountKindValidator = bankAccountKind
 export const ledgerEntryTypeValidator = ledgerEntryType
 export const rosterStatusValidator = rosterStatus
 export const studentAppValidator = studentApp
+export const vaultFundingModeValidator = vaultFundingMode
+export const vaultStatusValidator = vaultStatus
+export const vaultScheduleCadenceValidator = vaultScheduleCadence
+export const vaultOnDepositRuleValidator = vaultOnDepositRule
+export const notificationKindValidator = notificationKind
 export { payScheduleValidator, weekdayValidator }

@@ -256,7 +256,7 @@ function transferAccount(
 ): TransferAccount {
   const savings: TransferAccount = {
     label: 'Savings',
-    balanceKey: 'savingsCents',
+    balanceKey: 'savingsUnallocatedCents',
   }
   const checking: TransferAccount = {
     label: 'Checking',
@@ -297,13 +297,13 @@ function transferAvailableCents(
   direction: TransferDirection
 ): number {
   return direction === 'savings_to_checking'
-    ? balances.savingsCents
+    ? balances.savingsUnallocatedCents
     : balances.checkingCents
 }
 
 type TransferAccount = {
   label: string
-  balanceKey: 'savingsCents' | 'checkingCents'
+  balanceKey: 'savingsUnallocatedCents' | 'checkingCents'
 }
 
 type PawketStudentBalances = NonNullable<
