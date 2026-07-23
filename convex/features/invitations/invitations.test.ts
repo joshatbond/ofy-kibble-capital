@@ -423,6 +423,25 @@ describe('roster maintenance', () => {
       stranger.client.query(api.features.invitations.listClassroomRoster, {
         organizationId,
       })
-    ).rejects.toThrow()
+    ).rejects.toThrow(/Teacher access required/)
+
+    const invited = await teacher.client.query(
+      api.features.invitations.listClassroomRoster,
+      { organizationId }
+    )
+    expect(invited).toHaveLength(1)
+
+    const studentUser = await asAuthedUser(t, { email: 'kid@ofy.org' })
+    // Accept so they are an org member with student role, then confirm roster stays teacher-only.
+    await studentUser.client.mutation(
+      api.features.invitations.acceptClassroomInvitation,
+      { invitationId: invited[0]!.invitationId }
+    )
+
+    await expect(
+      studentUser.client.query(api.features.invitations.listClassroomRoster, {
+        organizationId,
+      })
+    ).rejects.toThrow(/Teacher access required/)
   })
 })

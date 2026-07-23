@@ -239,7 +239,7 @@ describe('tenants membership isolation', () => {
           'invitations:create'
         )
       })
-    ).rejects.toThrow()
+    ).rejects.toThrow(/Teacher access required/)
   })
 })
 
