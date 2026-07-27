@@ -42,6 +42,7 @@ import type * as features_payroll_money from "../features/payroll/money.js";
 import type * as features_payroll_payrollMath from "../features/payroll/payrollMath.js";
 import type * as features_payroll_periodStore from "../features/payroll/periodStore.js";
 import type * as features_payroll_periods from "../features/payroll/periods.js";
+import type * as features_payroll_runPayPeriod from "../features/payroll/runPayPeriod.js";
 import type * as features_payroll_taxTables from "../features/payroll/taxTables.js";
 import type * as features_payroll_validateAttendance from "../features/payroll/validateAttendance.js";
 import type * as features_roster_cleanup from "../features/roster/cleanup.js";
@@ -110,6 +111,7 @@ declare const fullApi: ApiFromModules<{
   "features/payroll/payrollMath": typeof features_payroll_payrollMath;
   "features/payroll/periodStore": typeof features_payroll_periodStore;
   "features/payroll/periods": typeof features_payroll_periods;
+  "features/payroll/runPayPeriod": typeof features_payroll_runPayPeriod;
   "features/payroll/taxTables": typeof features_payroll_taxTables;
   "features/payroll/validateAttendance": typeof features_payroll_validateAttendance;
   "features/roster/cleanup": typeof features_roster_cleanup;

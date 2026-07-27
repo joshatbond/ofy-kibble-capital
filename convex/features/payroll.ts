@@ -14,6 +14,7 @@ import {
   listPayPeriodsForOrg,
   toPayPeriodPublic,
 } from './payroll/periodStore'
+import { executePayRunForPeriod } from './payroll/runPayPeriod'
 
 const payPeriodPublicValidator = v.object({
   _id: v.id('payPeriods'),
@@ -46,6 +47,22 @@ const attendanceValidationValidator = v.union(
   v.object({
     status: v.literal('blocked'),
     activeStudentCount: v.number(),
+    payPeriodId: v.id('payPeriods'),
+    blockReasons: v.array(v.string()),
+  })
+)
+
+const payRunResultValidator = v.union(
+  v.object({
+    status: v.literal('succeeded'),
+    payRunId: v.id('payRuns'),
+    payPeriodId: v.id('payPeriods'),
+    stubCount: v.number(),
+    alreadyCompleted: v.boolean(),
+  }),
+  v.object({
+    status: v.literal('blocked'),
+    payRunId: v.id('payRuns'),
     payPeriodId: v.id('payPeriods'),
     blockReasons: v.array(v.string()),
   })
@@ -145,5 +162,38 @@ export const validateAttendanceForPayPeriod = query({
       payPeriodId: result.payPeriod._id,
       records: result.records,
     }
+  },
+})
+
+/**
+ * Manual **Pay run** for a period: attendance gate → paystubs → ledger.
+ * Idempotent after the first successful run for that period.
+ */
+export const runPayPeriod = mutation({
+  args: {
+    organizationId: v.string(),
+    payPeriodId: v.id('payPeriods'),
+    nowMs: v.optional(v.number()),
+  },
+  returns: payRunResultValidator,
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx)
+    if (userId === null) {
+      throw new Error('Not authenticated')
+    }
+
+    await requireTeacherForOrg(
+      ctx,
+      userId,
+      args.organizationId,
+      'organizations:update'
+    )
+
+    return await executePayRunForPeriod(ctx, {
+      organizationId: args.organizationId,
+      payPeriodId: args.payPeriodId,
+      triggeredBy: 'manual',
+      nowMs: args.nowMs ?? Date.now(),
+    })
   },
 })
