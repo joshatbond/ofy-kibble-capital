@@ -13,6 +13,7 @@ import {
 
 import { requireTeacherForOrg } from './auth/teacher'
 import { getStudentBalances } from './banking/ledger'
+import { applyPaycheckPipeline } from './banking/paycheckPipeline'
 import { getActiveRosterStudentForUser } from './banking/student'
 import {
   moveBetweenStudentAccounts,
@@ -293,5 +294,29 @@ export const sweepToChecking = internalMutation({
     })
 
     return await getStudentBalances(ctx, roster)
+  },
+})
+
+/**
+ * Stub net-pay credit for Slice 6 pay runs — runs the paycheck pipeline
+ * (on-deposit vault first cut → pay split remainder).
+ */
+export const creditNetPay = internalMutation({
+  args: {
+    rosterStudentId: v.id('rosterStudents'),
+    netPayCents: v.number(),
+  },
+  returns: balancesOnlyValidator,
+  handler: async (ctx, args) => {
+    const roster = await ctx.db.get('rosterStudents', args.rosterStudentId)
+    if (roster === null || roster.status !== 'active') {
+      throw new Error('Active student account required.')
+    }
+
+    return await applyPaycheckPipeline(ctx, {
+      roster,
+      netPayCents: args.netPayCents,
+      nowMs: Date.now(),
+    })
   },
 })

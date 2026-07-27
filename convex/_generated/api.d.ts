@@ -21,6 +21,7 @@ import type * as features_auth_teacher from "../features/auth/teacher.js";
 import type * as features_banking from "../features/banking.js";
 import type * as features_banking_accounts from "../features/banking/accounts.js";
 import type * as features_banking_ledger from "../features/banking/ledger.js";
+import type * as features_banking_paycheckPipeline from "../features/banking/paycheckPipeline.js";
 import type * as features_banking_student from "../features/banking/student.js";
 import type * as features_banking_transfers from "../features/banking/transfers.js";
 import type * as features_catalog_siteSlug from "../features/catalog/siteSlug.js";
@@ -73,6 +74,7 @@ declare const fullApi: ApiFromModules<{
   "features/banking": typeof features_banking;
   "features/banking/accounts": typeof features_banking_accounts;
   "features/banking/ledger": typeof features_banking_ledger;
+  "features/banking/paycheckPipeline": typeof features_banking_paycheckPipeline;
   "features/banking/student": typeof features_banking_student;
   "features/banking/transfers": typeof features_banking_transfers;
   "features/catalog/siteSlug": typeof features_catalog_siteSlug;
