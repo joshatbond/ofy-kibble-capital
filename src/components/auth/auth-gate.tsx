@@ -7,8 +7,12 @@ import { KibbleLoadingScreen } from '~/components/loading/kibble-loader'
 import { PawketLoadingScreen } from '~/components/loading/pawket-loader'
 import { Case, SwitchOn } from '~/components/switch-on'
 import { api } from '~/convex/_generated/api'
-import { protectedRouteReturnTo, studentAppHomePath } from '~/lib/auth-redirect'
-import type { StudentApp } from '~/lib/auth-redirect'
+import {
+  omitSignedOutSearch,
+  protectedRouteReturnTo,
+  studentAppHomePath,
+} from '~/lib/auth-redirect'
+import type { StudentApp, StudentLandingSearch } from '~/lib/auth-redirect'
 
 import type { ReactNode } from 'react'
 
@@ -60,6 +64,16 @@ function AuthGateWithConvex(props: {
     }
 
     if (isLanding) {
+      // Sign-out race finished — drop the flag so a later sign-in can redirect.
+      if (signedOut && !isAuthenticated) {
+        void navigate({
+          to: props.landingPath,
+          search: (prev: StudentLandingSearch) => omitSignedOutSearch(prev),
+          replace: true,
+        })
+        return
+      }
+
       if (isAuthenticated && !signedOut) {
         void navigate({ to: homePath, replace: true })
       }

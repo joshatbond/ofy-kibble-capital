@@ -12,8 +12,15 @@ import { AdminShell } from '~/components/admin/admin-shell'
 import { Case, SwitchOn } from '~/components/switch-on'
 import { api } from '~/convex/_generated/api'
 import { isScopedAdminPath } from '~/lib/admin-route-context'
-import { adminAppHomePath, adminAppLandingPath } from '~/lib/auth-redirect'
-import { protectedAdminRouteReturnTo } from '~/lib/admin-auth-redirect'
+import {
+  type AdminLandingSearch,
+  protectedAdminRouteReturnTo,
+} from '~/lib/admin-auth-redirect'
+import {
+  adminAppHomePath,
+  adminAppLandingPath,
+  omitSignedOutSearch,
+} from '~/lib/auth-redirect'
 
 export function AdminAuthGate() {
   if (!import.meta.env.VITE_CONVEX_URL) return <Outlet />
@@ -57,6 +64,15 @@ function AdminAuthGateWithConvex() {
 
   useEffect(() => {
     if (isLoading) return
+
+    if (isLanding && signedOut && !isAuthenticated) {
+      void navigate({
+        to: landingPath,
+        search: (prev: AdminLandingSearch) => omitSignedOutSearch(prev),
+        replace: true,
+      })
+      return
+    }
 
     if (isLanding && isAuthenticated && !signedOut) {
       if (teacherContext === undefined) {

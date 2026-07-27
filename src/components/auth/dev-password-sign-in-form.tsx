@@ -1,13 +1,16 @@
 import { useAuthActions } from '@convex-dev/auth/react'
+import { useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 
 import { PawketBrutalButton } from '~/components/pawket/landing/pawket-brutal-button'
+import { omitSignedOutSearch } from '~/lib/auth-redirect'
 
 export function DevPasswordSignInForm(props: {
   email?: string
   emailReadOnly?: boolean
 }) {
   const { signIn } = useAuthActions()
+  const navigate = useNavigate()
   const emailReadOnly = props.emailReadOnly ?? props.email !== undefined
   const [email, setEmail] = useState(props.email ?? '')
   const [password, setPassword] = useState('')
@@ -85,6 +88,7 @@ export function DevPasswordSignInForm(props: {
         password,
         flow: 'signIn',
       })
+      clearSignedOutFlag()
       return
     } catch (signInError) {
       try {
@@ -93,6 +97,7 @@ export function DevPasswordSignInForm(props: {
           password,
           flow: 'signUp',
         })
+        clearSignedOutFlag()
       } catch (signUpError) {
         setError(
           signUpError instanceof Error
@@ -105,5 +110,12 @@ export function DevPasswordSignInForm(props: {
     } finally {
       setPending(false)
     }
+  }
+
+  function clearSignedOutFlag() {
+    void navigate({
+      search: (prev: { signedOut?: boolean }) => omitSignedOutSearch(prev),
+      replace: true,
+    })
   }
 }

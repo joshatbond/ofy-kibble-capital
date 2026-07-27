@@ -136,6 +136,18 @@ export function inviteRedirectTo(invitationId: string): string {
   return `${window.location.origin}${path}`
 }
 export type { StudentApp, StudentLandingSearch }
+/**
+ * Drop the ephemeral sign-out race flag. Landing AuthGates use
+ * `signedOut` only between navigate(landing) and `signOut()` finishing —
+ * leftovers must be cleared or the next sign-in never redirects home.
+ */
+export function omitSignedOutSearch<T extends { signedOut?: boolean }>(
+  search: T
+): Omit<T, 'signedOut'> {
+  const { signedOut: _signedOut, ...rest } = search
+
+  return rest
+}
 function isStudentAppLandingPath(pathname: string, app: StudentApp): boolean {
   return pathname === studentAppLandingPath(app)
 }
@@ -146,6 +158,7 @@ type StudentLandingSearch = {
    * Set by the sign-out flow so the landing route skips its
    * "you're authenticated, redirect to the dashboard" check for the brief
    * window between `navigate(landing)` and `signOut()` finishing.
+   * Cleared once the session is gone (and after password sign-in).
    */
   signedOut?: boolean
 }
