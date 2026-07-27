@@ -9,6 +9,7 @@
  */
 
 import type * as auth from "../auth.js";
+import type * as crons from "../crons.js";
 import type * as features_admin_context from "../features/admin/context.js";
 import type * as features_auth_authz from "../features/auth/authz.js";
 import type * as features_auth_devOnly from "../features/auth/devOnly.js";
@@ -28,6 +29,7 @@ import type * as features_catalog_siteSlug from "../features/catalog/siteSlug.js
 import type * as features_invitations from "../features/invitations.js";
 import type * as features_invitations_payToken from "../features/invitations/payToken.js";
 import type * as features_invitations_policy from "../features/invitations/policy.js";
+import type * as features_notifications_helpers from "../features/notifications/helpers.js";
 import type * as features_organizations from "../features/organizations.js";
 import type * as features_paySplit from "../features/paySplit.js";
 import type * as features_paySplit_helpers from "../features/paySplit/helpers.js";
@@ -46,6 +48,8 @@ import type * as features_users from "../features/users.js";
 import type * as features_users_profileImage from "../features/users/profileImage.js";
 import type * as features_vaults from "../features/vaults.js";
 import type * as features_vaults_helpers from "../features/vaults/helpers.js";
+import type * as features_vaults_scheduledFunding from "../features/vaults/scheduledFunding.js";
+import type * as features_vaultsCron from "../features/vaultsCron.js";
 import type * as http from "../http.js";
 import type * as lib_displayName from "../lib/displayName.js";
 import type * as schema_schemaFields from "../schema/schemaFields.js";
@@ -62,6 +66,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
+  crons: typeof crons;
   "features/admin/context": typeof features_admin_context;
   "features/auth/authz": typeof features_auth_authz;
   "features/auth/devOnly": typeof features_auth_devOnly;
@@ -81,6 +86,7 @@ declare const fullApi: ApiFromModules<{
   "features/invitations": typeof features_invitations;
   "features/invitations/payToken": typeof features_invitations_payToken;
   "features/invitations/policy": typeof features_invitations_policy;
+  "features/notifications/helpers": typeof features_notifications_helpers;
   "features/organizations": typeof features_organizations;
   "features/paySplit": typeof features_paySplit;
   "features/paySplit/helpers": typeof features_paySplit_helpers;
@@ -99,6 +105,8 @@ declare const fullApi: ApiFromModules<{
   "features/users/profileImage": typeof features_users_profileImage;
   "features/vaults": typeof features_vaults;
   "features/vaults/helpers": typeof features_vaults_helpers;
+  "features/vaults/scheduledFunding": typeof features_vaults_scheduledFunding;
+  "features/vaultsCron": typeof features_vaultsCron;
   http: typeof http;
   "lib/displayName": typeof lib_displayName;
   "schema/schemaFields": typeof schema_schemaFields;
