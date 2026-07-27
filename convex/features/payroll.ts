@@ -8,6 +8,7 @@ import {
 } from '../schema/schemaFields'
 
 import { requireTeacherForOrg } from './auth/teacher'
+import { validateStubAttendanceForPayPeriod } from './payroll/attendanceValidation'
 import {
   ensureCurrentPayPeriodForOrg,
   listPayPeriodsForOrg,
@@ -26,6 +27,29 @@ const payPeriodPublicValidator = v.object({
   createdAt: v.number(),
   closedAt: v.optional(v.number()),
 })
+
+const attendanceValidationValidator = v.union(
+  v.object({
+    status: v.literal('ready'),
+    activeStudentCount: v.number(),
+    payPeriodId: v.id('payPeriods'),
+    records: v.array(
+      v.object({
+        rosterStudentId: v.id('rosterStudents'),
+        externalStudentId: v.number(),
+        presentDates: v.array(v.string()),
+        daysAttended: v.number(),
+        overtimeHours: v.number(),
+      })
+    ),
+  }),
+  v.object({
+    status: v.literal('blocked'),
+    activeStudentCount: v.number(),
+    payPeriodId: v.id('payPeriods'),
+    blockReasons: v.array(v.string()),
+  })
+)
 
 /** Pay periods for a classroom, newest pay date first. */
 export const listPayPeriodsForOrganization = query({
@@ -78,5 +102,48 @@ export const ensureCurrentPayPeriod = mutation({
     })
 
     return toPayPeriodPublic(period)
+  },
+})
+
+/**
+ * Preview stub attendance validation for a pay period.
+ * Pay run mutations must use the same gate before posting stubs.
+ */
+export const validateAttendanceForPayPeriod = query({
+  args: {
+    organizationId: v.string(),
+    payPeriodId: v.id('payPeriods'),
+  },
+  returns: attendanceValidationValidator,
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx)
+    if (userId === null) {
+      throw new Error('Not authenticated')
+    }
+
+    await requireTeacherForOrg(
+      ctx,
+      userId,
+      args.organizationId,
+      'organizations:read'
+    )
+
+    const result = await validateStubAttendanceForPayPeriod(ctx, args)
+
+    if (result.status === 'blocked') {
+      return {
+        status: 'blocked' as const,
+        activeStudentCount: result.activeStudentCount,
+        payPeriodId: result.payPeriod._id,
+        blockReasons: result.blockReasons,
+      }
+    }
+
+    return {
+      status: 'ready' as const,
+      activeStudentCount: result.activeStudentCount,
+      payPeriodId: result.payPeriod._id,
+      records: result.records,
+    }
   },
 })
