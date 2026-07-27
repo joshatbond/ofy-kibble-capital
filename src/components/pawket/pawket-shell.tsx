@@ -1,9 +1,10 @@
 import { Link, useRouterState } from '@tanstack/react-router'
 import { useQuery } from 'convex/react'
-import { Bell, Home, PiggyBank, Wallet } from 'lucide-react'
+import { Home, PiggyBank, Wallet } from 'lucide-react'
 
 import { PawketOfflineBanner } from '~/components/pawket/offline-banner'
 import { PawketAccountMenu } from '~/components/pawket/pawket-account-menu'
+import { PawketNotificationsBell } from '~/components/pawket/pawket-notifications-bell'
 import { AppTheme } from '~/components/theme/app-theme'
 import { For } from '~/components/ui/for'
 import { api } from '~/convex/_generated/api'
@@ -80,13 +81,7 @@ function PawketTopBar(props: {
         </span>
       </div>
 
-      <button
-        type="button"
-        className="border-ink bg-card shadow-brutal flex size-10 items-center justify-center rounded-lg border-2 transition-all active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
-        aria-label="Notifications"
-      >
-        <Bell className="text-primary size-5" aria-hidden />
-      </button>
+      <PawketNotificationsBell />
     </header>
   )
 }

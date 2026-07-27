@@ -29,6 +29,7 @@ import type * as features_catalog_siteSlug from "../features/catalog/siteSlug.js
 import type * as features_invitations from "../features/invitations.js";
 import type * as features_invitations_payToken from "../features/invitations/payToken.js";
 import type * as features_invitations_policy from "../features/invitations/policy.js";
+import type * as features_notifications from "../features/notifications.js";
 import type * as features_notifications_helpers from "../features/notifications/helpers.js";
 import type * as features_organizations from "../features/organizations.js";
 import type * as features_paySplit from "../features/paySplit.js";
@@ -86,6 +87,7 @@ declare const fullApi: ApiFromModules<{
   "features/invitations": typeof features_invitations;
   "features/invitations/payToken": typeof features_invitations_payToken;
   "features/invitations/policy": typeof features_invitations_policy;
+  "features/notifications": typeof features_notifications;
   "features/notifications/helpers": typeof features_notifications_helpers;
   "features/organizations": typeof features_organizations;
   "features/paySplit": typeof features_paySplit;
