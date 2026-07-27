@@ -6,8 +6,8 @@ Student **PTO request** workflow in Kibble; teacher approve/deny in admin; pay r
 
 ## Dependencies
 
-- Slice 5 (absent days in import)
-- Slice 6 (pay run applies PTO debit + paid day credit)
+- Slice 6 (absent days in import)
+- Slice 5 (pay run applies PTO debit + paid day credit)
 - Slice 10 (notifications)
 
 ## Deliverables

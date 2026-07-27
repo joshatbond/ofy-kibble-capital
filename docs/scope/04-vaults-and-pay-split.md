@@ -7,7 +7,7 @@ Student savings behavior: **Pay split** wizard in Kibble, vault setup in PawKet,
 ## Dependencies
 
 - Slice 3 (ledger accounts)
-- Slice 6 will call pipeline on **Net pay** credit (stub credit mutation testable here)
+- Slice 5 will call pipeline on **Net pay** credit (stub credit mutation testable here)
 
 ## Deliverables
 
