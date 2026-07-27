@@ -34,6 +34,10 @@ import type * as features_notifications_helpers from "../features/notifications/
 import type * as features_organizations from "../features/organizations.js";
 import type * as features_paySplit from "../features/paySplit.js";
 import type * as features_paySplit_helpers from "../features/paySplit/helpers.js";
+import type * as features_payroll from "../features/payroll.js";
+import type * as features_payroll_dates from "../features/payroll/dates.js";
+import type * as features_payroll_periodStore from "../features/payroll/periodStore.js";
+import type * as features_payroll_periods from "../features/payroll/periods.js";
 import type * as features_roster_cleanup from "../features/roster/cleanup.js";
 import type * as features_roster_roster from "../features/roster/roster.js";
 import type * as features_roster_status from "../features/roster/status.js";
@@ -92,6 +96,10 @@ declare const fullApi: ApiFromModules<{
   "features/organizations": typeof features_organizations;
   "features/paySplit": typeof features_paySplit;
   "features/paySplit/helpers": typeof features_paySplit_helpers;
+  "features/payroll": typeof features_payroll;
+  "features/payroll/dates": typeof features_payroll_dates;
+  "features/payroll/periodStore": typeof features_payroll_periodStore;
+  "features/payroll/periods": typeof features_payroll_periods;
   "features/roster/cleanup": typeof features_roster_cleanup;
   "features/roster/roster": typeof features_roster_roster;
   "features/roster/status": typeof features_roster_status;
