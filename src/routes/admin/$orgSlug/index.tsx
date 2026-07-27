@@ -168,11 +168,18 @@ function ClassroomRosterTable(props: {
     api.features.invitations.revokeClassroomInvitation
   )
   const rotatePayToken = useMutation(api.features.invitations.rotatePayToken)
+  const paySplits = useQuery(api.features.paySplit.listClassroomPaySplits, {
+    organizationId: props.organizationId,
+  })
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<RosterStatusFilter>('all')
   const [rowActionError, setRowActionError] = useState<string | null>(null)
   const [resendSuccessLink, setResendSuccessLink] = useState<string | null>(
     null
+  )
+
+  const paySplitByRosterId = new Map(
+    (paySplits ?? []).map(row => [row.rosterStudentId, row] as const)
   )
 
   const filteredRoster = props.roster.filter(row => {
@@ -256,6 +263,7 @@ function ClassroomRosterTable(props: {
                 {row => (
                   <RosterStudentCard
                     row={row}
+                    paySplit={paySplitByRosterId.get(row.rosterStudentId)}
                     onResend={handleResend}
                     onRevoke={handleRevoke}
                     onRotate={handleRotate}
@@ -656,6 +664,7 @@ function PendingInvitationActions(props: {
 }
 function RosterStudentCard(props: {
   row: RosterRow
+  paySplit: PaySplitRow | undefined
   onResend: (invitationId: string) => void
   onRevoke: (invitationId: string) => void
   onRotate: (rosterStudentId: Id<'rosterStudents'>) => void
@@ -701,6 +710,8 @@ function RosterStudentCard(props: {
               {`Invite: ${row.invitationStatus}${row.invitationIsExpired ? ' (expired)' : ''}`}
             </p>
           ) : null}
+
+          <PaySplitReadOnly paySplit={props.paySplit} status={row.status} />
         </div>
       </div>
 
@@ -741,6 +752,35 @@ function RosterStudentCard(props: {
     </article>
   )
 }
+
+function PaySplitReadOnly(props: {
+  paySplit: PaySplitRow | undefined
+  status: RosterRow['status']
+}) {
+  if (props.status !== 'active') {
+    return null
+  }
+
+  if (props.paySplit === undefined) {
+    return (
+      <p className="text-muted-foreground mt-1 text-sm font-bold">
+        Pay Split (%): …
+      </p>
+    )
+  }
+
+  return (
+    <p
+      className={cn(
+        'mt-1 text-sm font-bold',
+        !props.paySplit.isConfigured && 'text-muted-foreground'
+      )}
+    >
+      Pay Split (%): {props.paySplit.checkingPercent} /{' '}
+      {props.paySplit.savingsPercent}
+    </p>
+  )
+}
 function PayTokenCopyButton(props: { payToken: string }) {
   const [copied, setCopied] = useState(false)
 
@@ -758,6 +798,9 @@ function PayTokenCopyButton(props: { payToken: string }) {
 type RosterStatusFilter = 'all' | 'active' | 'inactive'
 type RosterRow = FunctionReturnType<
   typeof api.features.invitations.listClassroomRoster
+>[number]
+type PaySplitRow = FunctionReturnType<
+  typeof api.features.paySplit.listClassroomPaySplits
 >[number]
 type ClassroomTeacher = FunctionReturnType<
   typeof api.features.admin.context.listClassroomTeachers
