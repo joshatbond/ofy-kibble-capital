@@ -27,7 +27,10 @@ export function isPawketTransactionDetail(pathname: string): boolean {
 export function isPawketTransferOverlay(pathname: string): boolean {
   const path = normalizePawketPathname(pathname)
 
-  return path === '/pawket/transfer'
+  return (
+    path === '/pawket/transfer' ||
+    /^\/pawket\/savings\/vaults\/[^/]+\/transfer$/.test(path)
+  )
 }
 export function isPawketVaultRoute(pathname: string): boolean {
   const path = normalizePawketPathname(pathname)

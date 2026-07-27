@@ -39,7 +39,10 @@ import { Route as AdminOrgSlugPosRouteImport } from './routes/admin/$orgSlug/pos
 import { Route as AdminOrgSlugActivityRouteImport } from './routes/admin/$orgSlug/activity'
 import { Route as AdminOrgSlugAbsencesRouteImport } from './routes/admin/$orgSlug/absences'
 import { Route as PawketSavingsVaultsIndexRouteImport } from './routes/pawket/savings/vaults/index'
+import { Route as PawketSavingsVaultsSetupRouteImport } from './routes/pawket/savings/vaults/setup'
 import { Route as PawketSavingsVaultsVaultIdIndexRouteImport } from './routes/pawket/savings/vaults/$vaultId/index'
+import { Route as PawketSavingsVaultsVaultIdTransferRouteImport } from './routes/pawket/savings/vaults/$vaultId/transfer'
+import { Route as PawketSavingsVaultsVaultIdEditRouteImport } from './routes/pawket/savings/vaults/$vaultId/edit'
 import { Route as PawketSavingsVaultsVaultIdTransactionsIndexRouteImport } from './routes/pawket/savings/vaults/$vaultId/transactions/index'
 import { Route as PawketSavingsVaultsVaultIdTransactionsTransactionIdRouteImport } from './routes/pawket/savings/vaults/$vaultId/transactions/$transactionId'
 
@@ -197,10 +200,28 @@ const PawketSavingsVaultsIndexRoute =
     path: '/savings/vaults/',
     getParentRoute: () => PawketRouteRoute,
   } as any)
+const PawketSavingsVaultsSetupRoute =
+  PawketSavingsVaultsSetupRouteImport.update({
+    id: '/savings/vaults/setup',
+    path: '/savings/vaults/setup',
+    getParentRoute: () => PawketRouteRoute,
+  } as any)
 const PawketSavingsVaultsVaultIdIndexRoute =
   PawketSavingsVaultsVaultIdIndexRouteImport.update({
     id: '/savings/vaults/$vaultId/',
     path: '/savings/vaults/$vaultId/',
+    getParentRoute: () => PawketRouteRoute,
+  } as any)
+const PawketSavingsVaultsVaultIdTransferRoute =
+  PawketSavingsVaultsVaultIdTransferRouteImport.update({
+    id: '/savings/vaults/$vaultId/transfer',
+    path: '/savings/vaults/$vaultId/transfer',
+    getParentRoute: () => PawketRouteRoute,
+  } as any)
+const PawketSavingsVaultsVaultIdEditRoute =
+  PawketSavingsVaultsVaultIdEditRouteImport.update({
+    id: '/savings/vaults/$vaultId/edit',
+    path: '/savings/vaults/$vaultId/edit',
     getParentRoute: () => PawketRouteRoute,
   } as any)
 const PawketSavingsVaultsVaultIdTransactionsIndexRoute =
@@ -246,7 +267,10 @@ export interface FileRoutesByFullPath {
   '/pawket/checking/': typeof PawketCheckingIndexRoute
   '/pawket/savings/': typeof PawketSavingsIndexRoute
   '/pawket/transfer/': typeof PawketTransferIndexRoute
+  '/pawket/savings/vaults/setup': typeof PawketSavingsVaultsSetupRoute
   '/pawket/savings/vaults/': typeof PawketSavingsVaultsIndexRoute
+  '/pawket/savings/vaults/$vaultId/edit': typeof PawketSavingsVaultsVaultIdEditRoute
+  '/pawket/savings/vaults/$vaultId/transfer': typeof PawketSavingsVaultsVaultIdTransferRoute
   '/pawket/savings/vaults/$vaultId/': typeof PawketSavingsVaultsVaultIdIndexRoute
   '/pawket/savings/vaults/$vaultId/transactions/$transactionId': typeof PawketSavingsVaultsVaultIdTransactionsTransactionIdRoute
   '/pawket/savings/vaults/$vaultId/transactions/': typeof PawketSavingsVaultsVaultIdTransactionsIndexRoute
@@ -278,7 +302,10 @@ export interface FileRoutesByTo {
   '/pawket/checking': typeof PawketCheckingIndexRoute
   '/pawket/savings': typeof PawketSavingsIndexRoute
   '/pawket/transfer': typeof PawketTransferIndexRoute
+  '/pawket/savings/vaults/setup': typeof PawketSavingsVaultsSetupRoute
   '/pawket/savings/vaults': typeof PawketSavingsVaultsIndexRoute
+  '/pawket/savings/vaults/$vaultId/edit': typeof PawketSavingsVaultsVaultIdEditRoute
+  '/pawket/savings/vaults/$vaultId/transfer': typeof PawketSavingsVaultsVaultIdTransferRoute
   '/pawket/savings/vaults/$vaultId': typeof PawketSavingsVaultsVaultIdIndexRoute
   '/pawket/savings/vaults/$vaultId/transactions/$transactionId': typeof PawketSavingsVaultsVaultIdTransactionsTransactionIdRoute
   '/pawket/savings/vaults/$vaultId/transactions': typeof PawketSavingsVaultsVaultIdTransactionsIndexRoute
@@ -314,7 +341,10 @@ export interface FileRoutesById {
   '/pawket/checking/': typeof PawketCheckingIndexRoute
   '/pawket/savings/': typeof PawketSavingsIndexRoute
   '/pawket/transfer/': typeof PawketTransferIndexRoute
+  '/pawket/savings/vaults/setup': typeof PawketSavingsVaultsSetupRoute
   '/pawket/savings/vaults/': typeof PawketSavingsVaultsIndexRoute
+  '/pawket/savings/vaults/$vaultId/edit': typeof PawketSavingsVaultsVaultIdEditRoute
+  '/pawket/savings/vaults/$vaultId/transfer': typeof PawketSavingsVaultsVaultIdTransferRoute
   '/pawket/savings/vaults/$vaultId/': typeof PawketSavingsVaultsVaultIdIndexRoute
   '/pawket/savings/vaults/$vaultId/transactions/$transactionId': typeof PawketSavingsVaultsVaultIdTransactionsTransactionIdRoute
   '/pawket/savings/vaults/$vaultId/transactions/': typeof PawketSavingsVaultsVaultIdTransactionsIndexRoute
@@ -351,7 +381,10 @@ export interface FileRouteTypes {
     | '/pawket/checking/'
     | '/pawket/savings/'
     | '/pawket/transfer/'
+    | '/pawket/savings/vaults/setup'
     | '/pawket/savings/vaults/'
+    | '/pawket/savings/vaults/$vaultId/edit'
+    | '/pawket/savings/vaults/$vaultId/transfer'
     | '/pawket/savings/vaults/$vaultId/'
     | '/pawket/savings/vaults/$vaultId/transactions/$transactionId'
     | '/pawket/savings/vaults/$vaultId/transactions/'
@@ -383,7 +416,10 @@ export interface FileRouteTypes {
     | '/pawket/checking'
     | '/pawket/savings'
     | '/pawket/transfer'
+    | '/pawket/savings/vaults/setup'
     | '/pawket/savings/vaults'
+    | '/pawket/savings/vaults/$vaultId/edit'
+    | '/pawket/savings/vaults/$vaultId/transfer'
     | '/pawket/savings/vaults/$vaultId'
     | '/pawket/savings/vaults/$vaultId/transactions/$transactionId'
     | '/pawket/savings/vaults/$vaultId/transactions'
@@ -418,7 +454,10 @@ export interface FileRouteTypes {
     | '/pawket/checking/'
     | '/pawket/savings/'
     | '/pawket/transfer/'
+    | '/pawket/savings/vaults/setup'
     | '/pawket/savings/vaults/'
+    | '/pawket/savings/vaults/$vaultId/edit'
+    | '/pawket/savings/vaults/$vaultId/transfer'
     | '/pawket/savings/vaults/$vaultId/'
     | '/pawket/savings/vaults/$vaultId/transactions/$transactionId'
     | '/pawket/savings/vaults/$vaultId/transactions/'
@@ -644,11 +683,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PawketSavingsVaultsIndexRouteImport
       parentRoute: typeof PawketRouteRoute
     }
+    '/pawket/savings/vaults/setup': {
+      id: '/pawket/savings/vaults/setup'
+      path: '/savings/vaults/setup'
+      fullPath: '/pawket/savings/vaults/setup'
+      preLoaderRoute: typeof PawketSavingsVaultsSetupRouteImport
+      parentRoute: typeof PawketRouteRoute
+    }
     '/pawket/savings/vaults/$vaultId/': {
       id: '/pawket/savings/vaults/$vaultId/'
       path: '/savings/vaults/$vaultId'
       fullPath: '/pawket/savings/vaults/$vaultId/'
       preLoaderRoute: typeof PawketSavingsVaultsVaultIdIndexRouteImport
+      parentRoute: typeof PawketRouteRoute
+    }
+    '/pawket/savings/vaults/$vaultId/transfer': {
+      id: '/pawket/savings/vaults/$vaultId/transfer'
+      path: '/savings/vaults/$vaultId/transfer'
+      fullPath: '/pawket/savings/vaults/$vaultId/transfer'
+      preLoaderRoute: typeof PawketSavingsVaultsVaultIdTransferRouteImport
+      parentRoute: typeof PawketRouteRoute
+    }
+    '/pawket/savings/vaults/$vaultId/edit': {
+      id: '/pawket/savings/vaults/$vaultId/edit'
+      path: '/savings/vaults/$vaultId/edit'
+      fullPath: '/pawket/savings/vaults/$vaultId/edit'
+      preLoaderRoute: typeof PawketSavingsVaultsVaultIdEditRouteImport
       parentRoute: typeof PawketRouteRoute
     }
     '/pawket/savings/vaults/$vaultId/transactions/': {
@@ -729,7 +789,10 @@ interface PawketRouteRouteChildren {
   PawketCheckingIndexRoute: typeof PawketCheckingIndexRoute
   PawketSavingsIndexRoute: typeof PawketSavingsIndexRoute
   PawketTransferIndexRoute: typeof PawketTransferIndexRoute
+  PawketSavingsVaultsSetupRoute: typeof PawketSavingsVaultsSetupRoute
   PawketSavingsVaultsIndexRoute: typeof PawketSavingsVaultsIndexRoute
+  PawketSavingsVaultsVaultIdEditRoute: typeof PawketSavingsVaultsVaultIdEditRoute
+  PawketSavingsVaultsVaultIdTransferRoute: typeof PawketSavingsVaultsVaultIdTransferRoute
   PawketSavingsVaultsVaultIdIndexRoute: typeof PawketSavingsVaultsVaultIdIndexRoute
   PawketSavingsVaultsVaultIdTransactionsTransactionIdRoute: typeof PawketSavingsVaultsVaultIdTransactionsTransactionIdRoute
   PawketSavingsVaultsVaultIdTransactionsIndexRoute: typeof PawketSavingsVaultsVaultIdTransactionsIndexRoute
@@ -744,7 +807,11 @@ const PawketRouteRouteChildren: PawketRouteRouteChildren = {
   PawketCheckingIndexRoute: PawketCheckingIndexRoute,
   PawketSavingsIndexRoute: PawketSavingsIndexRoute,
   PawketTransferIndexRoute: PawketTransferIndexRoute,
+  PawketSavingsVaultsSetupRoute: PawketSavingsVaultsSetupRoute,
   PawketSavingsVaultsIndexRoute: PawketSavingsVaultsIndexRoute,
+  PawketSavingsVaultsVaultIdEditRoute: PawketSavingsVaultsVaultIdEditRoute,
+  PawketSavingsVaultsVaultIdTransferRoute:
+    PawketSavingsVaultsVaultIdTransferRoute,
   PawketSavingsVaultsVaultIdIndexRoute: PawketSavingsVaultsVaultIdIndexRoute,
   PawketSavingsVaultsVaultIdTransactionsTransactionIdRoute:
     PawketSavingsVaultsVaultIdTransactionsTransactionIdRoute,

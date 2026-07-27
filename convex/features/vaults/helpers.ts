@@ -3,6 +3,9 @@ import {
   vaultOnDepositRuleValidator,
   vaultScheduleCadenceValidator,
 } from '../../schema/schemaFields'
+import { requireBankAccountForStudent } from '../banking/accounts'
+import { postLedgerEntry } from '../banking/ledger'
+import { moveBetweenStudentAccounts } from '../banking/transfers'
 import { resolveEffectiveSettings } from '../settings/effectiveSettings'
 
 import type { Infer } from 'convex/values'
@@ -301,4 +304,365 @@ export async function createVaultForStudent(
     throw new Error('Failed to create vault.')
   }
   return vault
+}
+
+/**
+ * Archives an empty vault. Vaults with a balance must move funds out first
+ * (liquidation on close comes with manual transfer work).
+ */
+export async function closeEmptyVaultForStudent(
+  ctx: MutationCtx,
+  args: {
+    vaultId: Id<'vaults'>
+    rosterStudentId: Id<'rosterStudents'>
+    nowMs: number
+  }
+): Promise<void> {
+  const vault = await getVaultOwnedByStudent(ctx, {
+    vaultId: args.vaultId,
+    rosterStudentId: args.rosterStudentId,
+  })
+  if (vault === null) {
+    throw new Error('Vault not found.')
+  }
+
+  if (vault.balanceCents > 0) {
+    throw new Error(
+      'Move all funds out of this vault before closing it.'
+    )
+  }
+
+  await ctx.db.patch('vaults', vault._id, {
+    status: 'closed',
+    closedAt: args.nowMs,
+    updatedAt: args.nowMs,
+    nextRunAt: undefined,
+  })
+}
+
+export type ManualVaultTransferDirection = 'to_vault' | 'from_vault'
+
+export async function manualVaultTransferForStudent(
+  ctx: MutationCtx,
+  args: {
+    roster: Doc<'rosterStudents'>
+    vaultId: Id<'vaults'>
+    direction: ManualVaultTransferDirection
+    amountCents: number
+    nowMs: number
+  }
+): Promise<Doc<'vaults'>> {
+  if (!Number.isInteger(args.amountCents) || args.amountCents <= 0) {
+    throw new Error('Amount must be a positive integer number of cents.')
+  }
+
+  const vault = await getVaultOwnedByStudent(ctx, {
+    vaultId: args.vaultId,
+    rosterStudentId: args.roster._id,
+  })
+  if (vault === null) {
+    throw new Error('Vault not found.')
+  }
+
+  const savings = await requireBankAccountForStudent(
+    ctx,
+    args.roster._id,
+    'savings'
+  )
+
+  if (args.direction === 'to_vault') {
+    if (savings.balanceCents < args.amountCents) {
+      throw new Error('Insufficient unallocated savings.')
+    }
+
+    await postLedgerEntry(ctx, {
+      organizationId: args.roster.organizationId,
+      rosterStudentId: args.roster._id,
+      bankAccountId: savings._id,
+      accountKind: 'savings',
+      direction: 'debit',
+      amountCents: args.amountCents,
+      entryType: 'vault_manual',
+      label: `Transfer to ${vault.name}`,
+      createdAt: args.nowMs,
+      vaultId: vault._id,
+    })
+
+    const nextBalance = vault.balanceCents + args.amountCents
+    const reachedGoal =
+      vault.goalCents !== undefined && nextBalance >= vault.goalCents
+
+    await ctx.db.patch('vaults', vault._id, {
+      balanceCents: nextBalance,
+      updatedAt: args.nowMs,
+      ...(reachedGoal && vault.status === 'active'
+        ? { status: 'complete' as const }
+        : {}),
+    })
+  } else {
+    if (vault.balanceCents < args.amountCents) {
+      throw new Error('Insufficient vault balance.')
+    }
+
+    await postLedgerEntry(ctx, {
+      organizationId: args.roster.organizationId,
+      rosterStudentId: args.roster._id,
+      bankAccountId: savings._id,
+      accountKind: 'savings',
+      direction: 'credit',
+      amountCents: args.amountCents,
+      entryType: 'vault_manual',
+      label: `Transfer from ${vault.name}`,
+      createdAt: args.nowMs,
+      vaultId: vault._id,
+    })
+
+    await ctx.db.patch('vaults', vault._id, {
+      balanceCents: vault.balanceCents - args.amountCents,
+      updatedAt: args.nowMs,
+    })
+  }
+
+  const updated = await ctx.db.get('vaults', vault._id)
+  if (updated === null) {
+    throw new Error('Vault not found.')
+  }
+  return updated
+}
+
+export async function updateVaultForStudent(
+  ctx: MutationCtx,
+  args: {
+    vaultId: Id<'vaults'>
+    rosterStudentId: Id<'rosterStudents'>
+    name: string
+    icon: string
+    goalCents: number | null
+    nowMs: number
+  }
+): Promise<Doc<'vaults'>> {
+  const vault = await getVaultOwnedByStudent(ctx, {
+    vaultId: args.vaultId,
+    rosterStudentId: args.rosterStudentId,
+  })
+  if (vault === null) {
+    throw new Error('Vault not found.')
+  }
+
+  const name = assertValidVaultName(args.name)
+  const icon = assertValidVaultIcon(args.icon)
+  const goalCents =
+    args.goalCents === null
+      ? undefined
+      : assertValidOptionalGoalCents(args.goalCents)
+
+  const nextBalance = vault.balanceCents
+  const reachedGoal =
+    goalCents !== undefined && nextBalance >= goalCents
+  const belowGoal =
+    goalCents === undefined || nextBalance < goalCents
+
+  await ctx.db.patch('vaults', vault._id, {
+    name,
+    icon,
+    goalCents,
+    updatedAt: args.nowMs,
+    ...(reachedGoal && vault.status === 'active'
+      ? { status: 'complete' as const }
+      : {}),
+    // Raising/clearing a goal can reopen a complete vault that no longer meets it.
+    ...(belowGoal && vault.status === 'complete'
+      ? { status: 'active' as const }
+      : {}),
+  })
+
+  const updated = await ctx.db.get('vaults', vault._id)
+  if (updated === null) {
+    throw new Error('Vault not found.')
+  }
+  return updated
+}
+
+export type TransferEndpoint =
+  | { type: 'checking' }
+  | { type: 'savings' }
+  | { type: 'vault'; vaultId: Id<'vaults'> }
+
+export type TransferAccountPublic = {
+  type: 'checking' | 'savings' | 'vault'
+  vaultId?: Id<'vaults'>
+  label: string
+  icon?: string
+  balanceCents: number
+}
+
+export async function listTransferAccountsForStudent(
+  ctx: QueryCtx | MutationCtx,
+  rosterStudentId: Id<'rosterStudents'>
+): Promise<TransferAccountPublic[]> {
+  const [checking, savings, vaults] = await Promise.all([
+    requireBankAccountForStudent(ctx, rosterStudentId, 'checking'),
+    requireBankAccountForStudent(ctx, rosterStudentId, 'savings'),
+    listOpenVaultsForStudent(ctx, rosterStudentId),
+  ])
+
+  return [
+    {
+      type: 'checking',
+      label: 'Checking',
+      balanceCents: checking.balanceCents,
+    },
+    {
+      type: 'savings',
+      label: 'Savings',
+      balanceCents: savings.balanceCents,
+    },
+    ...vaults.map(vault => ({
+      type: 'vault' as const,
+      vaultId: vault._id,
+      label: vault.name,
+      icon: vault.icon,
+      balanceCents: vault.balanceCents,
+    })),
+  ]
+}
+
+function endpointKey(endpoint: TransferEndpoint): string {
+  if (endpoint.type === 'vault') {
+    return `vault:${endpoint.vaultId}`
+  }
+  return endpoint.type
+}
+
+export async function transferFundsBetweenEndpoints(
+  ctx: MutationCtx,
+  args: {
+    roster: Doc<'rosterStudents'>
+    from: TransferEndpoint
+    to: TransferEndpoint
+    amountCents: number
+    nowMs: number
+  }
+): Promise<void> {
+  if (!Number.isInteger(args.amountCents) || args.amountCents <= 0) {
+    throw new Error('Amount must be a positive integer number of cents.')
+  }
+
+  if (endpointKey(args.from) === endpointKey(args.to)) {
+    throw new Error('Choose two different accounts.')
+  }
+
+  const { from, to, amountCents, nowMs, roster } = args
+
+  if (from.type === 'checking' && to.type === 'savings') {
+    await moveBetweenStudentAccounts(ctx, {
+      roster,
+      fromKind: 'checking',
+      toKind: 'savings',
+      amountCents,
+      entryType: 'internal_transfer',
+      label: 'Transfer to Savings',
+      createdAt: nowMs,
+      insufficientFundsMessage: 'Insufficient checking balance.',
+    })
+    return
+  }
+
+  if (from.type === 'savings' && to.type === 'checking') {
+    await moveBetweenStudentAccounts(ctx, {
+      roster,
+      fromKind: 'savings',
+      toKind: 'checking',
+      amountCents,
+      entryType: 'internal_transfer',
+      label: 'Transfer to Checking',
+      createdAt: nowMs,
+      insufficientFundsMessage: 'Insufficient unallocated savings.',
+    })
+    return
+  }
+
+  if (from.type === 'savings' && to.type === 'vault') {
+    await manualVaultTransferForStudent(ctx, {
+      roster,
+      vaultId: to.vaultId,
+      direction: 'to_vault',
+      amountCents,
+      nowMs,
+    })
+    return
+  }
+
+  if (from.type === 'vault' && to.type === 'savings') {
+    await manualVaultTransferForStudent(ctx, {
+      roster,
+      vaultId: from.vaultId,
+      direction: 'from_vault',
+      amountCents,
+      nowMs,
+    })
+    return
+  }
+
+  if (from.type === 'checking' && to.type === 'vault') {
+    await moveBetweenStudentAccounts(ctx, {
+      roster,
+      fromKind: 'checking',
+      toKind: 'savings',
+      amountCents,
+      entryType: 'internal_transfer',
+      label: 'Transfer to Savings',
+      createdAt: nowMs,
+      insufficientFundsMessage: 'Insufficient checking balance.',
+    })
+    await manualVaultTransferForStudent(ctx, {
+      roster,
+      vaultId: to.vaultId,
+      direction: 'to_vault',
+      amountCents,
+      nowMs,
+    })
+    return
+  }
+
+  if (from.type === 'vault' && to.type === 'checking') {
+    await manualVaultTransferForStudent(ctx, {
+      roster,
+      vaultId: from.vaultId,
+      direction: 'from_vault',
+      amountCents,
+      nowMs,
+    })
+    await moveBetweenStudentAccounts(ctx, {
+      roster,
+      fromKind: 'savings',
+      toKind: 'checking',
+      amountCents,
+      entryType: 'internal_transfer',
+      label: 'Transfer to Checking',
+      createdAt: nowMs,
+      insufficientFundsMessage: 'Insufficient unallocated savings.',
+    })
+    return
+  }
+
+  if (from.type === 'vault' && to.type === 'vault') {
+    await manualVaultTransferForStudent(ctx, {
+      roster,
+      vaultId: from.vaultId,
+      direction: 'from_vault',
+      amountCents,
+      nowMs,
+    })
+    await manualVaultTransferForStudent(ctx, {
+      roster,
+      vaultId: to.vaultId,
+      direction: 'to_vault',
+      amountCents,
+      nowMs,
+    })
+    return
+  }
+
+  throw new Error('Unsupported transfer.')
 }

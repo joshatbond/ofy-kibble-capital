@@ -110,8 +110,8 @@ export function PawketTransferPage() {
 
       <div className="grid grid-rows-[1fr_auto] px-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
         <div className="grid place-content-center gap-2 py-8">
-          <label className="grid w-full max-w-sm justify-items-center gap-2">
-            <div className="flex w-full items-center justify-center gap-2 text-5xl font-extrabold">
+          <label className="grid justify-items-center gap-2">
+            <div className="inline-flex items-center gap-2 text-5xl font-extrabold">
               <BarkBuckSymbol className="text-muted-foreground/50 size-[0.55em] shrink-0" />
 
               <input
@@ -122,7 +122,8 @@ export function PawketTransferPage() {
                 placeholder="0"
                 value={amountInput}
                 disabled={isSubmitting || balances === null}
-                className="font-heading placeholder:text-muted-foreground/50 w-full min-w-0 border-0 bg-transparent text-center text-5xl font-extrabold tracking-tight focus:ring-0 focus:outline-none"
+                size={Math.max(amountInput.length, 1)}
+                className="font-heading placeholder:text-muted-foreground/50 field-sizing-content min-w-[1ch] border-0 bg-transparent text-center text-5xl font-extrabold tracking-tight focus:ring-0 focus:outline-none"
                 onChange={event => {
                   setAmountInput(event.target.value)
                   setError(null)

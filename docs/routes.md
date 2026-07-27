@@ -74,8 +74,14 @@ Shared chrome: `AdminShell` (sidebar on desktop, top bar on mobile, classroom sw
   - Savings account transaction detail page
 - `/pawket/savings/vaults`
   - Vaults list (specialized savings accounts)
+- `/pawket/savings/vaults/setup`
+  - Vault setup wizard (name, optional goal, funding mode)
 - `/pawket/savings/vaults/[vaultId]`
   - Vault detail page
+- `/pawket/savings/vaults/[vaultId]/edit`
+  - Edit vault name, emoji, and goal
+- `/pawket/savings/vaults/[vaultId]/transfer`
+  - Transfer between checking, savings, and vaults
 - `/pawket/savings/vaults/[vaultId]/transactions`
   - Vault transactions list page
 - `/pawket/savings/vaults/[vaultId]/transactions/[transactionId]`

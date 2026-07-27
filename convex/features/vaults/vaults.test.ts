@@ -6,6 +6,8 @@ import {
   initConvexTest,
   setupDevTeacherClassroom,
 } from '../../test.setup'
+import { requireBankAccountForStudent } from '../banking/accounts'
+import { postLedgerEntry } from '../banking/ledger'
 import { V1_BASE_SETTINGS } from '../settings/defaults'
 
 import type { ConvexTest } from '../../test.setup'
@@ -250,6 +252,269 @@ describe('createVault / listMyVaults / getMyVault', () => {
   })
 })
 
+describe('closeVault', () => {
+  test('closes an empty vault and removes it from list/get', async () => {
+    const t = initConvexTest()
+    const { student } = await setupActiveStudent(t)
+
+    const created = await student.client.mutation(
+      api.features.vaults.createVault,
+      {
+        name: 'Empty',
+        icon: '🗑️',
+        fundingMode: 'manual',
+      }
+    )
+
+    await student.client.mutation(api.features.vaults.closeVault, {
+      vaultId: created._id,
+    })
+
+    expect(
+      await student.client.query(api.features.vaults.listMyVaults, {})
+    ).toEqual([])
+    expect(
+      await student.client.query(api.features.vaults.getMyVault, {
+        vaultId: created._id,
+      })
+    ).toBeNull()
+  })
+
+  test('rejects closing a vault that still has funds', async () => {
+    const t = initConvexTest()
+    const { student } = await setupActiveStudent(t)
+
+    const created = await student.client.mutation(
+      api.features.vaults.createVault,
+      {
+        name: 'Funded',
+        icon: '💰',
+        fundingMode: 'manual',
+      }
+    )
+
+    await t.run(async ctx => {
+      await ctx.db.patch('vaults', created._id, { balanceCents: 250 })
+    })
+
+    await expect(
+      student.client.mutation(api.features.vaults.closeVault, {
+        vaultId: created._id,
+      })
+    ).rejects.toThrow(/Move all funds out/)
+
+    expect(
+      await student.client.query(api.features.vaults.getMyVault, {
+        vaultId: created._id,
+      })
+    ).toMatchObject({ balanceCents: 250, status: 'active' })
+  })
+})
+
+describe('manualVaultTransfer', () => {
+  test('adds funds from unallocated savings into any open vault', async () => {
+    const t = initConvexTest()
+    const { student, rosterStudentId } = await setupActiveStudent(t)
+
+    await creditSavings(t, rosterStudentId, 1000)
+
+    const vault = await student.client.mutation(api.features.vaults.createVault, {
+      name: 'Phone',
+      icon: '📱',
+      goalCents: 500,
+      fundingMode: 'on_deposit',
+      onDepositRule: { kind: 'percent', percent: 10 },
+    })
+
+    const result = await student.client.mutation(
+      api.features.vaults.manualVaultTransfer,
+      {
+        vaultId: vault._id,
+        direction: 'to_vault',
+        amountCents: 500,
+      }
+    )
+
+    expect(result).toMatchObject({
+      balanceCents: 500,
+      status: 'complete',
+    })
+
+    expect(
+      await student.client.query(api.features.banking.getMyBalances, {})
+    ).toMatchObject({
+      savingsUnallocatedCents: 500,
+      vaultsTotalCents: 500,
+      savingsCents: 1000,
+    })
+  })
+
+  test('rejects insufficient unallocated savings and closed vaults', async () => {
+    const t = initConvexTest()
+    const { student, rosterStudentId } = await setupActiveStudent(t)
+
+    await creditSavings(t, rosterStudentId, 100)
+
+    const vault = await student.client.mutation(api.features.vaults.createVault, {
+      name: 'Trip',
+      icon: '✈️',
+      fundingMode: 'scheduled',
+      scheduledAmountCents: 50,
+      scheduleCadence: 'weekly',
+    })
+
+    await expect(
+      student.client.mutation(api.features.vaults.manualVaultTransfer, {
+        vaultId: vault._id,
+        direction: 'to_vault',
+        amountCents: 101,
+      })
+    ).rejects.toThrow(/Insufficient unallocated savings/)
+
+    await student.client.mutation(api.features.vaults.closeVault, {
+      vaultId: vault._id,
+    })
+
+    await expect(
+      student.client.mutation(api.features.vaults.manualVaultTransfer, {
+        vaultId: vault._id,
+        direction: 'to_vault',
+        amountCents: 50,
+      })
+    ).rejects.toThrow(/Vault not found/)
+  })
+})
+
+describe('updateVault', () => {
+  test('updates name, icon, and goal without changing funding mode', async () => {
+    const t = initConvexTest()
+    const { student } = await setupActiveStudent(t)
+
+    const created = await student.client.mutation(
+      api.features.vaults.createVault,
+      {
+        name: 'Phone',
+        icon: '📱',
+        fundingMode: 'on_deposit',
+        onDepositRule: { kind: 'percent', percent: 15 },
+      }
+    )
+
+    const updated = await student.client.mutation(
+      api.features.vaults.updateVault,
+      {
+        vaultId: created._id,
+        name: 'New phone',
+        icon: '☎️',
+        goalCents: 20_000,
+      }
+    )
+
+    expect(updated).toMatchObject({
+      name: 'New phone',
+      icon: '☎️',
+      goalCents: 20_000,
+      fundingMode: 'on_deposit',
+      onDepositRule: { kind: 'percent', percent: 15 },
+    })
+  })
+})
+
+describe('transferFunds / listMyTransferAccounts', () => {
+  test('lists checking, savings, and open vaults with balances', async () => {
+    const t = initConvexTest()
+    const { student, rosterStudentId } = await setupActiveStudent(t)
+
+    await creditAccount(t, rosterStudentId, 'checking', 400)
+    await creditSavings(t, rosterStudentId, 600)
+
+    const vault = await student.client.mutation(api.features.vaults.createVault, {
+      name: 'Car',
+      icon: '🚗',
+      fundingMode: 'manual',
+    })
+
+    await student.client.mutation(api.features.vaults.manualVaultTransfer, {
+      vaultId: vault._id,
+      direction: 'to_vault',
+      amountCents: 100,
+    })
+
+    const accounts = await student.client.query(
+      api.features.vaults.listMyTransferAccounts,
+      {}
+    )
+
+    expect(accounts).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: 'checking',
+          label: 'Checking',
+          balanceCents: 400,
+        }),
+        expect.objectContaining({
+          type: 'savings',
+          label: 'Savings',
+          balanceCents: 500,
+        }),
+        expect.objectContaining({
+          type: 'vault',
+          vaultId: vault._id,
+          label: 'Car',
+          icon: '🚗',
+          balanceCents: 100,
+        }),
+      ])
+    )
+  })
+
+  test('transfers between checking, savings, and vaults', async () => {
+    const t = initConvexTest()
+    const { student, rosterStudentId } = await setupActiveStudent(t)
+
+    await creditAccount(t, rosterStudentId, 'checking', 1000)
+    await creditSavings(t, rosterStudentId, 500)
+
+    const vault = await student.client.mutation(api.features.vaults.createVault, {
+      name: 'Car',
+      icon: '🚗',
+      fundingMode: 'manual',
+    })
+
+    await student.client.mutation(api.features.vaults.transferFunds, {
+      from: { type: 'checking' },
+      to: { type: 'vault', vaultId: vault._id },
+      amountCents: 200,
+    })
+
+    expect(
+      await student.client.query(api.features.vaults.getMyVault, {
+        vaultId: vault._id,
+      })
+    ).toMatchObject({ balanceCents: 200 })
+
+    expect(
+      await student.client.query(api.features.banking.getMyBalances, {})
+    ).toMatchObject({
+      checkingCents: 800,
+      savingsUnallocatedCents: 500,
+      vaultsTotalCents: 200,
+    })
+
+    await student.client.mutation(api.features.vaults.transferFunds, {
+      from: { type: 'vault', vaultId: vault._id },
+      to: { type: 'savings' },
+      amountCents: 50,
+    })
+
+    expect(
+      await student.client.query(api.features.vaults.getMyVault, {
+        vaultId: vault._id,
+      })
+    ).toMatchObject({ balanceCents: 150 })
+  })
+})
+
 async function setupActiveStudent(
   t: ConvexTest,
   options: {
@@ -311,4 +576,44 @@ async function inviteAndAcceptStudent(
     organizationId: classroom.organizationId,
     rosterStudentId,
   }
+}
+
+async function creditSavings(
+  t: ConvexTest,
+  rosterStudentId: Id<'rosterStudents'>,
+  amountCents: number
+) {
+  await creditAccount(t, rosterStudentId, 'savings', amountCents)
+}
+
+async function creditAccount(
+  t: ConvexTest,
+  rosterStudentId: Id<'rosterStudents'>,
+  kind: 'checking' | 'savings',
+  amountCents: number
+) {
+  await t.run(async ctx => {
+    const roster = await ctx.db.get('rosterStudents', rosterStudentId)
+    if (roster === null) {
+      throw new Error('Roster student missing')
+    }
+
+    const account = await requireBankAccountForStudent(
+      ctx,
+      rosterStudentId,
+      kind
+    )
+
+    await postLedgerEntry(ctx, {
+      organizationId: roster.organizationId,
+      rosterStudentId,
+      bankAccountId: account._id,
+      accountKind: kind,
+      direction: 'credit',
+      amountCents,
+      entryType: 'internal_transfer',
+      label: `Test credit ${kind}`,
+      createdAt: Date.now(),
+    })
+  })
 }

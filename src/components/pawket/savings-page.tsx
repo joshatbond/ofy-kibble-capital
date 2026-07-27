@@ -1,10 +1,12 @@
 import { Link } from '@tanstack/react-router'
+import { useQuery } from 'convex/react'
 import { ArrowLeftRight, CreditCard, PiggyBank } from 'lucide-react'
 
-import { PawketActivityFeed } from '~/components/pawket/activity-feed'
 import { MoneyAmount } from '~/components/money-amount'
+import { PawketActivityFeed } from '~/components/pawket/activity-feed'
 import { Case, SwitchOn } from '~/components/switch-on'
-import type { api } from '~/convex/_generated/api'
+import { For } from '~/components/ui/for'
+import { api } from '~/convex/_generated/api'
 import { usePawketBankingData } from '~/hooks/use-pawket-banking-data'
 
 import type { FunctionReturnType } from 'convex/server'
@@ -14,6 +16,7 @@ export function PawketSavingsPage() {
     activityPageSize: 20,
     accountKind: 'savings',
   })
+  const vaults = useQuery(api.features.vaults.listMyVaults)
 
   return (
     <main className="grid gap-6 px-4 py-6 pb-8">
@@ -53,20 +56,17 @@ export function PawketSavingsPage() {
 
       <section className="grid gap-3">
         <div className="flex items-center justify-between">
-          <h3 className="font-heading text-lg font-bold">Vaults list</h3>
+          <h3 className="font-heading text-lg font-bold">Vaults</h3>
 
           <Link
-            to="/pawket/savings/vaults"
+            to="/pawket/savings/vaults/setup"
             className="text-primary text-sm font-bold"
           >
             + Create new
           </Link>
         </div>
 
-        <div className="border-ink bg-muted text-muted-foreground rounded-xl border-2 border-dashed p-6 text-sm">
-          Vault goals are coming in a later slice. All savings currently stay
-          unallocated.
-        </div>
+        <SavingsVaultsPreview vaults={vaults} />
       </section>
 
       <section className="grid gap-3">
@@ -147,6 +147,66 @@ function SavingsBalancesSections(props: {
         </div>
       </section>
     </>
+  )
+}
+
+function SavingsVaultsPreview(props: {
+  vaults:
+    | FunctionReturnType<typeof api.features.vaults.listMyVaults>
+    | undefined
+}) {
+  return (
+    <SwitchOn>
+      <Case predicate={props.vaults === undefined}>
+        <p className="text-muted-foreground text-sm">Loading vaults…</p>
+      </Case>
+
+      <Case predicate={props.vaults != null && props.vaults.length === 0}>
+        <div className="border-ink bg-muted text-muted-foreground rounded-xl border-2 border-dashed p-6 text-sm">
+          <p>No vaults yet. Create one to start saving toward a goal.</p>
+
+          <Link
+            to="/pawket/savings/vaults/setup"
+            className="text-primary mt-2 inline-block text-sm font-bold"
+          >
+            Create vault
+          </Link>
+        </div>
+      </Case>
+
+      <Case predicate={props.vaults != null}>
+        <div className="grid gap-3">
+          <div className="border-ink bg-card divide-ink divide-y-2 overflow-clip rounded-xl border-2">
+            <For data={props.vaults ?? []} getKey={vault => vault._id}>
+              {vault => (
+                <Link
+                  to="/pawket/savings/vaults/$vaultId"
+                  params={{ vaultId: vault._id }}
+                  className="flex items-center justify-between px-4 py-3 text-sm"
+                >
+                  <span className="flex items-center gap-2 font-bold">
+                    <span aria-hidden>{vault.icon}</span>
+
+                    {vault.name}
+                  </span>
+
+                  <span className="font-bold tabular-nums">
+                    <MoneyAmount cents={vault.balanceCents} />
+                  </span>
+                </Link>
+              )}
+            </For>
+          </div>
+
+          <Link
+            to="/pawket/savings/vaults"
+            className="text-primary text-sm font-bold"
+          >
+            Manage vaults
+          </Link>
+        </div>
+      </Case>
+    </SwitchOn>
   )
 }
 
