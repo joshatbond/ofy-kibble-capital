@@ -43,6 +43,8 @@ import type * as features_tenants_makeTenantsAPI from "../features/tenants/makeT
 import type * as features_tenants_roles from "../features/tenants/roles.js";
 import type * as features_users from "../features/users.js";
 import type * as features_users_profileImage from "../features/users/profileImage.js";
+import type * as features_vaults from "../features/vaults.js";
+import type * as features_vaults_helpers from "../features/vaults/helpers.js";
 import type * as http from "../http.js";
 import type * as lib_displayName from "../lib/displayName.js";
 import type * as schema_schemaFields from "../schema/schemaFields.js";
@@ -93,6 +95,8 @@ declare const fullApi: ApiFromModules<{
   "features/tenants/roles": typeof features_tenants_roles;
   "features/users": typeof features_users;
   "features/users/profileImage": typeof features_users_profileImage;
+  "features/vaults": typeof features_vaults;
+  "features/vaults/helpers": typeof features_vaults_helpers;
   http: typeof http;
   "lib/displayName": typeof lib_displayName;
   "schema/schemaFields": typeof schema_schemaFields;
