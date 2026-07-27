@@ -18,6 +18,7 @@ import { Route as KibbleIndexRouteImport } from './routes/kibble/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as PawketLandingRouteImport } from './routes/pawket/landing'
 import { Route as KibbleTimeRouteImport } from './routes/kibble/time'
+import { Route as KibblePaySplitRouteImport } from './routes/kibble/pay-split'
 import { Route as KibbleLandingRouteImport } from './routes/kibble/landing'
 import { Route as InviteInvitationIdRouteImport } from './routes/invite/$invitationId'
 import { Route as AdminLandingRouteImport } from './routes/admin/landing'
@@ -85,6 +86,11 @@ const PawketLandingRoute = PawketLandingRouteImport.update({
 const KibbleTimeRoute = KibbleTimeRouteImport.update({
   id: '/time',
   path: '/time',
+  getParentRoute: () => KibbleRouteRoute,
+} as any)
+const KibblePaySplitRoute = KibblePaySplitRouteImport.update({
+  id: '/pay-split',
+  path: '/pay-split',
   getParentRoute: () => KibbleRouteRoute,
 } as any)
 const KibbleLandingRoute = KibbleLandingRouteImport.update({
@@ -218,6 +224,7 @@ export interface FileRoutesByFullPath {
   '/admin/landing': typeof AdminLandingRoute
   '/invite/$invitationId': typeof InviteInvitationIdRoute
   '/kibble/landing': typeof KibbleLandingRoute
+  '/kibble/pay-split': typeof KibblePaySplitRoute
   '/kibble/time': typeof KibbleTimeRoute
   '/pawket/landing': typeof PawketLandingRoute
   '/admin/': typeof AdminIndexRoute
@@ -249,6 +256,7 @@ export interface FileRoutesByTo {
   '/admin/landing': typeof AdminLandingRoute
   '/invite/$invitationId': typeof InviteInvitationIdRoute
   '/kibble/landing': typeof KibbleLandingRoute
+  '/kibble/pay-split': typeof KibblePaySplitRoute
   '/kibble/time': typeof KibbleTimeRoute
   '/pawket/landing': typeof PawketLandingRoute
   '/admin': typeof AdminIndexRoute
@@ -284,6 +292,7 @@ export interface FileRoutesById {
   '/admin/landing': typeof AdminLandingRoute
   '/invite/$invitationId': typeof InviteInvitationIdRoute
   '/kibble/landing': typeof KibbleLandingRoute
+  '/kibble/pay-split': typeof KibblePaySplitRoute
   '/kibble/time': typeof KibbleTimeRoute
   '/pawket/landing': typeof PawketLandingRoute
   '/admin/': typeof AdminIndexRoute
@@ -320,6 +329,7 @@ export interface FileRouteTypes {
     | '/admin/landing'
     | '/invite/$invitationId'
     | '/kibble/landing'
+    | '/kibble/pay-split'
     | '/kibble/time'
     | '/pawket/landing'
     | '/admin/'
@@ -351,6 +361,7 @@ export interface FileRouteTypes {
     | '/admin/landing'
     | '/invite/$invitationId'
     | '/kibble/landing'
+    | '/kibble/pay-split'
     | '/kibble/time'
     | '/pawket/landing'
     | '/admin'
@@ -385,6 +396,7 @@ export interface FileRouteTypes {
     | '/admin/landing'
     | '/invite/$invitationId'
     | '/kibble/landing'
+    | '/kibble/pay-split'
     | '/kibble/time'
     | '/pawket/landing'
     | '/admin/'
@@ -483,6 +495,13 @@ declare module '@tanstack/react-router' {
       path: '/time'
       fullPath: '/kibble/time'
       preLoaderRoute: typeof KibbleTimeRouteImport
+      parentRoute: typeof KibbleRouteRoute
+    }
+    '/kibble/pay-split': {
+      id: '/kibble/pay-split'
+      path: '/pay-split'
+      fullPath: '/kibble/pay-split'
+      preLoaderRoute: typeof KibblePaySplitRouteImport
       parentRoute: typeof KibbleRouteRoute
     }
     '/kibble/landing': {
@@ -677,6 +696,7 @@ const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
 
 interface KibbleRouteRouteChildren {
   KibbleLandingRoute: typeof KibbleLandingRoute
+  KibblePaySplitRoute: typeof KibblePaySplitRoute
   KibbleTimeRoute: typeof KibbleTimeRoute
   KibbleIndexRoute: typeof KibbleIndexRoute
   KibbleAbsenceIdRoute: typeof KibbleAbsenceIdRoute
@@ -687,6 +707,7 @@ interface KibbleRouteRouteChildren {
 
 const KibbleRouteRouteChildren: KibbleRouteRouteChildren = {
   KibbleLandingRoute: KibbleLandingRoute,
+  KibblePaySplitRoute: KibblePaySplitRoute,
   KibbleTimeRoute: KibbleTimeRoute,
   KibbleIndexRoute: KibbleIndexRoute,
   KibbleAbsenceIdRoute: KibbleAbsenceIdRoute,

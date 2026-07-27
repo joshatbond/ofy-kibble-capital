@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import { AuthGate } from '~/components/auth/auth-gate'
+import { PaySplitGate } from '~/components/kibble/pay-split-gate'
 import { AppTheme } from '~/components/theme/app-theme'
 import { studentAppLandingPath } from '~/lib/auth-redirect'
 import { pwaManifests } from '~/lib/pwa-manifests'
@@ -27,7 +28,11 @@ export const Route = createFileRoute('/kibble')({
 function KibbleLayout() {
   return (
     <AppTheme theme="kibble">
-      <AuthGate app="kibble" landingPath={studentAppLandingPath('kibble')} />
+      <AuthGate
+        app="kibble"
+        landingPath={studentAppLandingPath('kibble')}
+        authenticatedShell={children => <PaySplitGate>{children}</PaySplitGate>}
+      />
     </AppTheme>
   )
 }
