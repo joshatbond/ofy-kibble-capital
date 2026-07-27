@@ -28,6 +28,8 @@ import type * as features_invitations from "../features/invitations.js";
 import type * as features_invitations_payToken from "../features/invitations/payToken.js";
 import type * as features_invitations_policy from "../features/invitations/policy.js";
 import type * as features_organizations from "../features/organizations.js";
+import type * as features_paySplit from "../features/paySplit.js";
+import type * as features_paySplit_helpers from "../features/paySplit/helpers.js";
 import type * as features_roster_cleanup from "../features/roster/cleanup.js";
 import type * as features_roster_roster from "../features/roster/roster.js";
 import type * as features_roster_status from "../features/roster/status.js";
@@ -76,6 +78,8 @@ declare const fullApi: ApiFromModules<{
   "features/invitations/payToken": typeof features_invitations_payToken;
   "features/invitations/policy": typeof features_invitations_policy;
   "features/organizations": typeof features_organizations;
+  "features/paySplit": typeof features_paySplit;
+  "features/paySplit/helpers": typeof features_paySplit_helpers;
   "features/roster/cleanup": typeof features_roster_cleanup;
   "features/roster/roster": typeof features_roster_roster;
   "features/roster/status": typeof features_roster_status;
