@@ -349,6 +349,62 @@ describe('manualVaultTransfer', () => {
     })
   })
 
+  test('allows manual transfer both directions after a vault is complete', async () => {
+    const t = initConvexTest()
+    const { student, rosterStudentId } = await setupActiveStudent(t, {
+      email: 'complete-transfer@ofy.org',
+      externalStudentId: 9501,
+    })
+
+    await creditSavings(t, rosterStudentId, 2_000)
+
+    const vault = await student.client.mutation(api.features.vaults.createVault, {
+      name: 'Bike',
+      icon: '🚲',
+      goalCents: 400,
+      fundingMode: 'manual',
+    })
+
+    await student.client.mutation(api.features.vaults.manualVaultTransfer, {
+      vaultId: vault._id,
+      direction: 'to_vault',
+      amountCents: 400,
+    })
+
+    expect(
+      await student.client.query(api.features.vaults.getMyVault, {
+        vaultId: vault._id,
+      })
+    ).toMatchObject({ balanceCents: 400, status: 'complete' })
+
+    // Still add more after complete
+    await student.client.mutation(api.features.vaults.manualVaultTransfer, {
+      vaultId: vault._id,
+      direction: 'to_vault',
+      amountCents: 100,
+    })
+
+    // And move out while complete
+    await student.client.mutation(api.features.vaults.manualVaultTransfer, {
+      vaultId: vault._id,
+      direction: 'from_vault',
+      amountCents: 150,
+    })
+
+    expect(
+      await student.client.query(api.features.vaults.getMyVault, {
+        vaultId: vault._id,
+      })
+    ).toMatchObject({ balanceCents: 350, status: 'complete' })
+
+    expect(
+      await student.client.query(api.features.banking.getMyBalances, {})
+    ).toMatchObject({
+      savingsUnallocatedCents: 1_650,
+      vaultsTotalCents: 350,
+    })
+  })
+
   test('rejects insufficient unallocated savings and closed vaults', async () => {
     const t = initConvexTest()
     const { student, rosterStudentId } = await setupActiveStudent(t)
@@ -512,6 +568,72 @@ describe('transferFunds / listMyTransferAccounts', () => {
         vaultId: vault._id,
       })
     ).toMatchObject({ balanceCents: 150 })
+  })
+})
+
+describe('listMyVaultActivity', () => {
+  test('lists vault-facing ledger lines for the owner only', async () => {
+    const t = initConvexTest()
+    const classroom = await setupDevTeacherClassroom(t)
+    const owner = await inviteAndAcceptStudent(t, classroom, {
+      email: 'vault-activity-owner@ofy.org',
+      externalStudentId: 9502,
+    })
+    const other = await inviteAndAcceptStudent(t, classroom, {
+      email: 'vault-activity-other@ofy.org',
+      externalStudentId: 9503,
+    })
+
+    await creditSavings(t, owner.rosterStudentId, 500)
+
+    const vault = await owner.student.client.mutation(
+      api.features.vaults.createVault,
+      {
+        name: 'Activity',
+        icon: '📒',
+        fundingMode: 'manual',
+      }
+    )
+
+    await owner.student.client.mutation(api.features.vaults.manualVaultTransfer, {
+      vaultId: vault._id,
+      direction: 'to_vault',
+      amountCents: 200,
+    })
+
+    await expect(
+      t.query(api.features.vaults.listMyVaultActivity, {
+        vaultId: vault._id,
+        paginationOpts: { numItems: 20, cursor: null },
+      })
+    ).rejects.toThrow(/Not authenticated/)
+
+    const page = await owner.student.client.query(
+      api.features.vaults.listMyVaultActivity,
+      {
+        vaultId: vault._id,
+        paginationOpts: { numItems: 20, cursor: null },
+      }
+    )
+
+    expect(page.page).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          entryType: 'vault_manual',
+          direction: 'credit',
+          amountCents: 200,
+        }),
+      ])
+    )
+
+    const strangerPage = await other.student.client.query(
+      api.features.vaults.listMyVaultActivity,
+      {
+        vaultId: vault._id,
+        paginationOpts: { numItems: 20, cursor: null },
+      }
+    )
+    expect(strangerPage.page).toEqual([])
   })
 })
 

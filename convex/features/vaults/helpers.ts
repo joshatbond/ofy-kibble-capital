@@ -307,8 +307,8 @@ export async function createVaultForStudent(
 }
 
 /**
- * Archives an empty vault. Vaults with a balance must move funds out first
- * (liquidation on close comes with manual transfer work).
+ * Archives an empty vault. Funds must be moved out first — empty-only close
+ * is intentional so students consciously empty the vault before archiving.
  */
 export async function closeEmptyVaultForStudent(
   ctx: MutationCtx,

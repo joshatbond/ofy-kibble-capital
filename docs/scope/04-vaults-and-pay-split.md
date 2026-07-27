@@ -28,7 +28,7 @@ Student savings behavior: **Pay split** wizard in Kibble, vault setup in PawKet,
 
 - Vault cap per classroom (default 5)
 - **Goal reached** → **Complete**: stop auto funding; manual in/out still allowed
-- **Close vault** → liquidate to unallocated **Savings**, archive
+- **Close vault** → vault must be empty first (manual transfer out), then archive. Empty-only close is intentional friction so students consciously empty the vault before closing.
 
 ### Paycheck pipeline (shared lib)
 
@@ -39,10 +39,10 @@ Student savings behavior: **Pay split** wizard in Kibble, vault setup in PawKet,
 
 ## Acceptance criteria
 
-- [ ] Multiple on-deposit vaults cannot exceed 100% at setup
-- [ ] **Complete** vault still allows **Manual vault transfer** both directions
-- [ ] **Scheduled** transfer skipped with **Transfer skipped notice** (in-app only) when insufficient unallocated **Savings**
-- [ ] Pipeline unit tests with fixed **Cents** inputs
+- [x] Multiple on-deposit vaults cannot exceed 100% at setup
+- [x] **Complete** vault still allows **Manual vault transfer** both directions
+- [x] **Scheduled** transfer skipped with **Transfer skipped notice** (in-app only) when insufficient unallocated **Savings**
+- [x] Pipeline unit tests with fixed **Cents** inputs
 
 ## Domain refs
 
