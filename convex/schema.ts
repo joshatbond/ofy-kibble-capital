@@ -8,7 +8,11 @@ import {
   classroomsTableFields,
   ledgerEntriesTableFields,
   notificationsTableFields,
+  payPeriodsTableFields,
+  payRunsTableFields,
+  payrollYtdTableFields,
   paySplitsTableFields,
+  paystubsTableFields,
   regionSettingsTableFields,
   regionsTableFields,
   rosterStudentsTableFields,
@@ -79,4 +83,24 @@ export default defineSchema({
   notifications: defineTable(notificationsTableFields)
     .index('by_user_createdAt', ['userId', 'createdAt'])
     .index('by_user_readAt_createdAt', ['userId', 'readAt', 'createdAt']),
+  payPeriods: defineTable(payPeriodsTableFields)
+    .index('by_organizationId', ['organizationId'])
+    .index('by_organizationId_payDate', ['organizationId', 'payDate'])
+    .index('by_organizationId_status', ['organizationId', 'status']),
+  payRuns: defineTable(payRunsTableFields)
+    .index('by_payPeriodId', ['payPeriodId'])
+    .index('by_organizationId', ['organizationId'])
+    .index('by_organizationId_status', ['organizationId', 'status']),
+  paystubs: defineTable(paystubsTableFields)
+    .index('by_payRunId', ['payRunId'])
+    .index('by_rosterStudentId', ['rosterStudentId'])
+    .index('by_rosterStudent_createdAt', ['rosterStudentId', 'createdAt'])
+    .index('by_organizationId_payPeriodId', [
+      'organizationId',
+      'payPeriodId',
+    ])
+    .index('by_payPeriod_rosterStudent', ['payPeriodId', 'rosterStudentId']),
+  payrollYtd: defineTable(payrollYtdTableFields)
+    .index('by_rosterStudent_schoolYear', ['rosterStudentId', 'schoolYear'])
+    .index('by_organizationId_schoolYear', ['organizationId', 'schoolYear']),
 })

@@ -38,6 +38,21 @@ const vaultOnDepositRule = v.union(
   })
 )
 const notificationKind = v.union(v.literal('transfer_skipped'))
+const payPeriodScheduleType = v.union(
+  v.literal('weekly'),
+  v.literal('biweekly'),
+  v.literal('semi_monthly'),
+  v.literal('monthly'),
+  v.literal('transition')
+)
+const payPeriodStatus = v.union(v.literal('open'), v.literal('closed'))
+const payRunStatus = v.union(
+  v.literal('pending'),
+  v.literal('blocked'),
+  v.literal('succeeded'),
+  v.literal('postponed')
+)
+const payRunTrigger = v.union(v.literal('manual'), v.literal('automation'))
 const rosterStatus = v.union(
   v.literal('pending'),
   v.literal('active'),
@@ -246,6 +261,97 @@ export const notificationsTableFields = {
   /** Optional vault that triggered the notice. */
   vaultId: v.optional(v.id('vaults')),
 }
+export const payPeriodsTableFields = {
+  organizationId: v.string(),
+  /** Inclusive work-window start (`YYYY-MM-DD`) in product timezone. */
+  startDate: v.string(),
+  /** Inclusive work-window end (`YYYY-MM-DD`) in product timezone. */
+  endDate: v.string(),
+  /** Calendar payday (`YYYY-MM-DD`) when automation / manual run targets this period. */
+  payDate: v.string(),
+  scheduleType: payPeriodScheduleType,
+  /** True for one-off gap coverage after a pay schedule change (ADR-0004). */
+  isTransition: v.boolean(),
+  status: payPeriodStatus,
+  createdAt: v.number(),
+  /** Unix ms when a successful pay run closed this period. */
+  closedAt: v.optional(v.number()),
+}
+export const payRunsTableFields = {
+  organizationId: v.string(),
+  payPeriodId: v.id('payPeriods'),
+  status: payRunStatus,
+  triggeredBy: payRunTrigger,
+  /** Human-readable block reasons when status is blocked. */
+  blockReasons: v.optional(v.array(v.string())),
+  /** New payday (`YYYY-MM-DD`) when status is postponed. */
+  postponedUntil: v.optional(v.string()),
+  /** Unix ms when this run attempt started. */
+  startedAt: v.number(),
+  /** Unix ms when status became succeeded or blocked (terminal for this attempt). */
+  completedAt: v.optional(v.number()),
+}
+export const paystubsTableFields = {
+  organizationId: v.string(),
+  payPeriodId: v.id('payPeriods'),
+  payRunId: v.id('payRuns'),
+  rosterStudentId: v.id('rosterStudents'),
+  /** School year label, e.g. `2026-2027` (July 1 reset). */
+  schoolYear: v.string(),
+  daysAttended: v.number(),
+  standardDayHours: v.number(),
+  overtimeHours: v.number(),
+  baseHours: v.number(),
+  basePayCents: v.number(),
+  overtimePayCents: v.number(),
+  grossPayCents: v.number(),
+  retirement401kCents: v.number(),
+  medicalInsuranceCents: v.number(),
+  taxableWagesCents: v.number(),
+  federalIncomeTaxCents: v.number(),
+  californiaIncomeTaxCents: v.number(),
+  socialSecurityCents: v.number(),
+  medicareCents: v.number(),
+  caSdiCents: v.number(),
+  netPayCents: v.number(),
+  /** Cumulative totals after this stub posts (school-year YTD). */
+  ytdGrossCents: v.number(),
+  ytdTaxableWagesCents: v.number(),
+  ytdRetirement401kCents: v.number(),
+  ytdMedicalInsuranceCents: v.number(),
+  ytdFederalIncomeTaxCents: v.number(),
+  ytdCaliforniaIncomeTaxCents: v.number(),
+  ytdSocialSecurityCents: v.number(),
+  ytdMedicareCents: v.number(),
+  ytdCaSdiCents: v.number(),
+  ytdNetPayCents: v.number(),
+  /** True when this stub is a later-run payroll correction. */
+  isCorrection: v.boolean(),
+  /** Required when isCorrection — teacher-supplied reason. */
+  correctionReason: v.optional(v.string()),
+  createdAt: v.number(),
+  /** Unix ms when the student opened this stub; omitted while “new”. */
+  viewedAt: v.optional(v.number()),
+}
+export const payrollYtdTableFields = {
+  organizationId: v.string(),
+  rosterStudentId: v.id('rosterStudents'),
+  /** School year label, e.g. `2026-2027` (July 1 reset). */
+  schoolYear: v.string(),
+  grossCents: v.number(),
+  taxableWagesCents: v.number(),
+  /** Wages subject to Social Security before applying the annual wage base cap. */
+  socialSecurityWagesCents: v.number(),
+  retirement401kCents: v.number(),
+  medicalInsuranceCents: v.number(),
+  federalIncomeTaxCents: v.number(),
+  californiaIncomeTaxCents: v.number(),
+  socialSecurityCents: v.number(),
+  medicareCents: v.number(),
+  caSdiCents: v.number(),
+  netPayCents: v.number(),
+  updatedAt: v.number(),
+}
 export const bankAccountKindValidator = bankAccountKind
 export const ledgerEntryTypeValidator = ledgerEntryType
 export const rosterStatusValidator = rosterStatus
@@ -255,4 +361,8 @@ export const vaultStatusValidator = vaultStatus
 export const vaultScheduleCadenceValidator = vaultScheduleCadence
 export const vaultOnDepositRuleValidator = vaultOnDepositRule
 export const notificationKindValidator = notificationKind
+export const payPeriodScheduleTypeValidator = payPeriodScheduleType
+export const payPeriodStatusValidator = payPeriodStatus
+export const payRunStatusValidator = payRunStatus
+export const payRunTriggerValidator = payRunTrigger
 export { payScheduleValidator, weekdayValidator }
