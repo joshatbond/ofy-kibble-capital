@@ -14,6 +14,7 @@ import {
   listPayPeriodsForOrg,
   toPayPeriodPublic,
 } from './payroll/periodStore'
+import { postponePayPeriodRun } from './payroll/postpone'
 import { executePayRunForPeriod } from './payroll/runPayPeriod'
 
 const payPeriodPublicValidator = v.object({
@@ -193,6 +194,45 @@ export const runPayPeriod = mutation({
       organizationId: args.organizationId,
       payPeriodId: args.payPeriodId,
       triggeredBy: 'manual',
+      nowMs: args.nowMs ?? Date.now(),
+    })
+  },
+})
+
+/**
+ * **Postpone pay run** — delay automation to a later calendar date.
+ * Work-window bounds stay the same; effective payday becomes `postponedUntil`.
+ */
+export const postponePayPeriod = mutation({
+  args: {
+    organizationId: v.string(),
+    payPeriodId: v.id('payPeriods'),
+    postponedUntil: v.string(),
+    nowMs: v.optional(v.number()),
+  },
+  returns: v.object({
+    payRunId: v.id('payRuns'),
+    payPeriodId: v.id('payPeriods'),
+    postponedUntil: v.string(),
+    effectivePayDate: v.string(),
+  }),
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx)
+    if (userId === null) {
+      throw new Error('Not authenticated')
+    }
+
+    await requireTeacherForOrg(
+      ctx,
+      userId,
+      args.organizationId,
+      'organizations:update'
+    )
+
+    return await postponePayPeriodRun(ctx, {
+      organizationId: args.organizationId,
+      payPeriodId: args.payPeriodId,
+      postponedUntil: args.postponedUntil,
       nowMs: args.nowMs ?? Date.now(),
     })
   },

@@ -27,6 +27,34 @@ export function civilDateInProductTimezone(nowMs: number): string {
     day: '2-digit',
   }).format(new Date(nowMs))
 }
+
+/** Clock parts in product timezone (24h). */
+export function clockInProductTimezone(nowMs: number): {
+  hour: number
+  minute: number
+} {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: PRODUCT_TIMEZONE,
+    hour: 'numeric',
+    minute: 'numeric',
+    hourCycle: 'h23',
+  }).formatToParts(new Date(nowMs))
+
+  const hour = Number(parts.find(part => part.type === 'hour')?.value)
+  const minute = Number(parts.find(part => part.type === 'minute')?.value)
+  if (!Number.isInteger(hour) || !Number.isInteger(minute)) {
+    throw new Error('Failed to read product-timezone clock.')
+  }
+
+  return { hour, minute }
+}
+
+/** v1 **Pay run time**: 8:30 AM America/Los_Angeles. */
+export function isPaydayAutomationClock(nowMs: number): boolean {
+  const { hour, minute } = clockInProductTimezone(nowMs)
+  return hour === 8 && minute === 30
+}
+
 export function weekdayOf(date: CivilDate): number {
   return new Date(Date.UTC(date.year, date.month - 1, date.day, 12)).getUTCDay()
 }

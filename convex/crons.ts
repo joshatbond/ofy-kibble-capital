@@ -12,4 +12,13 @@ crons.cron(
   {}
 )
 
+// Every hour at :30 UTC; handler no-ops unless product clock is 8:30 AM PT
+// (covers PST=16:30 UTC and PDT=15:30 UTC without dual crons).
+crons.cron(
+  'payday automation',
+  '30 * * * *',
+  internal.features.payrollCron.processPaydayAutomationCron,
+  {}
+)
+
 export default crons
