@@ -39,6 +39,7 @@ import type * as features_payroll_attendanceSource from "../features/payroll/att
 import type * as features_payroll_attendanceValidation from "../features/payroll/attendanceValidation.js";
 import type * as features_payroll_dates from "../features/payroll/dates.js";
 import type * as features_payroll_money from "../features/payroll/money.js";
+import type * as features_payroll_paydayAutomation from "../features/payroll/paydayAutomation.js";
 import type * as features_payroll_payrollMath from "../features/payroll/payrollMath.js";
 import type * as features_payroll_periodStore from "../features/payroll/periodStore.js";
 import type * as features_payroll_periods from "../features/payroll/periods.js";
@@ -46,6 +47,7 @@ import type * as features_payroll_postpone from "../features/payroll/postpone.js
 import type * as features_payroll_runPayPeriod from "../features/payroll/runPayPeriod.js";
 import type * as features_payroll_taxTables from "../features/payroll/taxTables.js";
 import type * as features_payroll_validateAttendance from "../features/payroll/validateAttendance.js";
+import type * as features_payrollCron from "../features/payrollCron.js";
 import type * as features_roster_cleanup from "../features/roster/cleanup.js";
 import type * as features_roster_roster from "../features/roster/roster.js";
 import type * as features_roster_status from "../features/roster/status.js";
@@ -109,6 +111,7 @@ declare const fullApi: ApiFromModules<{
   "features/payroll/attendanceValidation": typeof features_payroll_attendanceValidation;
   "features/payroll/dates": typeof features_payroll_dates;
   "features/payroll/money": typeof features_payroll_money;
+  "features/payroll/paydayAutomation": typeof features_payroll_paydayAutomation;
   "features/payroll/payrollMath": typeof features_payroll_payrollMath;
   "features/payroll/periodStore": typeof features_payroll_periodStore;
   "features/payroll/periods": typeof features_payroll_periods;
@@ -116,6 +119,7 @@ declare const fullApi: ApiFromModules<{
   "features/payroll/runPayPeriod": typeof features_payroll_runPayPeriod;
   "features/payroll/taxTables": typeof features_payroll_taxTables;
   "features/payroll/validateAttendance": typeof features_payroll_validateAttendance;
+  "features/payrollCron": typeof features_payrollCron;
   "features/roster/cleanup": typeof features_roster_cleanup;
   "features/roster/roster": typeof features_roster_roster;
   "features/roster/status": typeof features_roster_status;
