@@ -7,6 +7,7 @@ import {
   computePayrollForStudent,
   schoolYearForIsoDate,
 } from './payrollMath'
+import { incrementUnviewedPaystubCount } from './studentPaystubs'
 
 import type { PayrollYtdSnapshot } from './payrollMath'
 import type { Doc, Id } from '../../_generated/dataModel'
@@ -149,6 +150,8 @@ export async function executePayRunForPeriod(
       isCorrection: false,
       createdAt: args.nowMs,
     })
+
+    await incrementUnviewedPaystubCount(ctx, roster._id)
 
     await upsertPayrollYtd(ctx, {
       organizationId: args.organizationId,

@@ -7,8 +7,6 @@ import {
   setupDevTeacherClassroom,
 } from '../../test.setup'
 
-import type { Id } from '../../_generated/dataModel'
-
 afterEach(() => {
   vi.unstubAllEnvs()
 })

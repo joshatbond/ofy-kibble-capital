@@ -193,6 +193,8 @@ export const rosterStudentsTableFields = {
   /** Student pay / transfer token (provisioned at invite send). */
   payToken: v.string(),
   status: rosterStatus,
+  /** Denormalized count of this student's paystubs that have not been viewed. */
+  unviewedPaystubCount: v.number(),
 }
 export const bankAccountsTableFields = {
   organizationId: v.string(),

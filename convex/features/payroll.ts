@@ -1,4 +1,8 @@
 import { getAuthUserId } from '@convex-dev/auth/server'
+import {
+  paginationOptsValidator,
+  paginationResultValidator,
+} from 'convex/server'
 import { v } from 'convex/values'
 
 import { mutation, query } from '../_generated/server'
@@ -8,6 +12,7 @@ import {
 } from '../schema/schemaFields'
 
 import { requireTeacherForOrg } from './auth/teacher'
+import { getActiveRosterStudentForUser } from './banking/student'
 import { validateStubAttendanceForPayPeriod } from './payroll/attendanceValidation'
 import {
   ensureCurrentPayPeriodForOrg,
@@ -16,6 +21,14 @@ import {
 } from './payroll/periodStore'
 import { postponePayPeriodRun } from './payroll/postpone'
 import { executePayRunForPeriod } from './payroll/runPayPeriod'
+import {
+  countUnviewedPaystubsForStudent,
+  getPaystubForStudent,
+  listPaystubsForStudent,
+  markPaystubViewedForStudent,
+  paystubDetailValidator,
+  paystubListItemValidator,
+} from './payroll/studentPaystubs'
 
 const payPeriodPublicValidator = v.object({
   _id: v.id('payPeriods'),
@@ -29,7 +42,6 @@ const payPeriodPublicValidator = v.object({
   createdAt: v.number(),
   closedAt: v.optional(v.number()),
 })
-
 const attendanceValidationValidator = v.union(
   v.object({
     status: v.literal('ready'),
@@ -52,7 +64,6 @@ const attendanceValidationValidator = v.union(
     blockReasons: v.array(v.string()),
   })
 )
-
 const payRunResultValidator = v.union(
   v.object({
     status: v.literal('succeeded'),
@@ -68,8 +79,6 @@ const payRunResultValidator = v.union(
     blockReasons: v.array(v.string()),
   })
 )
-
-/** Pay periods for a classroom, newest pay date first. */
 export const listPayPeriodsForOrganization = query({
   args: { organizationId: v.string() },
   returns: v.array(payPeriodPublicValidator),
@@ -90,11 +99,6 @@ export const listPayPeriodsForOrganization = query({
     return periods.map(toPayPeriodPublic)
   },
 })
-
-/**
- * Open period for the next payday on/after today, creating it when missing.
- * Pass `nowMs` only from tests; production uses Date.now().
- */
 export const ensureCurrentPayPeriod = mutation({
   args: {
     organizationId: v.string(),
@@ -122,11 +126,6 @@ export const ensureCurrentPayPeriod = mutation({
     return toPayPeriodPublic(period)
   },
 })
-
-/**
- * Preview stub attendance validation for a pay period.
- * Pay run mutations must use the same gate before posting stubs.
- */
 export const validateAttendanceForPayPeriod = query({
   args: {
     organizationId: v.string(),
@@ -165,11 +164,6 @@ export const validateAttendanceForPayPeriod = query({
     }
   },
 })
-
-/**
- * Manual **Pay run** for a period: attendance gate → paystubs → ledger.
- * Idempotent after the first successful run for that period.
- */
 export const runPayPeriod = mutation({
   args: {
     organizationId: v.string(),
@@ -198,11 +192,6 @@ export const runPayPeriod = mutation({
     })
   },
 })
-
-/**
- * **Postpone pay run** — delay automation to a later calendar date.
- * Work-window bounds stay the same; effective payday becomes `postponedUntil`.
- */
 export const postponePayPeriod = mutation({
   args: {
     organizationId: v.string(),
@@ -234,6 +223,98 @@ export const postponePayPeriod = mutation({
       payPeriodId: args.payPeriodId,
       postponedUntil: args.postponedUntil,
       nowMs: args.nowMs ?? Date.now(),
+    })
+  },
+})
+export const listMyPaystubs = query({
+  args: {
+    paginationOpts: paginationOptsValidator,
+  },
+  returns: paginationResultValidator(paystubListItemValidator),
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx)
+    if (userId === null) {
+      throw new Error('Not authenticated')
+    }
+
+    const roster = await getActiveRosterStudentForUser(ctx, userId)
+    if (roster === null) {
+      return { page: [], isDone: true, continueCursor: '' }
+    }
+
+    return await listPaystubsForStudent(ctx, {
+      rosterStudentId: roster._id,
+      paginationOpts: args.paginationOpts,
+    })
+  },
+})
+export const countMyUnviewedPaystubs = query({
+  args: {},
+  returns: v.number(),
+  handler: async ctx => {
+    const userId = await getAuthUserId(ctx)
+    if (userId === null) {
+      throw new Error('Not authenticated')
+    }
+
+    const roster = await getActiveRosterStudentForUser(ctx, userId)
+    if (roster === null) {
+      return 0
+    }
+
+    return await countUnviewedPaystubsForStudent(ctx, roster._id)
+  },
+})
+export const getMyPaystub = query({
+  args: { paystubId: v.string() },
+  returns: v.union(paystubDetailValidator, v.null()),
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx)
+    if (userId === null) {
+      throw new Error('Not authenticated')
+    }
+
+    const roster = await getActiveRosterStudentForUser(ctx, userId)
+    if (roster === null) {
+      return null
+    }
+
+    const paystubId = ctx.db.normalizeId('paystubs', args.paystubId)
+    if (paystubId === null) {
+      return null
+    }
+
+    return await getPaystubForStudent(ctx, {
+      rosterStudentId: roster._id,
+      paystubId,
+    })
+  },
+})
+export const markMyPaystubViewed = mutation({
+  args: {
+    paystubId: v.string(),
+  },
+  returns: v.union(paystubDetailValidator, v.null()),
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx)
+    if (userId === null) {
+      throw new Error('Not authenticated')
+    }
+
+    const roster = await getActiveRosterStudentForUser(ctx, userId)
+    if (roster === null) {
+      return null
+    }
+
+    const paystubId = ctx.db.normalizeId('paystubs', args.paystubId)
+    if (paystubId === null) {
+      return null
+    }
+
+    return await markPaystubViewedForStudent(ctx, {
+      rosterStudentId: roster._id,
+      paystubId,
+      nowMs: Date.now(),
     })
   },
 })

@@ -115,6 +115,7 @@ export async function insertPendingRosterStudent(
   const rosterStudentId = await ctx.db.insert('rosterStudents', {
     ...args,
     status: 'pending',
+    unviewedPaystubCount: 0,
   })
 
   await provisionStudentBankAccounts(ctx, {

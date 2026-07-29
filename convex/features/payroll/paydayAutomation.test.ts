@@ -13,7 +13,6 @@ import {
 } from './dates'
 import { getEffectivePayDate } from './postpone'
 
-import type { Id } from '../../_generated/dataModel'
 import type { ConvexTest } from '../../test.setup'
 
 afterEach(() => {
