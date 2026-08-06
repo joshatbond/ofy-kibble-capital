@@ -20,6 +20,8 @@ import { api } from '~/convex/_generated/api'
 import type { Id } from '~/convex/_generated/dataModel'
 import { cn } from '~/lib/class-name-merge'
 import { formatIsoDay } from '~/lib/format-iso-day'
+import { studentPayBreakdown } from '~/lib/payroll-admin-report'
+import type { PayBreakdownField } from '~/lib/payroll-admin-report'
 import { userFacingErrorMessage } from '~/lib/user-facing-error'
 
 import { Case, SwitchOn } from '../switch-on'
@@ -588,73 +590,6 @@ function scrollPanelInReportDialog(element: HTMLElement) {
   scroller.scrollBy({ top: delta, behavior: 'smooth' })
 }
 
-function studentPayBreakdown(stub: PayRunReport['stubs'][number]) {
-  const pretaxTotal = stub.retirement401kCents + stub.medicalInsuranceCents
-  const taxTotal =
-    stub.federalIncomeTaxCents +
-    stub.californiaIncomeTaxCents +
-    stub.socialSecurityCents +
-    stub.medicareCents +
-    stub.caSdiCents
-
-  return {
-    panels: [
-      {
-        title: 'gross pay',
-        amountCents: stub.grossPayCents,
-        accentColor: 'text-emerald-700',
-        groups: [
-          {
-            title: 'Regular',
-            fields: [
-              { label: 'hours', value: String(stub.baseHours) },
-              { label: 'rate', cents: stub.regularRateCents },
-              { label: 'amount', cents: stub.basePayCents },
-            ],
-          },
-          {
-            title: 'Overtime',
-            fields: [
-              { label: 'hours', value: String(stub.overtimeHours) },
-              { label: 'rate', cents: stub.overtimeRateCents },
-              { label: 'amount', cents: stub.overtimePayCents },
-            ],
-          },
-        ],
-      },
-      {
-        title: 'taxes and deductions',
-        amountCents: pretaxTotal + taxTotal,
-        accentColor: 'text-destructive',
-        groups: [
-          {
-            title: 'Pre-tax deductions',
-            fields: [
-              { label: '401(k)', cents: stub.retirement401kCents },
-              { label: 'Medical insurance', cents: stub.medicalInsuranceCents },
-              { label: 'amount', cents: pretaxTotal },
-            ],
-          },
-          {
-            title: 'taxes',
-            fields: [
-              { label: 'social security', cents: stub.socialSecurityCents },
-              { label: 'medicare', cents: stub.medicareCents },
-              { label: 'federal withholding', cents: stub.federalIncomeTaxCents },
-              {
-                label: 'State withholdings',
-                cents: stub.californiaIncomeTaxCents,
-              },
-              { label: 'CA SDI', cents: stub.caSdiCents },
-              { label: 'amount', cents: taxTotal },
-            ],
-          },
-        ],
-      },
-    ],
-  } as const
-}
-
 function StudentPayReportCard(props: { stub: PayRunReport['stubs'][number] }) {
   const stub = props.stub
   const [expanded, setExpanded] = useState(false)
@@ -786,9 +721,7 @@ function PayBreakdownPanel(props: {
   )
 }
 
-function breakdownFieldValue(
-  field: { label: string; value: string } | { label: string; cents: number }
-): ReactNode {
+function breakdownFieldValue(field: PayBreakdownField): ReactNode {
   if ('cents' in field) {
     return <MoneyAmount cents={field.cents} />
   }
@@ -798,9 +731,7 @@ function breakdownFieldValue(
 function PayBreakdownGroup(props: {
   title: string
   accentColor: string
-  fields: ReadonlyArray<
-    { label: string; value: string } | { label: string; cents: number }
-  >
+  fields: ReadonlyArray<PayBreakdownField>
 }) {
   const lastField = props.fields.at(-1)
   if (lastField === undefined) {
