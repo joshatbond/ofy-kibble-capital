@@ -10,6 +10,12 @@ import { Toaster as Sonner } from 'sonner'
 import type { CSSProperties } from 'react'
 import type { ToasterProps } from 'sonner'
 
+/**
+ * Sonner’s toaster defaults to z-index 999999999 so toasts clear sticky admin
+ * chrome and Radix overlays (z-50). Native `<dialog showModal()>` uses the
+ * browser top layer and still stacks above Sonner — toasts while a modal is
+ * open may sit behind it.
+ */
 export function Toaster(props: ToasterProps) {
   return (
     <Sonner
@@ -30,11 +36,6 @@ export function Toaster(props: ToasterProps) {
           '--border-radius': 'var(--radius)',
         } as CSSProperties
       }
-      toastOptions={{
-        classNames: {
-          toast: 'cn-toast',
-        },
-      }}
       {...props}
     />
   )

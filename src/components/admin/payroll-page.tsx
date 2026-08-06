@@ -23,7 +23,10 @@ import { cn } from '~/lib/class-name-merge'
 import { formatIsoDay } from '~/lib/format-iso-day'
 import {
   emptyPaystubsMessage,
+  formatBlockedReasonsDescription,
+  payrollActionDisabledReason,
   resolvePayRunReportViewState,
+  shortRunId,
   studentPayBreakdown,
 } from '~/lib/payroll-admin-report'
 import type { PayBreakdownField } from '~/lib/payroll-admin-report'
@@ -32,9 +35,11 @@ import { userFacingErrorMessage } from '~/lib/user-facing-error'
 import { Case, SwitchOn } from '../switch-on'
 import { Field, FieldLabel } from '../ui/field'
 
-
 import type { FunctionReturnType } from 'convex/server'
 import type { ReactNode } from 'react'
+
+const PAYROLL_ACTIONS_HINT_ID = 'payroll-actions-hint'
+const PAY_REPORT_TITLE_ID = 'pay-report-title'
 
 export function AdminPayrollPage(props: {
   organizationId: string
@@ -50,9 +55,17 @@ export function AdminPayrollPage(props: {
     run => run.status === 'succeeded' || run.status === 'blocked'
   )
   const [selectedRunId, setSelectedRunId] = useState<Id<'payRuns'> | null>(null)
+  const actionDisabledReason = payrollActionDisabledReason({
+    isOpen,
+    isReady,
+  })
 
   return (
-    <AdminPage title="Payroll" description="Pay period information">
+    <AdminPage
+      title="Payroll"
+      description="Pay period information"
+      className="gap-0"
+    >
       <PayrollSection title="Current Period">
         <div className="grid grid-cols-[repeat(auto-fit,minmax(max(100px,30%),1fr))] gap-4">
           <StatusField
@@ -90,7 +103,7 @@ export function AdminPayrollPage(props: {
           />
         </div>
 
-        <div className="flex flex-col gap-4 bg-[#eee] p-6">
+        <div className="bg-muted flex flex-col gap-4 p-6">
           <SwitchOn value={attendance}>
             <Case
               predicate={(
@@ -116,8 +129,8 @@ export function AdminPayrollPage(props: {
 
             <Case>
               <>
-                <div className="flex items-center justify-between gap-4">
-                  <h3 className="text-lg font-semibold">
+                <div className="flex flex-col gap-3 @min-[40rem]/admin:flex-row @min-[40rem]/admin:items-center @min-[40rem]/admin:justify-between">
+                  <h3 className="min-w-0 truncate text-lg font-semibold">
                     Pay Runs this Period
                   </h3>
 
@@ -126,6 +139,11 @@ export function AdminPayrollPage(props: {
                       organizationId={props.organizationId}
                       payPeriodId={period._id}
                       disabled={!isOpen || !isReady}
+                      describedBy={
+                        actionDisabledReason !== null
+                          ? PAYROLL_ACTIONS_HINT_ID
+                          : undefined
+                      }
                     />
 
                     <PostponePaydayMenu
@@ -133,9 +151,23 @@ export function AdminPayrollPage(props: {
                       payPeriodId={period._id}
                       effectivePayDate={details.effectivePayDate}
                       disabled={!isOpen}
+                      describedBy={
+                        actionDisabledReason !== null
+                          ? PAYROLL_ACTIONS_HINT_ID
+                          : undefined
+                      }
                     />
                   </div>
                 </div>
+
+                {actionDisabledReason !== null ? (
+                  <p
+                    id={PAYROLL_ACTIONS_HINT_ID}
+                    className="text-muted-foreground text-sm"
+                  >
+                    {actionDisabledReason}
+                  </p>
+                ) : null}
 
                 <SwitchOn>
                   <Case predicate={currentRuns.length === 0}>
@@ -218,11 +250,11 @@ function StatusField(props: {
 }) {
   return (
     <div className={cn('grid gap-0.5', props.className)}>
-      <dt className="text-muted-foreground text-xs font-bold tracking-wide uppercase">
+      <p className="text-muted-foreground text-xs font-bold tracking-wide uppercase">
         {props.label}
-      </dt>
+      </p>
 
-      <dd className="text-xs font-bold">{props.value}</dd>
+      <p className="text-xs font-bold">{props.value}</p>
     </div>
   )
 }
@@ -231,6 +263,7 @@ function RunPayrollButton(props: {
   organizationId: string
   payPeriodId: Id<'payPeriods'>
   disabled: boolean
+  describedBy?: string
 }) {
   const runPayPeriod = useMutation(api.features.payroll.runPayPeriod)
   const [pending, setPending] = useState(false)
@@ -243,7 +276,9 @@ function RunPayrollButton(props: {
         payPeriodId: props.payPeriodId,
       })
       if (result.status === 'blocked') {
-        toast.error(result.blockReasons.join(' '))
+        toast.error('Payroll blocked', {
+          description: formatBlockedReasonsDescription(result.blockReasons),
+        })
         return
       }
       toast.success(
@@ -264,6 +299,7 @@ function RunPayrollButton(props: {
       variant="brutal"
       size="sm"
       disabled={props.disabled || pending}
+      aria-describedby={props.describedBy}
       onClick={() => {
         void handleRun()
       }}
@@ -278,6 +314,7 @@ function PostponePaydayMenu(props: {
   payPeriodId: Id<'payPeriods'>
   effectivePayDate: string
   disabled: boolean
+  describedBy?: string
 }) {
   const postponePayPeriod = useMutation(api.features.payroll.postponePayPeriod)
   const [open, setOpen] = useState(false)
@@ -315,6 +352,7 @@ function PostponePaydayMenu(props: {
           variant="brutal-outline"
           size="sm"
           disabled={props.disabled}
+          aria-describedby={props.describedBy}
         >
           Postpone
         </Button>
@@ -334,9 +372,10 @@ function PostponePaydayMenu(props: {
         </PopoverHeader>
 
         <Field>
-          <FieldLabel>New payday</FieldLabel>
+          <FieldLabel htmlFor="postpone-payday">New payday</FieldLabel>
 
           <Input
+            id="postpone-payday"
             type="date"
             value={postponeUntil}
             disabled={pending}
@@ -378,7 +417,7 @@ function PayRunCard(props: { run: PayRunSummary; onOpen: () => void }) {
       className="border-ink bg-card hover:bg-muted/40 focus-visible:ring-ring grid w-full gap-0 overflow-clip rounded-lg border text-left transition-colors focus-visible:ring-3 focus-visible:outline-none"
     >
       <span className="bg-ink text-primary-foreground w-fit px-4 py-1.5 text-sm">
-        ID: {run._id}
+        ID: {shortRunId(run._id)}
       </span>
 
       <div className="grid grid-cols-[repeat(auto-fit,minmax(max(100px,30%),1fr))] gap-2 px-4 py-4 text-xs">
@@ -417,6 +456,9 @@ function PayRunReportDialog(props: {
   return (
     <dialog
       ref={dialogRef}
+      aria-labelledby={
+        props.payRunId === null ? undefined : PAY_REPORT_TITLE_ID
+      }
       className="backdrop:bg-foreground/40 bg-transparent p-0 open:fixed open:inset-0 open:m-0 open:flex open:h-dvh open:w-dvw open:items-center open:justify-center open:overflow-auto"
       onClose={props.onClose}
       onClick={event => {
@@ -475,7 +517,15 @@ function PayRunReportDialogContent(props: {
   return (
     <SwitchOn value={view}>
       <Case predicate={view.status === 'loading'}>
-        <p className="text-muted-foreground text-sm">Loading pay report…</p>
+        <>
+          <h2 id={PAY_REPORT_TITLE_ID} className="sr-only">
+            Pay Report
+          </h2>
+
+          <p className="text-muted-foreground text-sm" role="status">
+            Loading pay report…
+          </p>
+        </>
       </Case>
 
       <Case
@@ -486,7 +536,14 @@ function PayRunReportDialogContent(props: {
       >
         {state => (
           <div className="grid gap-4">
-            <p className="text-destructive text-sm font-bold" role="alert">
+            <h2 id={PAY_REPORT_TITLE_ID} className="sr-only">
+              Pay Report
+            </h2>
+
+            <p
+              className="border-destructive bg-destructive/10 text-destructive border-2 p-4 text-sm font-bold"
+              role="alert"
+            >
               {state.message}
             </p>
 
@@ -531,27 +588,33 @@ function PayRunReportBody(props: {
 
   return (
     <>
-      <header className="">
-        <div className="flex items-center justify-between gap-4">
-          <h2 className="font-heading text-4xl font-bold">Pay Report</h2>
+      <header>
+        <div className="flex min-w-0 items-start justify-between gap-4">
+          <h2
+            id={PAY_REPORT_TITLE_ID}
+            className="font-heading min-w-0 truncate text-4xl font-bold"
+          >
+            Pay Report
+          </h2>
 
           <Button
             type="button"
             variant="ghost"
             size="icon-lg"
-            className="mt-2 justify-self-end"
+            className="mt-2 shrink-0 justify-self-end"
+            aria-label="Close"
             onClick={props.onClose}
           >
-            <X className="size-6" />
+            <X className="size-6" aria-hidden />
           </Button>
         </div>
 
-        <div className="flex items-center justify-between gap-4">
-          <p className="text-muted-foreground text-lg">
+        <div className="flex min-w-0 flex-col gap-2 @min-[30rem]/admin:flex-row @min-[30rem]/admin:items-center @min-[30rem]/admin:justify-between">
+          <p className="text-muted-foreground min-w-0 truncate text-lg">
             ID: {shortRunId(run._id)}
           </p>
 
-          <div className="grid gap-0.5 text-right text-xs">
+          <div className="grid gap-0.5 text-xs @min-[30rem]/admin:text-right">
             <p className="text-muted-foreground font-bold uppercase">
               run completed
             </p>
@@ -667,40 +730,41 @@ function StudentPayReportCard(props: { stub: PayRunReport['stubs'][number] }) {
   const [expanded, setExpanded] = useState(false)
   const panelRef = useRef<HTMLDivElement>(null)
   const breakdown = studentPayBreakdown(stub)
-  const disbursementAccent = 'text-blue-700'
+  const disbursementAccent = 'text-chart-2'
 
   return (
     <div className="border-ink overflow-hidden rounded-lg border">
       <button
         type="button"
-        className="flex w-full items-center justify-between gap-0 text-left"
+        className="flex w-full min-w-0 flex-col gap-3 text-left @min-[40rem]/admin:flex-row @min-[40rem]/admin:items-center @min-[40rem]/admin:justify-between @min-[40rem]/admin:gap-0"
         aria-expanded={expanded}
         onClick={() => {
           setExpanded(value => !value)
         }}
       >
-        <span className="bg-ink text-primary-foreground inline-flex w-fit items-center gap-2 px-4 py-2 text-sm">
+        <span className="bg-ink text-primary-foreground inline-flex max-w-full min-w-0 items-center gap-2 px-4 py-2 text-sm">
           <ChevronDown
             className={cn(
-              'size-4 transition-transform',
+              'size-4 shrink-0 transition-transform',
               expanded ? '' : '-rotate-90'
             )}
+            aria-hidden
           />
 
-          <span>{stub.displayName}</span>
+          <span className="truncate">{stub.displayName}</span>
         </span>
 
-        <div className="grid grid-cols-2 gap-6 text-xs">
+        <div className="grid min-w-0 grid-cols-2 gap-4 px-3 pb-3 text-xs @min-[40rem]/admin:gap-6 @min-[40rem]/admin:px-4 @min-[40rem]/admin:pb-0">
           <StatusField
             label="Gross pay"
             value={<MoneyAmount cents={stub.grossPayCents} />}
-            className="flex gap-2"
+            className="flex min-w-0 flex-wrap gap-2"
           />
 
           <StatusField
             label="net pay"
             value={<MoneyAmount cents={stub.netPayCents} />}
-            className="flex gap-2"
+            className="flex min-w-0 flex-wrap gap-2"
           />
         </div>
       </button>
@@ -720,7 +784,7 @@ function StudentPayReportCard(props: { stub: PayRunReport['stubs'][number] }) {
         }}
       >
         <div className="min-h-0 overflow-hidden">
-          <div className="border-ink grid gap-4 border-t bg-[#ddd] px-3 py-4">
+          <div className="border-ink bg-muted grid gap-4 border-t px-3 py-4">
             <div className="grid gap-3 @min-[40rem]/admin:grid-cols-2">
               <For data={breakdown.panels} getKey={panel => panel.title}>
                 {panel => (
@@ -780,7 +844,7 @@ function PayBreakdownPanel(props: {
 }) {
   return (
     <div className="bg-background space-y-2 rounded-lg py-2">
-      <div className="flex items-center justify-between border-b border-[#8a7574] px-3 pb-2">
+      <div className="flex items-center justify-between border-b border-border px-3 pb-2">
         <p className="text-base uppercase">{props.title}</p>
 
         <p className={cn('text-base font-bold', props.accentColor)}>
@@ -827,7 +891,7 @@ function PayBreakdownGroup(props: {
           )}
         </For>
 
-        <div className="border-b border-[#8a7574]" />
+        <div className="border-border border-b" />
 
         <StatusField
           label={lastField.label}
@@ -886,10 +950,6 @@ function formatStatusTimestamp(ms: number): string {
     minute: '2-digit',
     hour12: false,
   })
-}
-
-function shortRunId(id: string): string {
-  return id.slice(-4).toUpperCase()
 }
 
 function formatMoneyPlain(cents: number): string {

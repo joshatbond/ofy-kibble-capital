@@ -15,7 +15,6 @@ import {
 import { useState } from 'react'
 
 import { AdminPage } from '~/components/admin/admin-shell'
-import { KibbleLoadingScreen } from '~/components/loading/kibble-loader'
 import { Case, SwitchOn } from '~/components/switch-on'
 import { Button } from '~/components/ui/button'
 import { For } from '~/components/ui/for'

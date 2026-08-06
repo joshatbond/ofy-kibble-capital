@@ -22,7 +22,7 @@ export function studentPayBreakdown(
       {
         title: 'gross pay',
         amountCents: stub.grossPayCents,
-        accentColor: 'text-emerald-700',
+        accentColor: 'text-primary',
         groups: [
           {
             title: 'Regular',
@@ -102,6 +102,32 @@ export function emptyPaystubsMessage(
     return 'No paystubs — this run was blocked.'
   }
   return 'No paystubs for this run.'
+}
+
+/** Display-only short id (last 4). Keep the full Convex id for state and API calls. */
+export function shortRunId(id: string): string {
+  return id.slice(-4).toUpperCase()
+}
+
+/** Why Run / Postpone are disabled; null when both actions may proceed. */
+export function payrollActionDisabledReason(args: {
+  isOpen: boolean
+  isReady: boolean
+}): string | null {
+  if (!args.isOpen) {
+    return 'This pay period is closed, so payroll actions are disabled.'
+  }
+  if (!args.isReady) {
+    return 'Attendance is not ready yet. Fix blocked reasons before running payroll.'
+  }
+  return null
+}
+
+/** Newline-separated block reasons for toast descriptions (not concatenated prose). */
+export function formatBlockedReasonsDescription(
+  blockReasons: ReadonlyArray<string>
+): string {
+  return blockReasons.map(reason => `• ${reason}`).join('\n')
 }
 
 export type PayRunReportViewState<TReport> =

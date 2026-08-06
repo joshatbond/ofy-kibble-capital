@@ -5,7 +5,10 @@ import type { Id } from '~/convex/_generated/dataModel'
 
 import {
   emptyPaystubsMessage,
+  formatBlockedReasonsDescription,
+  payrollActionDisabledReason,
   resolvePayRunReportViewState,
+  shortRunId,
   studentPayBreakdown,
 } from './payroll-admin-report'
 
@@ -52,8 +55,52 @@ describe('studentPayBreakdown', () => {
     expect(fields.some(field => 'cents' in field)).toBe(true)
 
     expect(breakdown.panels[0]?.amountCents).toBe(62_000)
+    expect(breakdown.panels[0]?.accentColor).toBe('text-primary')
     expect(breakdown.panels[1]?.amountCents).toBe(
       1_000 + 500 + 2_000 + 800 + 3_720 + 899 + 558
+    )
+    expect(breakdown.panels[1]?.accentColor).toBe('text-destructive')
+  })
+})
+
+describe('shortRunId', () => {
+  test('returns the last four characters uppercased for display', () => {
+    expect(shortRunId('jd7abcdefghijklmnop1234')).toBe('1234')
+    expect(shortRunId('abcd')).toBe('ABCD')
+  })
+})
+
+describe('payrollActionDisabledReason', () => {
+  test('explains a closed period first', () => {
+    expect(
+      payrollActionDisabledReason({ isOpen: false, isReady: false })
+    ).toBe('This pay period is closed, so payroll actions are disabled.')
+  })
+
+  test('explains attendance not ready when the period is open', () => {
+    expect(
+      payrollActionDisabledReason({ isOpen: true, isReady: false })
+    ).toBe(
+      'Attendance is not ready yet. Fix blocked reasons before running payroll.'
+    )
+  })
+
+  test('returns null when actions may proceed', () => {
+    expect(payrollActionDisabledReason({ isOpen: true, isReady: true })).toBe(
+      null
+    )
+  })
+})
+
+describe('formatBlockedReasonsDescription', () => {
+  test('lists each reason on its own line', () => {
+    expect(
+      formatBlockedReasonsDescription([
+        'Missing attendance for 2 students',
+        'No active students in period',
+      ])
+    ).toBe(
+      '• Missing attendance for 2 students\n• No active students in period'
     )
   })
 })
@@ -164,3 +211,4 @@ function sampleStub(
     ...overrides,
   }
 }
+

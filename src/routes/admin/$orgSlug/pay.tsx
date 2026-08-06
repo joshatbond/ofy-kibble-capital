@@ -34,19 +34,26 @@ function AdminPayPageBody(props: {
   return (
     <SwitchOn value={payroll}>
       <Case predicate={payroll.status === 'loading'}>
-        <p className="text-muted-foreground p-8 text-sm">Loading payroll…</p>
+        <p className="text-muted-foreground p-8 text-sm" role="status">
+          Loading payroll…
+        </p>
       </Case>
 
       <Case predicate={payroll.status === 'unauthorized'}>
-        <p className="p-8 text-sm">
-          This classroom does not match your teacher account.
-        </p>
+        <div className="grid gap-4 p-8">
+          <p
+            className="border-destructive bg-destructive/10 text-destructive border-2 p-4 text-sm font-bold"
+            role="alert"
+          >
+            This classroom does not match your teacher account.
+          </p>
 
-        <p className="px-8 text-sm">
-          <Link to="/admin" className="text-primary font-bold underline">
-            Back to dashboard
-          </Link>
-        </p>
+          <p className="text-sm">
+            <Link to="/admin" className="text-primary font-bold underline">
+              Back to dashboard
+            </Link>
+          </p>
+        </div>
       </Case>
 
       <Case
@@ -57,12 +64,19 @@ function AdminPayPageBody(props: {
       >
         {state => (
           <div className="grid gap-4 p-8">
-            <p className="text-destructive text-sm font-bold" role="alert">
+            <p
+              className="border-destructive bg-destructive/10 text-destructive border-2 p-4 text-sm font-bold"
+              role="alert"
+            >
               {state.message}
             </p>
 
             <div>
-              <Button type="button" variant="brutal-outline" onClick={props.onRetry}>
+              <Button
+                type="button"
+                variant="brutal-outline"
+                onClick={props.onRetry}
+              >
                 Retry
               </Button>
             </div>
