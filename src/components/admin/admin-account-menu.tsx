@@ -66,7 +66,7 @@ export function AdminAccountMenu(props: AdminAccountMenuProps) {
           size={layout === 'sidebar' ? 'default' : 'icon'}
           className={cn(
             layout === 'sidebar'
-              ? 'border-ink hover:bg-muted h-auto w-full justify-start gap-3 rounded-lg border-2 px-3 py-3'
+              ? 'border-ink hover:bg-muted h-auto w-full min-w-0 shrink justify-start gap-3 rounded-lg border-2 px-3 py-3'
               : 'size-10 rounded-full p-0'
           )}
           aria-label="Open account menu"

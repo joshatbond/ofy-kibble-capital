@@ -169,7 +169,7 @@ function AdminSidebar(props: {
   showAccountMenu: boolean
 }) {
   return (
-    <aside className="border-ink bg-background hidden min-h-0 grid-rows-[auto_minmax(0,1fr)_auto] border-r-2 @min-[48rem]/admin:grid">
+    <aside className="border-ink bg-background hidden min-h-0 min-w-0 grid-rows-[auto_minmax(0,1fr)_auto] border-r-2 @min-[48rem]/admin:grid">
       <div className="p-8 pb-4">
         <p className="font-heading text-primary text-xl font-bold">
           Kibble Admin
@@ -184,7 +184,7 @@ function AdminSidebar(props: {
         <AdminSidebarNav current={props.current} navParams={props.navParams} />
       </div>
 
-      <div className="border-ink border-t-2 p-4">
+      <div className="border-ink min-w-0 border-t-2 p-4">
         {props.showAccountMenu ? (
           <AdminAccountMenu {...props.accountMenu} layout="sidebar" />
         ) : null}
