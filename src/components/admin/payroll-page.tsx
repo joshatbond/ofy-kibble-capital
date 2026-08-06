@@ -22,6 +22,7 @@ import { useSafeQuery } from '~/hooks/use-safe-query'
 import { cn } from '~/lib/class-name-merge'
 import { formatIsoDay } from '~/lib/format-iso-day'
 import {
+  emptyPaystubsMessage,
   resolvePayRunReportViewState,
   studentPayBreakdown,
 } from '~/lib/payroll-admin-report'
@@ -597,7 +598,7 @@ function PayRunReportBody(props: {
         <SwitchOn>
           <Case predicate={report.stubs.length === 0}>
             <p className="text-muted-foreground text-sm">
-              Error loading pay report.
+              {emptyPaystubsMessage(run.status)}
             </p>
           </Case>
 

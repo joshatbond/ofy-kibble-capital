@@ -4,6 +4,7 @@ import { describe, expect, test } from 'vitest'
 import type { Id } from '~/convex/_generated/dataModel'
 
 import {
+  emptyPaystubsMessage,
   resolvePayRunReportViewState,
   studentPayBreakdown,
 } from './payroll-admin-report'
@@ -95,6 +96,19 @@ describe('resolvePayRunReportViewState', () => {
     expect(
       resolvePayRunReportViewState({ status: 'success', data: report })
     ).toEqual({ status: 'ready', report })
+  })
+})
+
+describe('emptyPaystubsMessage', () => {
+  test('explains empty stubs for blocked runs without calling it an error', () => {
+    expect(emptyPaystubsMessage('blocked')).toBe(
+      'No paystubs — this run was blocked.'
+    )
+  })
+
+  test('uses calm empty copy for other run statuses', () => {
+    expect(emptyPaystubsMessage('succeeded')).toBe('No paystubs for this run.')
+    expect(emptyPaystubsMessage('postponed')).toBe('No paystubs for this run.')
   })
 })
 

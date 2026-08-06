@@ -94,6 +94,16 @@ export function resolvePayRunReportViewState<TReport>(
   return { status: 'ready', report: report.data }
 }
 
+/** Empty Individual Pay copy — blocked runs intentionally have zero stubs. */
+export function emptyPaystubsMessage(
+  runStatus: PayRunAdminReport['run']['status']
+): string {
+  if (runStatus === 'blocked') {
+    return 'No paystubs — this run was blocked.'
+  }
+  return 'No paystubs for this run.'
+}
+
 export type PayRunReportViewState<TReport> =
   | { status: 'loading' }
   | { status: 'error'; message: string }

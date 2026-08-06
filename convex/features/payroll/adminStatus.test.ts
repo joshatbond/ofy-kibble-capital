@@ -210,6 +210,40 @@ describe('getPayPeriodAdminDetailsForOrganization', () => {
     expect(details.attendance.status).toBe('blocked')
   })
 
+  test('returns empty stubs for a blocked run report without failing', async () => {
+    const t = initConvexTest()
+    const { teacher, organizationId } = await setupDevTeacherClassroom(t)
+    const period = await t.mutation(
+      internal.features.payrollTesting.ensureCurrentPayPeriod,
+      { organizationId, nowMs: Date.UTC(2026, 6, 14, 15, 0, 0) }
+    )
+
+    const run = await t.mutation(internal.features.payrollTesting.runPayPeriod, {
+      organizationId,
+      payPeriodId: period._id,
+      nowMs: Date.UTC(2026, 6, 14, 15, 30, 0),
+    })
+    expect(run.status).toBe('blocked')
+    if (run.status !== 'blocked') {
+      return
+    }
+
+    const report = await teacher.client.query(
+      api.features.payroll.getPayRunAdminReportForOrganization,
+      { organizationId, payRunId: run.payRunId }
+    )
+
+    expect(report).toMatchObject({
+      studentCount: 0,
+      fundsDispersedCents: 0,
+      stubs: [],
+      run: {
+        status: 'blocked',
+        blockReasons: ['No active students on the roster.'],
+      },
+    })
+  })
+
   test('returns null when no open pay period exists', async () => {
     const t = initConvexTest()
     const { teacher, organizationId } = await setupDevTeacherClassroom(t)
