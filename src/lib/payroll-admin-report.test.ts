@@ -1,8 +1,12 @@
+import { ConvexError } from 'convex/values'
 import { describe, expect, test } from 'vitest'
 
 import type { Id } from '~/convex/_generated/dataModel'
 
-import { studentPayBreakdown } from './payroll-admin-report'
+import {
+  resolvePayRunReportViewState,
+  studentPayBreakdown,
+} from './payroll-admin-report'
 
 import type { AdminPaystubLine, PayBreakdownField } from './payroll-admin-report'
 
@@ -50,6 +54,47 @@ describe('studentPayBreakdown', () => {
     expect(breakdown.panels[1]?.amountCents).toBe(
       1_000 + 500 + 2_000 + 800 + 3_720 + 899 + 558
     )
+  })
+})
+
+describe('resolvePayRunReportViewState', () => {
+  test('maps pending to loading', () => {
+    expect(resolvePayRunReportViewState({ status: 'pending' })).toEqual({
+      status: 'loading',
+    })
+  })
+
+  test('maps query errors to a user-facing message', () => {
+    expect(
+      resolvePayRunReportViewState({
+        status: 'error',
+        error: new ConvexError('Pay run not found.'),
+      })
+    ).toEqual({
+      status: 'error',
+      message: 'Pay run not found.',
+    })
+  })
+
+  test('uses fallback when the error is not a ConvexError', () => {
+    expect(
+      resolvePayRunReportViewState({
+        status: 'error',
+        error: new Error(
+          '[CONVEX Q(features/payroll:getPayRunAdminReport)] boom'
+        ),
+      })
+    ).toEqual({
+      status: 'error',
+      message: 'Could not load pay run report.',
+    })
+  })
+
+  test('maps success to ready with the report payload', () => {
+    const report = { studentCount: 0, stubs: [] }
+    expect(
+      resolvePayRunReportViewState({ status: 'success', data: report })
+    ).toEqual({ status: 'ready', report })
   })
 })
 

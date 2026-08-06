@@ -1,5 +1,8 @@
 import type { api } from '~/convex/_generated/api'
 
+import { userFacingErrorMessage } from './user-facing-error'
+
+import type { SafeQueryResult } from './safe-query'
 import type { FunctionReturnType } from 'convex/server'
 
 /** UI projection of an admin paystub line into expandable breakdown panels. */
@@ -71,6 +74,30 @@ export function studentPayBreakdown(
     ],
   }
 }
+
+/** Map a pay-run report query result into dialog view state. */
+export function resolvePayRunReportViewState<TReport>(
+  report: SafeQueryResult<TReport>
+): PayRunReportViewState<TReport> {
+  if (report.status === 'pending') {
+    return { status: 'loading' }
+  }
+  if (report.status === 'error') {
+    return {
+      status: 'error',
+      message: userFacingErrorMessage(
+        report.error,
+        'Could not load pay run report.'
+      ),
+    }
+  }
+  return { status: 'ready', report: report.data }
+}
+
+export type PayRunReportViewState<TReport> =
+  | { status: 'loading' }
+  | { status: 'error'; message: string }
+  | { status: 'ready'; report: TReport }
 
 export type PayRunAdminReport = FunctionReturnType<
   typeof api.features.payroll.getPayRunAdminReportForOrganization

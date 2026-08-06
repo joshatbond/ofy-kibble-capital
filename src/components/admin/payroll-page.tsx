@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from 'convex/react'
+import { useMutation } from 'convex/react'
 import { ChevronDown, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -18,14 +18,19 @@ import {
 } from '~/components/ui/popover'
 import { api } from '~/convex/_generated/api'
 import type { Id } from '~/convex/_generated/dataModel'
+import { useSafeQuery } from '~/hooks/use-safe-query'
 import { cn } from '~/lib/class-name-merge'
 import { formatIsoDay } from '~/lib/format-iso-day'
-import { studentPayBreakdown } from '~/lib/payroll-admin-report'
+import {
+  resolvePayRunReportViewState,
+  studentPayBreakdown,
+} from '~/lib/payroll-admin-report'
 import type { PayBreakdownField } from '~/lib/payroll-admin-report'
 import { userFacingErrorMessage } from '~/lib/user-facing-error'
 
 import { Case, SwitchOn } from '../switch-on'
 import { Field, FieldLabel } from '../ui/field'
+
 
 import type { FunctionReturnType } from 'convex/server'
 import type { ReactNode } from 'react'
@@ -395,15 +400,7 @@ function PayRunReportDialog(props: {
   onClose: () => void
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null)
-  const report = useQuery(
-    api.features.payroll.getPayRunAdminReportForOrganization,
-    props.payRunId === null
-      ? 'skip'
-      : {
-          organizationId: props.organizationId,
-          payRunId: props.payRunId,
-        }
-  )
+  const [retryKey, setRetryKey] = useState(0)
 
   useEffect(() => {
     const dialog = dialogRef.current
@@ -435,17 +432,91 @@ function PayRunReportDialog(props: {
           event.stopPropagation()
         }}
       >
-        <SwitchOn>
-          <Case predicate={report === undefined}>
-            <p className="text-muted-foreground text-sm">Loading pay report…</p>
-          </Case>
-
-          <Case>
-            <PayRunReportBody report={report!} onClose={props.onClose} />
+        <SwitchOn value={props.payRunId}>
+          <Case
+            predicate={(
+              payRunId: Id<'payRuns'> | null
+            ): payRunId is Id<'payRuns'> => payRunId !== null}
+          >
+            {payRunId => (
+              <PayRunReportDialogContent
+                key={retryKey}
+                organizationId={props.organizationId}
+                payRunId={payRunId}
+                onClose={props.onClose}
+                onRetry={() => {
+                  setRetryKey(value => value + 1)
+                }}
+              />
+            )}
           </Case>
         </SwitchOn>
       </div>
     </dialog>
+  )
+}
+
+function PayRunReportDialogContent(props: {
+  organizationId: string
+  payRunId: Id<'payRuns'>
+  onClose: () => void
+  onRetry: () => void
+}) {
+  const reportQuery = useSafeQuery(
+    api.features.payroll.getPayRunAdminReportForOrganization,
+    {
+      organizationId: props.organizationId,
+      payRunId: props.payRunId,
+    }
+  )
+  const view = resolvePayRunReportViewState(reportQuery)
+
+  return (
+    <SwitchOn value={view}>
+      <Case predicate={view.status === 'loading'}>
+        <p className="text-muted-foreground text-sm">Loading pay report…</p>
+      </Case>
+
+      <Case
+        predicate={(
+          state: typeof view
+        ): state is Extract<typeof view, { status: 'error' }> =>
+          state.status === 'error'}
+      >
+        {state => (
+          <div className="grid gap-4">
+            <p className="text-destructive text-sm font-bold" role="alert">
+              {state.message}
+            </p>
+
+            <div className="flex flex-wrap gap-2">
+              <Button
+                type="button"
+                variant="brutal-outline"
+                onClick={props.onRetry}
+              >
+                Retry
+              </Button>
+
+              <Button type="button" variant="ghost" onClick={props.onClose}>
+                Close
+              </Button>
+            </div>
+          </div>
+        )}
+      </Case>
+
+      <Case
+        predicate={(
+          state: typeof view
+        ): state is Extract<typeof view, { status: 'ready' }> =>
+          state.status === 'ready'}
+      >
+        {state => (
+          <PayRunReportBody report={state.report} onClose={props.onClose} />
+        )}
+      </Case>
+    </SwitchOn>
   )
 }
 
