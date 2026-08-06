@@ -1,4 +1,5 @@
 import { applyPaycheckPipeline } from '../banking/paycheckPipeline'
+import { userError } from '../appError'
 import { resolveEffectiveSettings } from '../settings/effectiveSettings'
 
 import { validateStubAttendanceForPayPeriod } from './attendanceValidation'
@@ -24,30 +25,25 @@ export async function executePayRunForPeriod(
 ): Promise<PayRunExecutionResult> {
   const payPeriod = await ctx.db.get('payPeriods', args.payPeriodId)
   if (payPeriod === null) {
-    throw new Error('Pay period not found.')
+    userError('Pay period not found.')
   }
   if (payPeriod.organizationId !== args.organizationId) {
-    throw new Error('Pay period does not belong to this organization.')
+    userError('Pay period does not belong to this organization.')
   }
 
   const existingSuccess = await findSucceededPayRun(ctx, args.payPeriodId)
   if (existingSuccess !== null) {
-    const stubs = await ctx.db
-      .query('paystubs')
-      .withIndex('by_payRunId', q => q.eq('payRunId', existingSuccess._id))
-      .collect()
-
     return {
       status: 'succeeded',
       payRunId: existingSuccess._id,
       payPeriodId: args.payPeriodId,
-      stubCount: stubs.length,
+      stubCount: existingSuccess.stubCount,
       alreadyCompleted: true,
     }
   }
 
   if (payPeriod.status === 'closed') {
-    throw new Error('Pay period is closed without a successful pay run.')
+    userError('Pay period is closed without a successful pay run.')
   }
 
   const validation = await validateStubAttendanceForPayPeriod(ctx, {
@@ -64,6 +60,8 @@ export async function executePayRunForPeriod(
       blockReasons: validation.blockReasons,
       startedAt: args.nowMs,
       completedAt: args.nowMs,
+      totalFundsCents: 0,
+      stubCount: 0,
     })
 
     return {
@@ -82,9 +80,12 @@ export async function executePayRunForPeriod(
     status: 'pending',
     triggeredBy: args.triggeredBy,
     startedAt: args.nowMs,
+    totalFundsCents: 0,
+    stubCount: 0,
   })
 
   let stubCount = 0
+  let totalFundsCents = 0
 
   for (const attendance of validation.records) {
     const roster = await ctx.db.get(
@@ -170,11 +171,14 @@ export async function executePayRunForPeriod(
     }
 
     stubCount += 1
+    totalFundsCents += math.netPayCents
   }
 
   await ctx.db.patch('payRuns', payRunId, {
     status: 'succeeded',
     completedAt: args.nowMs,
+    totalFundsCents,
+    stubCount,
   })
   await ctx.db.patch('payPeriods', args.payPeriodId, {
     status: 'closed',

@@ -175,13 +175,13 @@ describe('student paystub APIs', () => {
 
     await expect(
       ctx.student.client.query(api.features.payroll.getMyPaystub, { paystubId })
-    ).rejects.toThrow(/missing pay period/)
+    ).rejects.toThrow(/Could not load paystub/)
 
     await expect(
       ctx.student.client.query(api.features.payroll.listMyPaystubs, {
         paginationOpts: { numItems: 10, cursor: null },
       })
-    ).rejects.toThrow(/missing pay period/)
+    ).rejects.toThrow(/Could not load paystubs/)
   })
 
   test('mark-viewed is idempotent, preserves viewedAt, and decrements once', async () => {

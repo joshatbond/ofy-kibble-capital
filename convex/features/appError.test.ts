@@ -38,18 +38,33 @@ describe('appError', () => {
     }
   })
 
-  test('toUserError passes through short plain Error messages', () => {
+  test('toUserError does not pass through unknown plain Error messages', () => {
     expect.assertions(2)
     try {
       toUserError(
-        new Error('Only an open pay period can be postponed.'),
-        'fallback'
+        new Error(
+          'Active roster student required for j57abc123:implementation detail.'
+        ),
+        'Could not run payroll.'
       )
       expect.unreachable('expected toUserError to throw')
     } catch (error) {
       expect(error).toBeInstanceOf(ConvexError)
+      expect((error as ConvexError<string>).data).toBe('Could not run payroll.')
+    }
+  })
+
+  test('toUserError uses fallback for short product-looking plain Errors', () => {
+    expect.assertions(1)
+    try {
+      toUserError(
+        new Error('Only an open pay period can be postponed.'),
+        'Could not postpone payday.'
+      )
+      expect.unreachable('expected toUserError to throw')
+    } catch (error) {
       expect((error as ConvexError<string>).data).toBe(
-        'Only an open pay period can be postponed.'
+        'Could not postpone payday.'
       )
     }
   })
@@ -92,7 +107,7 @@ describe('appError', () => {
     }
   })
 
-  test('toUserError rethrows existing ConvexError', () => {
+  test('toUserError rethrows existing ConvexError (approved product errors)', () => {
     const original = new ConvexError('Keep me.')
     expect.assertions(1)
     try {

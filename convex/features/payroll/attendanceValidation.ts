@@ -1,3 +1,5 @@
+import { userError } from '../appError'
+
 import { loadStubAttendance } from './attendanceSource'
 import { validateAttendanceForPayRun } from './validateAttendance'
 
@@ -39,11 +41,11 @@ export async function validateStubAttendanceForPayPeriod(
 > {
   const payPeriod = await ctx.db.get('payPeriods', args.payPeriodId)
   if (payPeriod === null) {
-    throw new Error('Pay period not found.')
+    userError('Pay period not found.')
   }
 
   if (payPeriod.organizationId !== args.organizationId) {
-    throw new Error('Pay period does not belong to this organization.')
+    userError('Pay period does not belong to this organization.')
   }
 
   const activeStudents = await listActiveAttendanceRoster(

@@ -1,6 +1,7 @@
 import { orgScope } from '@djpanda/convex-tenants'
 
 import { components } from '../../_generated/api'
+import { userError } from '../appError'
 import { isTeacherMemberRole } from '../tenants/roles'
 
 import { authz } from './authz'
@@ -19,7 +20,7 @@ export async function requireTeacherForOrg(
   })
 
   if (member === null || !isTeacherMemberRole(member.role)) {
-    throw new Error('Teacher access required')
+    userError('Teacher access required')
   }
 
   await authz.require(ctx, userId, permission, orgScope(organizationId))

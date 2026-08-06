@@ -1,3 +1,5 @@
+import { userError } from '../appError'
+
 import {
   civilDateInProductTimezone,
   compareIsoDates,
@@ -55,20 +57,18 @@ export async function postponePayPeriodRun(
 
   const payPeriod = await ctx.db.get('payPeriods', args.payPeriodId)
   if (payPeriod === null) {
-    throw new Error('Pay period not found.')
+    userError('Pay period not found.')
   }
   if (payPeriod.organizationId !== args.organizationId) {
-    throw new Error('Pay period does not belong to this organization.')
+    userError('Pay period does not belong to this organization.')
   }
   if (payPeriod.status !== 'open') {
-    throw new Error('Only an open pay period can be postponed.')
+    userError('Only an open pay period can be postponed.')
   }
 
   const succeeded = await findSucceededPayRun(ctx, args.payPeriodId)
   if (succeeded !== null) {
-    throw new Error(
-      'Cannot postpone a pay period that already paid successfully.'
-    )
+    userError('Cannot postpone a pay period that already paid successfully.')
   }
 
   const today = civilDateInProductTimezone(args.nowMs)
@@ -79,10 +79,10 @@ export async function postponePayPeriodRun(
   )
 
   if (compareIsoDates(args.postponedUntil, today) <= 0) {
-    throw new Error('Postpone date must be after today in product timezone.')
+    userError('Postpone date must be after today in product timezone.')
   }
   if (compareIsoDates(args.postponedUntil, currentEffective) <= 0) {
-    throw new Error('Postpone date must be after the current effective payday.')
+    userError('Postpone date must be after the current effective payday.')
   }
 
   const payRunId = await ctx.db.insert('payRuns', {
@@ -93,6 +93,8 @@ export async function postponePayPeriodRun(
     postponedUntil: args.postponedUntil,
     startedAt: args.nowMs,
     completedAt: args.nowMs,
+    totalFundsCents: 0,
+    stubCount: 0,
   })
 
   return {

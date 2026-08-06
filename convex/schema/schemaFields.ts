@@ -292,6 +292,16 @@ export const payRunsTableFields = {
   startedAt: v.number(),
   /** Unix ms when status became succeeded or blocked (terminal for this attempt). */
   completedAt: v.optional(v.number()),
+  /**
+   * Denormalized sum of paystub `netPayCents` for succeeded runs; 0 otherwise.
+   * Written transactionally with the run so admin lists avoid rescanning stubs.
+   */
+  totalFundsCents: v.number(),
+  /**
+   * Denormalized paystub count for succeeded runs; 0 otherwise.
+   * Written transactionally with the run.
+   */
+  stubCount: v.number(),
 }
 export const paystubsTableFields = {
   organizationId: v.string(),

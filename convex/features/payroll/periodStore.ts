@@ -53,6 +53,20 @@ export async function listPayPeriodsForOrg(
     return a.payDate < b.payDate ? 1 : -1
   })
 }
+
+/** Open pay period for an org via `by_organizationId_status` (at most one expected). */
+export async function findOpenPayPeriodForOrg(
+  ctx: QueryCtx | MutationCtx,
+  organizationId: string
+): Promise<Doc<'payPeriods'> | null> {
+  return await ctx.db
+    .query('payPeriods')
+    .withIndex('by_organizationId_status', q =>
+      q.eq('organizationId', organizationId).eq('status', 'open')
+    )
+    .order('desc')
+    .first()
+}
 export async function findPayPeriodByPayDate(
   ctx: QueryCtx | MutationCtx,
   organizationId: string,

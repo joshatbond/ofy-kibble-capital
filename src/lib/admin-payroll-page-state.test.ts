@@ -29,6 +29,7 @@ describe('resolveAdminPayrollPageState', () => {
   const page = {
     current: { period: { _id: 'period_1' } },
     previousRuns: [],
+    previousRunsHasMore: false,
   }
 
   test('stays loading while context is pending', () => {

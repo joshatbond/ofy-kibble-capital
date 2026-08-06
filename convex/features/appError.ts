@@ -11,7 +11,10 @@ export function userError(message: string): never {
 
 /**
  * Re-throw as {@link ConvexError} for public API boundaries.
- * Keeps an existing ConvexError; maps known internal messages; otherwise uses fallback.
+ *
+ * Safe by default: only existing {@link ConvexError}s (e.g. from {@link userError})
+ * and explicitly mapped `known` patterns reach clients. Unknown plain Error
+ * messages — including IDs and implementation details — map to `fallback`.
  */
 export function toUserError(
   error: unknown,
@@ -27,16 +30,6 @@ export function toUserError(
     if (entry.pattern.test(raw)) {
       throw new ConvexError(entry.message)
     }
-  }
-
-  // Plain single-line product errors thrown deeper in helpers.
-  if (
-    raw.length > 0 &&
-    raw.length <= 180 &&
-    !raw.includes('\n') &&
-    !raw.includes('[CONVEX')
-  ) {
-    throw new ConvexError(raw)
   }
 
   throw new ConvexError(fallback)

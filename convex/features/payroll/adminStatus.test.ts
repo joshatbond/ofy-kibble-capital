@@ -7,6 +7,8 @@ import {
   setupDevTeacherClassroom,
 } from '../../test.setup'
 
+import { PREVIOUS_PAY_RUNS_LIMIT } from './adminStatus'
+
 import type { Id } from '../../_generated/dataModel'
 import type { ConvexTest } from '../../test.setup'
 
@@ -317,6 +319,7 @@ describe('getPayrollAdminPageForOrganization', () => {
     expect(page?.current.latestRun).toBeNull()
     expect(page?.current.runs).toEqual([])
     expect(page?.previousRuns).toEqual([])
+    expect(page?.previousRunsHasMore).toBe(false)
   })
 
   test('reports ready attendance on the current period when a student is active', async () => {
@@ -394,6 +397,8 @@ describe('getPayrollAdminPageForOrganization', () => {
         triggeredBy: 'manual',
         startedAt: Date.UTC(2026, 5, 16, 15, 0, 0),
         completedAt: Date.UTC(2026, 5, 16, 15, 1, 0),
+        totalFundsCents: 0,
+        stubCount: 0,
       })
       const blockedId = await ctx.db.insert('payRuns', {
         organizationId,
@@ -403,6 +408,8 @@ describe('getPayrollAdminPageForOrganization', () => {
         blockReasons: ['No active students on the roster.'],
         startedAt: Date.UTC(2026, 5, 30, 15, 0, 0),
         completedAt: Date.UTC(2026, 5, 30, 15, 1, 0),
+        totalFundsCents: 0,
+        stubCount: 0,
       })
       await ctx.db.insert('payRuns', {
         organizationId,
@@ -412,6 +419,8 @@ describe('getPayrollAdminPageForOrganization', () => {
         postponedUntil: '2026-06-09',
         startedAt: Date.UTC(2026, 5, 2, 16, 0, 0),
         completedAt: Date.UTC(2026, 5, 2, 16, 0, 0),
+        totalFundsCents: 0,
+        stubCount: 0,
       })
 
       return { succeededId, blockedId }
@@ -435,6 +444,56 @@ describe('getPayrollAdminPageForOrganization', () => {
     )
     const startedAts = page?.previousRuns.map(run => run.startedAt) ?? []
     expect(startedAts).toEqual([...startedAts].sort((a, b) => b - a))
+    expect(page?.previousRunsHasMore).toBe(false)
+  })
+
+  test('bounds previous run history and sets previousRunsHasMore', async () => {
+    const t = initConvexTest()
+    const { teacher, organizationId } = await setupDevTeacherClassroom(t)
+    const openPeriod = await t.mutation(
+      internal.features.payrollTesting.ensureCurrentPayPeriod,
+      { organizationId, nowMs: Date.UTC(2026, 6, 14, 15, 0, 0) }
+    )
+
+    await t.run(async ctx => {
+      for (let i = 0; i < PREVIOUS_PAY_RUNS_LIMIT + 3; i += 1) {
+        const periodId = await ctx.db.insert('payPeriods', {
+          organizationId,
+          startDate: '2026-01-01',
+          endDate: '2026-01-14',
+          payDate: `2026-01-${String((i % 28) + 1).padStart(2, '0')}`,
+          scheduleType: 'biweekly',
+          isTransition: false,
+          status: 'closed',
+          createdAt: Date.UTC(2026, 0, 1, 12, 0, i),
+          closedAt: Date.UTC(2026, 0, 15, 15, 0, i),
+        })
+        await ctx.db.insert('payRuns', {
+          organizationId,
+          payPeriodId: periodId,
+          status: i % 2 === 0 ? 'succeeded' : 'blocked',
+          triggeredBy: 'manual',
+          startedAt: Date.UTC(2026, 0, 15, 15, 0, i),
+          completedAt: Date.UTC(2026, 0, 15, 15, 1, i),
+          totalFundsCents: i % 2 === 0 ? 1000 + i : 0,
+          stubCount: i % 2 === 0 ? 1 : 0,
+        })
+      }
+    })
+
+    const page = await teacher.client.query(
+      api.features.payroll.getPayrollAdminPageForOrganization,
+      { organizationId }
+    )
+
+    expect(page?.current.period._id).toBe(openPeriod._id)
+    expect(page?.previousRuns).toHaveLength(PREVIOUS_PAY_RUNS_LIMIT)
+    expect(page?.previousRunsHasMore).toBe(true)
+    expect(
+      page?.previousRuns.every(
+        run => run.status === 'succeeded' || run.status === 'blocked'
+      )
+    ).toBe(true)
   })
 })
 
@@ -461,6 +520,8 @@ describe('getPayRunAdminReportForOrganization', () => {
         blockReasons: ['No active students on the roster.'],
         startedAt: Date.UTC(2026, 6, 14, 15, 30, 0),
         completedAt: Date.UTC(2026, 6, 14, 15, 30, 0),
+        totalFundsCents: 0,
+        stubCount: 0,
       })
     })
 
@@ -494,6 +555,8 @@ describe('getPayRunAdminReportForOrganization', () => {
         blockReasons: ['No active students on the roster.'],
         startedAt: Date.UTC(2026, 6, 14, 15, 30, 0),
         completedAt: Date.UTC(2026, 6, 14, 15, 30, 0),
+        totalFundsCents: 0,
+        stubCount: 0,
       })
     })
     const stranger = await asAuthedUser(t, {
@@ -531,6 +594,8 @@ describe('getPayRunAdminReportForOrganization', () => {
         triggeredBy: 'manual',
         startedAt: Date.UTC(2026, 6, 14, 15, 30, 0),
         completedAt: Date.UTC(2026, 6, 14, 15, 30, 0),
+        totalFundsCents: 0,
+        stubCount: 0,
       })
       await ctx.db.delete('payRuns', id)
       return id
@@ -561,6 +626,8 @@ describe('getPayRunAdminReportForOrganization', () => {
         triggeredBy: 'manual',
         startedAt: Date.UTC(2026, 6, 14, 15, 30, 0),
         completedAt: Date.UTC(2026, 6, 14, 15, 31, 0),
+        totalFundsCents: 0,
+        stubCount: 0,
       })
     })
 
@@ -570,6 +637,42 @@ describe('getPayRunAdminReportForOrganization', () => {
         { organizationId, payRunId: foreignRunId }
       )
     ).rejects.toThrow(/does not belong to this organization/)
+  })
+
+  test('rejects when the pay period belongs to another organization', async () => {
+    const t = initConvexTest()
+    const { teacher, organizationId } = await setupDevTeacherClassroom(t)
+
+    const payRunId = await t.run(async ctx => {
+      const foreignPeriodId = await ctx.db.insert('payPeriods', {
+        organizationId: 'org_foreign_period',
+        startDate: '2026-07-06',
+        endDate: '2026-07-12',
+        payDate: '2026-07-17',
+        scheduleType: 'biweekly',
+        isTransition: false,
+        status: 'closed',
+        createdAt: Date.UTC(2026, 6, 14, 15, 0, 0),
+      })
+      return await ctx.db.insert('payRuns', {
+        organizationId,
+        payPeriodId: foreignPeriodId,
+        status: 'blocked',
+        triggeredBy: 'manual',
+        blockReasons: ['No active students on the roster.'],
+        startedAt: Date.UTC(2026, 6, 14, 15, 30, 0),
+        completedAt: Date.UTC(2026, 6, 14, 15, 30, 0),
+        totalFundsCents: 0,
+        stubCount: 0,
+      })
+    })
+
+    await expect(
+      teacher.client.query(
+        api.features.payroll.getPayRunAdminReportForOrganization,
+        { organizationId, payRunId }
+      )
+    ).rejects.toThrow(/Pay period does not belong to this organization/)
   })
 
   test('returns empty stubs for a blocked run without failing', async () => {
