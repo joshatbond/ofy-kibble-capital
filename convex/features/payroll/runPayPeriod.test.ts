@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test, vi } from 'vitest'
 
-import { api } from '../../_generated/api'
+import { api, internal } from '../../_generated/api'
 import {
   asAuthedUser,
   initConvexTest,
@@ -19,13 +19,13 @@ describe('runPayPeriod', () => {
     const t = initConvexTest()
     const { teacher, organizationId } = await setupDevTeacherClassroom(t)
 
-    const period = await teacher.client.mutation(
-      api.features.payroll.ensureCurrentPayPeriod,
+    const period = await t.mutation(
+      internal.features.payrollTesting.ensureCurrentPayPeriod,
       { organizationId, nowMs: Date.UTC(2026, 6, 14, 15, 0, 0) }
     )
 
-    const result = await teacher.client.mutation(
-      api.features.payroll.runPayPeriod,
+    const result = await t.mutation(
+      internal.features.payrollTesting.runPayPeriod,
       {
         organizationId,
         payPeriodId: period._id,
@@ -55,19 +55,16 @@ describe('runPayPeriod', () => {
     const { teacher, organizationId, rosterStudentId, student } =
       await setupActiveStudent(t)
 
-    const period = await teacher.client.mutation(
-      api.features.payroll.ensureCurrentPayPeriod,
+    const period = await t.mutation(
+      internal.features.payrollTesting.ensureCurrentPayPeriod,
       { organizationId, nowMs: Date.UTC(2026, 6, 14, 15, 0, 0) }
     )
 
-    const first = await teacher.client.mutation(
-      api.features.payroll.runPayPeriod,
-      {
-        organizationId,
-        payPeriodId: period._id,
-        nowMs: Date.UTC(2026, 6, 14, 15, 30, 0),
-      }
-    )
+    const first = await t.mutation(internal.features.payrollTesting.runPayPeriod, {
+      organizationId,
+      payPeriodId: period._id,
+      nowMs: Date.UTC(2026, 6, 14, 15, 30, 0),
+    })
 
     expect(first).toMatchObject({
       status: 'succeeded',
@@ -120,8 +117,8 @@ describe('runPayPeriod', () => {
       status: 'closed',
     })
 
-    const second = await teacher.client.mutation(
-      api.features.payroll.runPayPeriod,
+    const second = await t.mutation(
+      internal.features.payrollTesting.runPayPeriod,
       {
         organizationId,
         payPeriodId: period._id,

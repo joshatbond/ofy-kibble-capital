@@ -17,6 +17,7 @@ import type { ConvexTest } from '../../test.setup'
 
 afterEach(() => {
   vi.unstubAllEnvs()
+  vi.useRealTimers()
 })
 
 /** 2026-07-14 08:30 America/Los_Angeles (PDT = UTC-7). */
@@ -40,13 +41,13 @@ describe('postponePayPeriod', () => {
     const t = initConvexTest()
     const { teacher, organizationId } = await setupDevTeacherClassroom(t)
 
-    const period = await teacher.client.mutation(
-      api.features.payroll.ensureCurrentPayPeriod,
+    const period = await t.mutation(
+      internal.features.payrollTesting.ensureCurrentPayPeriod,
       { organizationId, nowMs: AFTERNOON_MS }
     )
 
-    const postponed = await teacher.client.mutation(
-      api.features.payroll.postponePayPeriod,
+    const postponed = await t.mutation(
+      internal.features.payrollTesting.postponePayPeriod,
       {
         organizationId,
         payPeriodId: period._id,
@@ -84,17 +85,19 @@ describe('postponePayPeriod', () => {
     const t = initConvexTest()
     const { teacher, organizationId } = await setupDevTeacherClassroom(t)
 
-    const period = await teacher.client.mutation(
-      api.features.payroll.ensureCurrentPayPeriod,
+    const period = await t.mutation(
+      internal.features.payrollTesting.ensureCurrentPayPeriod,
       { organizationId, nowMs: AFTERNOON_MS }
     )
+
+    vi.useFakeTimers()
+    vi.setSystemTime(AFTERNOON_MS)
 
     await expect(
       teacher.client.mutation(api.features.payroll.postponePayPeriod, {
         organizationId,
         payPeriodId: period._id,
         postponedUntil: '2026-07-14',
-        nowMs: AFTERNOON_MS,
       })
     ).rejects.toThrow(/after today/)
   })
@@ -123,12 +126,12 @@ describe('processPaydayAutomationCron', () => {
     const t = initConvexTest()
     const { teacher, organizationId } = await setupActiveStudent(t)
 
-    const period = await teacher.client.mutation(
-      api.features.payroll.ensureCurrentPayPeriod,
+    const period = await t.mutation(
+      internal.features.payrollTesting.ensureCurrentPayPeriod,
       { organizationId, nowMs: AFTERNOON_MS }
     )
 
-    await teacher.client.mutation(api.features.payroll.postponePayPeriod, {
+    await t.mutation(internal.features.payrollTesting.postponePayPeriod, {
       organizationId,
       payPeriodId: period._id,
       postponedUntil: '2026-07-16',
@@ -162,7 +165,7 @@ describe('processPaydayAutomationCron', () => {
     const { teacher, organizationId, rosterStudentId } =
       await setupActiveStudent(t)
 
-    await teacher.client.mutation(api.features.payroll.ensureCurrentPayPeriod, {
+    await t.mutation(internal.features.payrollTesting.ensureCurrentPayPeriod, {
       organizationId,
       nowMs: AFTERNOON_MS,
     })

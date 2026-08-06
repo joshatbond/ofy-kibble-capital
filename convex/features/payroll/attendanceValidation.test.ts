@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test, vi } from 'vitest'
 
-import { api } from '../../_generated/api'
+import { api, internal } from '../../_generated/api'
 import {
   asAuthedUser,
   initConvexTest,
@@ -16,8 +16,8 @@ describe('validateAttendanceForPayPeriod', () => {
     const t = initConvexTest()
     const { teacher, organizationId } = await setupDevTeacherClassroom(t)
 
-    const period = await teacher.client.mutation(
-      api.features.payroll.ensureCurrentPayPeriod,
+    const period = await t.mutation(
+      internal.features.payrollTesting.ensureCurrentPayPeriod,
       {
         organizationId,
         nowMs: Date.UTC(2026, 6, 14, 15, 0, 0),
@@ -77,8 +77,8 @@ describe('validateAttendanceForPayPeriod', () => {
       return roster!._id
     })
 
-    const period = await teacher.client.mutation(
-      api.features.payroll.ensureCurrentPayPeriod,
+    const period = await t.mutation(
+      internal.features.payrollTesting.ensureCurrentPayPeriod,
       {
         organizationId,
         nowMs: Date.UTC(2026, 6, 14, 15, 0, 0),

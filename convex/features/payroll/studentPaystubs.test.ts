@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test, vi } from 'vitest'
 
-import { api } from '../../_generated/api'
+import { api, internal } from '../../_generated/api'
 import {
   asAuthedUser,
   initConvexTest,
@@ -420,15 +420,15 @@ async function postOnePaystub(
   t: ConvexTest,
   ctx: ActiveStudentContext
 ): Promise<Id<'paystubs'>> {
-  const period = await ctx.teacher.client.mutation(
-    api.features.payroll.ensureCurrentPayPeriod,
+  const period = await t.mutation(
+    internal.features.payrollTesting.ensureCurrentPayPeriod,
     {
       organizationId: ctx.organizationId,
       nowMs: Date.UTC(2026, 6, 14, 15, 0, 0),
     }
   )
 
-  await ctx.teacher.client.mutation(api.features.payroll.runPayPeriod, {
+  await t.mutation(internal.features.payrollTesting.runPayPeriod, {
     organizationId: ctx.organizationId,
     payPeriodId: period._id,
     nowMs: Date.UTC(2026, 6, 14, 15, 30, 0),

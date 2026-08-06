@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test, vi } from 'vitest'
 
-import { api } from '../../_generated/api'
+import { api, internal } from '../../_generated/api'
 import {
   asAuthedUser,
   initConvexTest,
@@ -17,9 +17,9 @@ afterEach(() => {
 describe('getPayPeriodAdminDetailsForOrganization', () => {
   test('rejects unauthenticated callers', async () => {
     const t = initConvexTest()
-    const { teacher, organizationId } = await setupDevTeacherClassroom(t)
-    const period = await teacher.client.mutation(
-      api.features.payroll.ensureCurrentPayPeriod,
+    const { organizationId } = await setupDevTeacherClassroom(t)
+    const period = await t.mutation(
+      internal.features.payrollTesting.ensureCurrentPayPeriod,
       { organizationId, nowMs: Date.UTC(2026, 6, 14, 15, 0, 0) }
     )
 
@@ -33,9 +33,9 @@ describe('getPayPeriodAdminDetailsForOrganization', () => {
 
   test('rejects non-teacher callers', async () => {
     const t = initConvexTest()
-    const { teacher, organizationId } = await setupDevTeacherClassroom(t)
-    const period = await teacher.client.mutation(
-      api.features.payroll.ensureCurrentPayPeriod,
+    const { organizationId } = await setupDevTeacherClassroom(t)
+    const period = await t.mutation(
+      internal.features.payrollTesting.ensureCurrentPayPeriod,
       { organizationId, nowMs: Date.UTC(2026, 6, 14, 15, 0, 0) }
     )
 
@@ -105,8 +105,8 @@ describe('getPayPeriodAdminDetailsForOrganization', () => {
   test('returns period, effective payday, attendance gate, and null latest run', async () => {
     const t = initConvexTest()
     const { teacher, organizationId } = await setupDevTeacherClassroom(t)
-    const period = await teacher.client.mutation(
-      api.features.payroll.ensureCurrentPayPeriod,
+    const period = await t.mutation(
+      internal.features.payrollTesting.ensureCurrentPayPeriod,
       { organizationId, nowMs: Date.UTC(2026, 6, 14, 15, 0, 0) }
     )
 
@@ -134,8 +134,8 @@ describe('getPayPeriodAdminDetailsForOrganization', () => {
 
     const t = initConvexTest()
     const { teacher, organizationId } = await setupActiveStudent(t)
-    const period = await teacher.client.mutation(
-      api.features.payroll.ensureCurrentPayPeriod,
+    const period = await t.mutation(
+      internal.features.payrollTesting.ensureCurrentPayPeriod,
       { organizationId, nowMs: Date.UTC(2026, 6, 14, 15, 0, 0) }
     )
 
@@ -156,12 +156,12 @@ describe('getPayPeriodAdminDetailsForOrganization', () => {
   test('surfaces postpone as effective payday and latest run', async () => {
     const t = initConvexTest()
     const { teacher, organizationId } = await setupDevTeacherClassroom(t)
-    const period = await teacher.client.mutation(
-      api.features.payroll.ensureCurrentPayPeriod,
+    const period = await t.mutation(
+      internal.features.payrollTesting.ensureCurrentPayPeriod,
       { organizationId, nowMs: Date.UTC(2026, 6, 14, 15, 0, 0) }
     )
 
-    await teacher.client.mutation(api.features.payroll.postponePayPeriod, {
+    await t.mutation(internal.features.payrollTesting.postponePayPeriod, {
       organizationId,
       payPeriodId: period._id,
       postponedUntil: '2026-07-21',
@@ -184,12 +184,12 @@ describe('getPayPeriodAdminDetailsForOrganization', () => {
   test('surfaces the latest blocked pay run after a manual attempt', async () => {
     const t = initConvexTest()
     const { teacher, organizationId } = await setupDevTeacherClassroom(t)
-    const period = await teacher.client.mutation(
-      api.features.payroll.ensureCurrentPayPeriod,
+    const period = await t.mutation(
+      internal.features.payrollTesting.ensureCurrentPayPeriod,
       { organizationId, nowMs: Date.UTC(2026, 6, 14, 15, 0, 0) }
     )
 
-    const run = await teacher.client.mutation(api.features.payroll.runPayPeriod, {
+    const run = await t.mutation(internal.features.payrollTesting.runPayPeriod, {
       organizationId,
       payPeriodId: period._id,
       nowMs: Date.UTC(2026, 6, 14, 15, 30, 0),
@@ -225,8 +225,8 @@ describe('getPayPeriodAdminDetailsForOrganization', () => {
   test('returns open-period details without an id argument', async () => {
     const t = initConvexTest()
     const { teacher, organizationId } = await setupDevTeacherClassroom(t)
-    const period = await teacher.client.mutation(
-      api.features.payroll.ensureCurrentPayPeriod,
+    const period = await t.mutation(
+      internal.features.payrollTesting.ensureCurrentPayPeriod,
       { organizationId, nowMs: Date.UTC(2026, 6, 14, 15, 0, 0) }
     )
 

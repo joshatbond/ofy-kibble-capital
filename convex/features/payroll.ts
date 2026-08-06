@@ -114,7 +114,6 @@ export const listPayPeriodsForOrganization = query({
 export const ensureCurrentPayPeriod = mutation({
   args: {
     organizationId: v.string(),
-    nowMs: v.optional(v.number()),
   },
   returns: payPeriodPublicValidator,
   handler: async (ctx, args) => {
@@ -133,7 +132,7 @@ export const ensureCurrentPayPeriod = mutation({
 
       const period = await ensureCurrentPayPeriodForOrg(ctx, {
         organizationId: args.organizationId,
-        nowMs: args.nowMs ?? Date.now(),
+        nowMs: Date.now(),
       })
 
       return toPayPeriodPublic(period)
@@ -302,7 +301,6 @@ export const runPayPeriod = mutation({
   args: {
     organizationId: v.string(),
     payPeriodId: v.id('payPeriods'),
-    nowMs: v.optional(v.number()),
   },
   returns: payRunResultValidator,
   handler: async (ctx, args) => {
@@ -323,7 +321,7 @@ export const runPayPeriod = mutation({
         organizationId: args.organizationId,
         payPeriodId: args.payPeriodId,
         triggeredBy: 'manual',
-        nowMs: args.nowMs ?? Date.now(),
+        nowMs: Date.now(),
       })
     } catch (error) {
       toUserError(error, 'Could not run payroll.')
@@ -335,7 +333,6 @@ export const postponePayPeriod = mutation({
     organizationId: v.string(),
     payPeriodId: v.id('payPeriods'),
     postponedUntil: v.string(),
-    nowMs: v.optional(v.number()),
   },
   returns: v.object({
     payRunId: v.id('payRuns'),
@@ -361,7 +358,7 @@ export const postponePayPeriod = mutation({
         organizationId: args.organizationId,
         payPeriodId: args.payPeriodId,
         postponedUntil: args.postponedUntil,
-        nowMs: args.nowMs ?? Date.now(),
+        nowMs: Date.now(),
       })
     } catch (error) {
       toUserError(error, 'Could not postpone payday.')

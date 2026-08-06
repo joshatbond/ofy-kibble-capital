@@ -1,8 +1,12 @@
 import { ConvexError } from 'convex/values'
-import { describe, expect, test } from 'vitest'
+import { afterEach, describe, expect, test, vi } from 'vitest'
 
-import { api } from '../../_generated/api'
+import { api, internal } from '../../_generated/api'
 import { initConvexTest, setupDevTeacherClassroom } from '../../test.setup'
+
+afterEach(() => {
+  vi.useRealTimers()
+})
 
 describe('ensureCurrentPayPeriod', () => {
   test('creates the biweekly period for the next payday and is idempotent', async () => {
@@ -11,8 +15,8 @@ describe('ensureCurrentPayPeriod', () => {
 
     // Seeded defaults: biweekly Tuesday from 2026-07-14.
     const nowMs = Date.UTC(2026, 6, 14, 15, 0, 0)
-    const first = await teacher.client.mutation(
-      api.features.payroll.ensureCurrentPayPeriod,
+    const first = await t.mutation(
+      internal.features.payrollTesting.ensureCurrentPayPeriod,
       { organizationId, nowMs }
     )
 
@@ -26,8 +30,8 @@ describe('ensureCurrentPayPeriod', () => {
       status: 'open',
     })
 
-    const second = await teacher.client.mutation(
-      api.features.payroll.ensureCurrentPayPeriod,
+    const second = await t.mutation(
+      internal.features.payrollTesting.ensureCurrentPayPeriod,
       { organizationId, nowMs }
     )
     expect(second._id).toBe(first._id)
@@ -63,10 +67,12 @@ describe('ensureCurrentPayPeriod', () => {
       })
     })
 
+    vi.useFakeTimers()
+    vi.setSystemTime(Date.UTC(2026, 6, 29, 15, 0, 0))
+
     try {
       await teacher.client.mutation(api.features.payroll.ensureCurrentPayPeriod, {
         organizationId,
-        nowMs: Date.UTC(2026, 6, 29, 15, 0, 0),
       })
       expect.unreachable('expected ensureCurrentPayPeriod to fail')
     } catch (error) {

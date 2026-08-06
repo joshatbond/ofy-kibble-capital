@@ -51,6 +51,7 @@ import type * as features_payroll_studentPaystubs from "../features/payroll/stud
 import type * as features_payroll_taxTables from "../features/payroll/taxTables.js";
 import type * as features_payroll_validateAttendance from "../features/payroll/validateAttendance.js";
 import type * as features_payrollCron from "../features/payrollCron.js";
+import type * as features_payrollTesting from "../features/payrollTesting.js";
 import type * as features_roster_cleanup from "../features/roster/cleanup.js";
 import type * as features_roster_roster from "../features/roster/roster.js";
 import type * as features_roster_status from "../features/roster/status.js";
@@ -126,6 +127,7 @@ declare const fullApi: ApiFromModules<{
   "features/payroll/taxTables": typeof features_payroll_taxTables;
   "features/payroll/validateAttendance": typeof features_payroll_validateAttendance;
   "features/payrollCron": typeof features_payrollCron;
+  "features/payrollTesting": typeof features_payrollTesting;
   "features/roster/cleanup": typeof features_roster_cleanup;
   "features/roster/roster": typeof features_roster_roster;
   "features/roster/status": typeof features_roster_status;
