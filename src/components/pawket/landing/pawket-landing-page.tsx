@@ -23,7 +23,7 @@ export function PawketLandingPage(props: { returnTo?: string }) {
         <LandingCta />
 
         <div className="max-md:col-start-2 md:px-0">
-          <LandingDevSignIn />
+          <LandingDevSignIn signedOutClearTo="/pawket/landing" />
         </div>
       </main>
 

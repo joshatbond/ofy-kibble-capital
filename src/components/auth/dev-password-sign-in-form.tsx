@@ -3,11 +3,18 @@ import { useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 
 import { PawketBrutalButton } from '~/components/pawket/landing/pawket-brutal-button'
+import type { AdminLandingSearch } from '~/lib/admin-auth-redirect'
 import { omitSignedOutSearch } from '~/lib/auth-redirect'
+import type { StudentLandingSearch } from '~/lib/auth-redirect'
 
 export function DevPasswordSignInForm(props: {
   email?: string
   emailReadOnly?: boolean
+  /**
+   * Landing route used to clear the ephemeral `signedOut` search flag after
+   * password sign-in. Omit on routes without that search param (e.g. invite).
+   */
+  signedOutClearTo?: SignedOutClearTo
 }) {
   const { signIn } = useAuthActions()
   const navigate = useNavigate()
@@ -113,9 +120,29 @@ export function DevPasswordSignInForm(props: {
   }
 
   function clearSignedOutFlag() {
+    const to = props.signedOutClearTo
+    if (to === undefined) {
+      return
+    }
+
+    if (to === '/admin/landing') {
+      void navigate({
+        to,
+        search: (prev: AdminLandingSearch) => omitSignedOutSearch(prev),
+        replace: true,
+      })
+      return
+    }
+
     void navigate({
-      search: (prev: { signedOut?: boolean }) => omitSignedOutSearch(prev),
+      to,
+      search: (prev: StudentLandingSearch) => omitSignedOutSearch(prev),
       replace: true,
     })
   }
 }
+
+export type SignedOutClearTo =
+  | '/kibble/landing'
+  | '/pawket/landing'
+  | '/admin/landing'

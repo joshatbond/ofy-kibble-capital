@@ -1,5 +1,8 @@
 import { userError } from '../appError'
-import { applyPaycheckPipeline } from '../banking/paycheckPipeline'
+import {
+  applyPaycheckPipeline,
+  preparePaycheckAllocation,
+} from '../banking/paycheckPipeline'
 import { resolveEffectiveSettings } from '../settings/effectiveSettings'
 
 import { validateStubAttendanceForPayPeriod } from './attendanceValidation'
@@ -116,6 +119,11 @@ export async function executePayRunForPeriod(
       ytd: priorYtd,
     })
 
+    const prepared = await preparePaycheckAllocation(ctx, {
+      roster,
+      netPayCents: math.netPayCents,
+    })
+
     await ctx.db.insert('paystubs', {
       organizationId: args.organizationId,
       payPeriodId: args.payPeriodId,
@@ -138,6 +146,7 @@ export async function executePayRunForPeriod(
       medicareCents: math.medicareCents,
       caSdiCents: math.caSdiCents,
       netPayCents: math.netPayCents,
+      disbursement: prepared.disbursement,
       ytdGrossCents: math.ytdAfter.grossCents,
       ytdTaxableWagesCents: math.ytdAfter.taxableWagesCents,
       ytdRetirement401kCents: math.ytdAfter.retirement401kCents,
@@ -167,6 +176,7 @@ export async function executePayRunForPeriod(
         roster,
         netPayCents: math.netPayCents,
         nowMs: args.nowMs,
+        prepared,
       })
     }
 

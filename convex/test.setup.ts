@@ -1,4 +1,5 @@
 /// <reference types="vite/client" />
+import migrationsTest from '@convex-dev/migrations/test'
 import authzTest from '@djpanda/convex-authz/test'
 import tenantsTest from '@djpanda/convex-tenants/test'
 import { convexTest } from 'convex-test'
@@ -6,19 +7,17 @@ import { convexTest } from 'convex-test'
 import { internal } from './_generated/api'
 import schema from './schema'
 
-import type { Id } from './_generated/dataModel'
 import type { StudentApp } from './features/auth/studentApp'
 import type { TestConvex } from 'convex-test'
 
 export const modules = import.meta.glob('./**/*.ts')
 
-export type ConvexTest = TestConvex<typeof schema>
-
-/** Fresh in-memory Convex backend with tenants + authz components registered. */
+/** Fresh in-memory Convex backend with tenants + authz + migrations registered. */
 export function initConvexTest() {
   const t = convexTest(schema, modules)
   tenantsTest.register(t, 'tenants')
   authzTest.register(t, 'authz')
+  migrationsTest.register(t, 'migrations')
   return t
 }
 
@@ -36,26 +35,26 @@ export async function asAuthedUser(
   } = {}
 ) {
   const { userId, sessionId } = await t.run(async ctx => {
-    const userId = await ctx.db.insert('users', {
+    const insertedUserId = await ctx.db.insert('users', {
       email: options.email ?? 'student@ofy.org',
       name: options.name ?? 'Test Student',
       ...(options.canCreateOrganization === true
         ? { canCreateOrganization: true }
         : {}),
     })
-    const sessionId = await ctx.db.insert('authSessions', {
-      userId,
+    const insertedSessionId = await ctx.db.insert('authSessions', {
+      userId: insertedUserId,
       expirationTime: Date.now() + 1000 * 60 * 60,
       ...(options.studentApp !== undefined
         ? { studentApp: options.studentApp }
         : {}),
     })
-    return { userId, sessionId }
+    return { userId: insertedUserId, sessionId: insertedSessionId }
   })
 
   return {
-    userId: userId as Id<'users'>,
-    sessionId: sessionId as Id<'authSessions'>,
+    userId,
+    sessionId,
     client: t.withIdentity({
       subject: `${userId}|${sessionId}`,
     }),
@@ -97,3 +96,5 @@ export async function setupDevTeacherClassroom(
     organizationId: linked.organizationId,
   }
 }
+
+export type ConvexTest = TestConvex<typeof schema>

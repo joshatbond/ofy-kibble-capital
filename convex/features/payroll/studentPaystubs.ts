@@ -2,6 +2,7 @@ import { v } from 'convex/values'
 
 import {
   payPeriodsTableFields,
+  paystubDisbursementValidator,
   paystubsTableFields,
 } from '../../schema/schemaFields'
 
@@ -43,6 +44,7 @@ export const paystubDetailValidator = v.object({
   medicareCents: paystubsTableFields.medicareCents,
   caSdiCents: paystubsTableFields.caSdiCents,
   netPayCents: paystubsTableFields.netPayCents,
+  disbursement: v.optional(paystubDisbursementValidator),
   ytdGrossCents: paystubsTableFields.ytdGrossCents,
   ytdTaxableWagesCents: paystubsTableFields.ytdTaxableWagesCents,
   ytdRetirement401kCents: paystubsTableFields.ytdRetirement401kCents,

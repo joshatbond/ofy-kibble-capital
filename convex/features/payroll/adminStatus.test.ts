@@ -789,9 +789,11 @@ describe('getPayRunAdminReportForOrganization', () => {
     const savings = alphaLine.paySplit.find(share => share.label === 'Savings')
     expect(checking?.percent).toBe(70)
     expect(savings?.percent).toBe(30)
-    const expectedChecking = Math.round((alphaLine.netPayCents * 70) / 100)
+    // Posting floors savings on the remainder (no vaults → full net).
+    const expectedSavings = Math.floor((alphaLine.netPayCents * 30) / 100)
+    const expectedChecking = alphaLine.netPayCents - expectedSavings
     expect(checking?.amountCents).toBe(expectedChecking)
-    expect(savings?.amountCents).toBe(alphaLine.netPayCents - expectedChecking)
+    expect(savings?.amountCents).toBe(expectedSavings)
     expect(
       (checking?.amountCents ?? 0) + (savings?.amountCents ?? 0)
     ).toBe(alphaLine.netPayCents)
@@ -800,6 +802,120 @@ describe('getPayRunAdminReportForOrganization', () => {
       alphaLine.netPayCents + zebraLine.netPayCents
     )
     expect(report.run.totalFundsCents).toBe(report.fundsDispersedCents)
+  })
+
+  test('report allocation uses posting-time vault cuts and ignores later pay-split edits', async () => {
+    vi.stubEnv('SITE_URL', 'https://app.example.com')
+    vi.stubEnv('DEV_PASSWORD_AUTH', '1')
+    vi.stubEnv('INVITE_DEV_RELAXED', '1')
+
+    const t = initConvexTest()
+    const classroom = await setupDevTeacherClassroom(t)
+    const { teacher, organizationId } = classroom
+
+    const invited = await classroom.teacher.client.mutation(
+      api.features.invitations.inviteStudent,
+      {
+        organizationId,
+        email: 'vault-split@ofy.org',
+        externalStudentId: 3601,
+        grade: 7,
+        displayName: 'Vault Kid',
+      }
+    )
+
+    const student = await asAuthedUser(t, {
+      email: 'vault-split@ofy.org',
+      name: 'Vault Kid',
+      studentApp: 'pawket',
+    })
+    await student.client.mutation(
+      api.features.invitations.acceptClassroomInvitation,
+      { invitationId: invited.invitationId }
+    )
+
+    const rosterStudentId = await t.run(async ctx => {
+      const roster = await ctx.db
+        .query('rosterStudents')
+        .withIndex('by_invitationId', q =>
+          q.eq('invitationId', invited.invitationId)
+        )
+        .unique()
+      return roster!._id
+    })
+
+    await student.client.mutation(api.features.paySplit.setMyPaySplit, {
+      savingsPercent: 40,
+    })
+    await student.client.mutation(api.features.vaults.createVault, {
+      name: 'Emergency',
+      icon: '🛟',
+      goalCents: 50_000,
+      fundingMode: 'on_deposit',
+      onDepositRule: { kind: 'percent', percent: 20 },
+    })
+
+    const period = await t.mutation(
+      internal.features.payrollTesting.ensureCurrentPayPeriod,
+      { organizationId, nowMs: Date.UTC(2026, 6, 14, 15, 0, 0) }
+    )
+    const run = await t.mutation(internal.features.payrollTesting.runPayPeriod, {
+      organizationId,
+      payPeriodId: period._id,
+      nowMs: Date.UTC(2026, 6, 14, 15, 30, 0),
+    })
+    expect(run.status).toBe('succeeded')
+
+    const reportBefore = await teacher.client.query(
+      api.features.payroll.getPayRunAdminReportForOrganization,
+      { organizationId, payRunId: run.payRunId }
+    )
+    const line = reportBefore.stubs.find(
+      stub => stub.rosterStudentId === rosterStudentId
+    )
+    expect(line).toBeDefined()
+    const net = line!.netPayCents
+    expect(net).toBeGreaterThan(0)
+
+    const vaultCut = Math.floor((net * 20) / 100)
+    const remainder = net - vaultCut
+    const expectedSavings = Math.floor((remainder * 40) / 100)
+    const expectedChecking = remainder - expectedSavings
+
+    expect(line!.paySplit).toEqual([
+      {
+        label: 'Emergency',
+        amountCents: vaultCut,
+        percent: Math.round((vaultCut * 100) / net),
+      },
+      {
+        label: 'Checking',
+        amountCents: expectedChecking,
+        percent: 60,
+      },
+      {
+        label: 'Savings',
+        amountCents: expectedSavings,
+        percent: 40,
+      },
+    ])
+    expect(
+      line!.paySplit.reduce((sum, share) => sum + share.amountCents, 0)
+    ).toBe(net)
+
+    // Change live split after posting — historical report must stay put.
+    await student.client.mutation(api.features.paySplit.setMyPaySplit, {
+      savingsPercent: 90,
+    })
+
+    const reportAfter = await teacher.client.query(
+      api.features.payroll.getPayRunAdminReportForOrganization,
+      { organizationId, payRunId: run.payRunId }
+    )
+    expect(
+      reportAfter.stubs.find(stub => stub.rosterStudentId === rosterStudentId)
+        ?.paySplit
+    ).toEqual(line!.paySplit)
   })
 
   test('falls back to Student external id when display name and email are blank', async () => {

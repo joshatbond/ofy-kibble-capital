@@ -1,9 +1,10 @@
 import { useQuery } from 'convex/react'
 
 import { DevPasswordSignInForm } from '~/components/auth/dev-password-sign-in-form'
+import type { SignedOutClearTo } from '~/components/auth/dev-password-sign-in-form'
 import { api } from '~/convex/_generated/api'
 
-export function LandingDevSignIn() {
+export function LandingDevSignIn(props: { signedOutClearTo: SignedOutClearTo }) {
   const devPasswordAuth = useQuery(api.features.auth.devPassword.isEnabled)
 
   if (devPasswordAuth !== true) {
@@ -19,7 +20,10 @@ export function LandingDevSignIn() {
         environments.
       </p>
 
-      <DevPasswordSignInForm emailReadOnly={false} />
+      <DevPasswordSignInForm
+        emailReadOnly={false}
+        signedOutClearTo={props.signedOutClearTo}
+      />
     </section>
   )
 }

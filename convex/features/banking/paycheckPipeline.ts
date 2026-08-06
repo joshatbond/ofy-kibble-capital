@@ -10,7 +10,10 @@ import { moveBetweenStudentAccounts } from './transfers'
 import type { StudentBalances } from './ledger'
 import type { Doc, Id } from '../../_generated/dataModel'
 import type { MutationCtx } from '../../_generated/server'
-import type { vaultOnDepositRuleValidator } from '../../schema/schemaFields'
+import type {
+  paystubDisbursementValidator,
+  vaultOnDepositRuleValidator,
+} from '../../schema/schemaFields'
 import type { Infer } from 'convex/values'
 
 export function planPaycheckAllocation(args: {
@@ -61,28 +64,44 @@ export function planPaycheckAllocation(args: {
     savingsCents,
   }
 }
-export async function applyPaycheckPipeline(
+
+/**
+ * Load on-deposit vaults + pay split and plan allocation once for posting and
+ * the paystub disbursement snapshot.
+ */
+export async function preparePaycheckAllocation(
   ctx: MutationCtx,
   args: {
     roster: Doc<'rosterStudents'>
     netPayCents: number
-    nowMs: number
   }
-): Promise<StudentBalances> {
-  if (!Number.isInteger(args.netPayCents) || args.netPayCents <= 0) {
-    throw new Error('Net pay must be a positive integer number of cents.')
+): Promise<PreparedPaycheckAllocation> {
+  if (!Number.isInteger(args.netPayCents) || args.netPayCents < 0) {
+    throw new Error('Net pay must be a non-negative integer number of cents.')
   }
 
-  const checking = await requireBankAccountForStudent(
-    ctx,
-    args.roster._id,
-    'checking'
-  )
-  const savings = await requireBankAccountForStudent(
-    ctx,
-    args.roster._id,
-    'savings'
-  )
+  const paySplit = await getPaySplitForStudent(ctx, args.roster._id)
+  const { savingsPercent, checkingPercent } =
+    effectivePaySplitPercents(paySplit)
+
+  if (args.netPayCents === 0) {
+    return {
+      plan: {
+        vaultCuts: [],
+        vaultCutsTotalCents: 0,
+        checkingCents: 0,
+        savingsCents: 0,
+      },
+      onDepositVaults: [],
+      disbursement: {
+        checkingCents: 0,
+        savingsCents: 0,
+        checkingPercent,
+        savingsPercent,
+        vaultCuts: [],
+      },
+    }
+  }
 
   const activeVaults = await ctx.db
     .query('vaults')
@@ -98,9 +117,6 @@ export async function applyPaycheckPipeline(
     )
     .sort((a, b) => a.createdAt - b.createdAt)
 
-  const paySplit = await getPaySplitForStudent(ctx, args.roster._id)
-  const { savingsPercent } = effectivePaySplitPercents(paySplit)
-
   const plan = planPaycheckAllocation({
     netPayCents: args.netPayCents,
     onDepositVaults: onDepositVaults.map(vault => ({
@@ -109,6 +125,61 @@ export async function applyPaycheckPipeline(
     })),
     savingsPercent,
   })
+
+  const vaultById = new Map(onDepositVaults.map(vault => [vault._id, vault]))
+  const disbursement: PaystubDisbursement = {
+    checkingCents: plan.checkingCents,
+    savingsCents: plan.savingsCents,
+    checkingPercent,
+    savingsPercent,
+    vaultCuts: plan.vaultCuts.map(cut => {
+      const vault = vaultById.get(cut.vaultId)
+      if (vault === undefined) {
+        throw new Error(`On-deposit vault ${cut.vaultId} missing during plan.`)
+      }
+      return {
+        vaultId: cut.vaultId,
+        name: vault.name,
+        amountCents: cut.amountCents,
+      }
+    }),
+  }
+
+  return { plan, onDepositVaults, disbursement }
+}
+
+export async function applyPaycheckPipeline(
+  ctx: MutationCtx,
+  args: {
+    roster: Doc<'rosterStudents'>
+    netPayCents: number
+    nowMs: number
+    /** When provided, skips re-planning so the stub snapshot matches the ledger. */
+    prepared?: PreparedPaycheckAllocation
+  }
+): Promise<StudentBalances> {
+  if (!Number.isInteger(args.netPayCents) || args.netPayCents <= 0) {
+    throw new Error('Net pay must be a positive integer number of cents.')
+  }
+
+  const prepared =
+    args.prepared ??
+    (await preparePaycheckAllocation(ctx, {
+      roster: args.roster,
+      netPayCents: args.netPayCents,
+    }))
+  const { plan, onDepositVaults } = prepared
+
+  const checking = await requireBankAccountForStudent(
+    ctx,
+    args.roster._id,
+    'checking'
+  )
+  const savings = await requireBankAccountForStudent(
+    ctx,
+    args.roster._id,
+    'savings'
+  )
 
   // 1. Credit full net pay into checking (deposit lands).
   await postLedgerEntry(ctx, {
@@ -204,5 +275,11 @@ export type PaycheckAllocationPlan = {
   vaultCutsTotalCents: number
   checkingCents: number
   savingsCents: number
+}
+export type PaystubDisbursement = Infer<typeof paystubDisbursementValidator>
+export type PreparedPaycheckAllocation = {
+  plan: PaycheckAllocationPlan
+  onDepositVaults: Array<Doc<'vaults'>>
+  disbursement: PaystubDisbursement
 }
 type OnDepositRule = Infer<typeof vaultOnDepositRuleValidator>

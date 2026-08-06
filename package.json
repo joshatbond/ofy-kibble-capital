@@ -26,6 +26,7 @@
   "dependencies": {
     "@auth/core": "0.37.0",
     "@convex-dev/auth": "^0.0.92",
+    "@convex-dev/migrations": "^0.3.6",
     "@convex-dev/react-query": "^0.1.0",
     "@djpanda/convex-authz": "^0.1.7",
     "@djpanda/convex-tenants": "^0.1.6",

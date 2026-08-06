@@ -41,6 +41,7 @@ import type * as features_payroll_attendanceSource from "../features/payroll/att
 import type * as features_payroll_attendanceValidation from "../features/payroll/attendanceValidation.js";
 import type * as features_payroll_dates from "../features/payroll/dates.js";
 import type * as features_payroll_money from "../features/payroll/money.js";
+import type * as features_payroll_payRunTotals from "../features/payroll/payRunTotals.js";
 import type * as features_payroll_paydayAutomation from "../features/payroll/paydayAutomation.js";
 import type * as features_payroll_payrollMath from "../features/payroll/payrollMath.js";
 import type * as features_payroll_periodStore from "../features/payroll/periodStore.js";
@@ -71,6 +72,7 @@ import type * as features_vaults_scheduledFunding from "../features/vaults/sched
 import type * as features_vaultsCron from "../features/vaultsCron.js";
 import type * as http from "../http.js";
 import type * as lib_displayName from "../lib/displayName.js";
+import type * as migrations from "../migrations.js";
 import type * as schema_schemaFields from "../schema/schemaFields.js";
 import type * as seed_catalog from "../seed/catalog.js";
 import type * as seed_catalogData from "../seed/catalogData.js";
@@ -117,6 +119,7 @@ declare const fullApi: ApiFromModules<{
   "features/payroll/attendanceValidation": typeof features_payroll_attendanceValidation;
   "features/payroll/dates": typeof features_payroll_dates;
   "features/payroll/money": typeof features_payroll_money;
+  "features/payroll/payRunTotals": typeof features_payroll_payRunTotals;
   "features/payroll/paydayAutomation": typeof features_payroll_paydayAutomation;
   "features/payroll/payrollMath": typeof features_payroll_payrollMath;
   "features/payroll/periodStore": typeof features_payroll_periodStore;
@@ -147,6 +150,7 @@ declare const fullApi: ApiFromModules<{
   "features/vaultsCron": typeof features_vaultsCron;
   http: typeof http;
   "lib/displayName": typeof lib_displayName;
+  migrations: typeof migrations;
   "schema/schemaFields": typeof schema_schemaFields;
   "seed/catalog": typeof seed_catalog;
   "seed/catalogData": typeof seed_catalogData;
@@ -183,4 +187,5 @@ export declare const internal: FilterApi<
 export declare const components: {
   tenants: import("@djpanda/convex-tenants/_generated/component.js").ComponentApi<"tenants">;
   authz: import("@djpanda/convex-authz/_generated/component.js").ComponentApi<"authz">;
+  migrations: import("@convex-dev/migrations/_generated/component.js").ComponentApi<"migrations">;
 };

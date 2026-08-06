@@ -7,14 +7,23 @@ const STUDENT_APP_BASE_PATH: Record<StudentApp, `/${string}`> = {
   kibble: '/kibble',
   pawket: '/pawket',
 }
+const STUDENT_APP_LANDING_PATH: Record<
+  StudentApp,
+  '/kibble/landing' | '/pawket/landing'
+> = {
+  kibble: '/kibble/landing',
+  pawket: '/pawket/landing',
+}
 const ALLOWED_APP_BASE_PATHS = [
   '/kibble',
   '/pawket',
   '/admin',
   '/invite',
 ] as const
-export function studentAppLandingPath(app: StudentApp): string {
-  return `${STUDENT_APP_BASE_PATH[app]}/landing`
+export function studentAppLandingPath(
+  app: StudentApp
+): '/kibble/landing' | '/pawket/landing' {
+  return STUDENT_APP_LANDING_PATH[app]
 }
 export function studentAppHomePath(app: StudentApp): string {
   return `${STUDENT_APP_BASE_PATH[app]}/`

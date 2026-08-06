@@ -218,18 +218,15 @@ export async function getPayRunAdminReport(
     .withIndex('by_payRunId', q => q.eq('payRunId', run._id))
     .collect()
 
-  const { rosterById, paySplitByRosterId } = await loadReportLookups(
-    ctx,
-    args.organizationId
-  )
+  const rosterById = await loadReportRosters(ctx, args.organizationId)
 
   const lines: Array<AdminPaystubLine> = []
   let fundsDispersedCents = 0
   for (const stub of stubs) {
-    const line = toAdminPaystubLine(stub, {
-      roster: rosterById.get(stub.rosterStudentId) ?? null,
-      paySplit: paySplitByRosterId.get(stub.rosterStudentId) ?? null,
-    })
+    const line = toAdminPaystubLine(
+      stub,
+      rosterById.get(stub.rosterStudentId) ?? null
+    )
     fundsDispersedCents += line.netPayCents
     lines.push(line)
   }
@@ -311,54 +308,30 @@ function toPayRunAdminSummary(run: Doc<'payRuns'>): PayRunAdminSummary {
   }
 }
 
-async function loadReportLookups(
+async function loadReportRosters(
   ctx: QueryCtx,
   organizationId: string
-): Promise<{
-  rosterById: Map<Id<'rosterStudents'>, Doc<'rosterStudents'>>
-  paySplitByRosterId: Map<Id<'rosterStudents'>, Doc<'paySplits'>>
-}> {
-  const [rosters, paySplits] = await Promise.all([
-    ctx.db
-      .query('rosterStudents')
-      .withIndex('by_organizationId', q => q.eq('organizationId', organizationId))
-      .collect(),
-    ctx.db
-      .query('paySplits')
-      .withIndex('by_organizationId', q => q.eq('organizationId', organizationId))
-      .collect(),
-  ])
+): Promise<Map<Id<'rosterStudents'>, Doc<'rosterStudents'>>> {
+  const rosters = await ctx.db
+    .query('rosterStudents')
+    .withIndex('by_organizationId', q => q.eq('organizationId', organizationId))
+    .collect()
 
   const rosterById = new Map<Id<'rosterStudents'>, Doc<'rosterStudents'>>()
   for (const roster of rosters) {
     rosterById.set(roster._id, roster)
   }
-
-  const paySplitByRosterId = new Map<Id<'rosterStudents'>, Doc<'paySplits'>>()
-  for (const split of paySplits) {
-    paySplitByRosterId.set(split.rosterStudentId, split)
-  }
-
-  return { rosterById, paySplitByRosterId }
+  return rosterById
 }
 
 function toAdminPaystubLine(
   stub: Doc<'paystubs'>,
-  lookups: {
-    roster: Doc<'rosterStudents'> | null
-    paySplit: Doc<'paySplits'> | null
-  }
+  roster: Doc<'rosterStudents'> | null
 ): AdminPaystubLine {
-  const roster = lookups.roster
   const displayName =
     roster?.displayName?.trim() ||
     roster?.email ||
     `Student ${String(roster?.externalStudentId ?? stub.rosterStudentId)}`
-
-  const checkingPercent = lookups.paySplit?.checkingPercent ?? 100
-  const savingsPercent = 100 - checkingPercent
-  const checkingCents = Math.round((stub.netPayCents * checkingPercent) / 100)
-  const savingsCents = stub.netPayCents - checkingCents
 
   return {
     rosterStudentId: stub.rosterStudentId,
@@ -382,18 +355,44 @@ function toAdminPaystubLine(
     socialSecurityCents: stub.socialSecurityCents,
     medicareCents: stub.medicareCents,
     caSdiCents: stub.caSdiCents,
-    paySplit: [
-      {
-        label: 'Checking',
-        amountCents: checkingCents,
-        percent: checkingPercent,
-      },
-      {
-        label: 'Savings',
-        amountCents: savingsCents,
-        percent: savingsPercent,
-      },
-    ],
+    paySplit: paySplitSharesFromDisbursement(stub),
   }
+}
+
+/**
+ * Prefer the posting-time disbursement snapshot. Legacy stubs without a
+ * snapshot fall back to 100% checking — never live paySplits.
+ */
+function paySplitSharesFromDisbursement(
+  stub: Doc<'paystubs'>
+): Array<{ label: string; amountCents: number; percent: number }> {
+  const disbursement = stub.disbursement
+  if (disbursement === undefined) {
+    return [
+      { label: 'Checking', amountCents: stub.netPayCents, percent: 100 },
+      { label: 'Savings', amountCents: 0, percent: 0 },
+    ]
+  }
+
+  const net = stub.netPayCents
+  const vaultShares = disbursement.vaultCuts.map(cut => ({
+    label: cut.name,
+    amountCents: cut.amountCents,
+    percent: net > 0 ? Math.round((cut.amountCents * 100) / net) : 0,
+  }))
+
+  return [
+    ...vaultShares,
+    {
+      label: 'Checking',
+      amountCents: disbursement.checkingCents,
+      percent: disbursement.checkingPercent,
+    },
+    {
+      label: 'Savings',
+      amountCents: disbursement.savingsCents,
+      percent: disbursement.savingsPercent,
+    },
+  ]
 }
 type AdminPaystubLine = Infer<typeof adminPaystubLineValidator>

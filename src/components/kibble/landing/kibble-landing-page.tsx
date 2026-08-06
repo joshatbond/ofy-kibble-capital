@@ -25,7 +25,7 @@ export function KibbleLandingPage(props: { returnTo?: string }) {
 
         <LandingCta />
 
-        <LandingDevSignIn />
+        <LandingDevSignIn signedOutClearTo="/kibble/landing" />
       </main>
 
       <LandingFooter />

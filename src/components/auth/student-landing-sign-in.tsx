@@ -3,7 +3,10 @@ import { useQuery } from 'convex/react'
 import { DevPasswordSignInForm } from '~/components/auth/dev-password-sign-in-form'
 import { GoogleSignInButton } from '~/components/auth/google-sign-in-button'
 import { api } from '~/convex/_generated/api'
-import { studentAppRedirectTo } from '~/lib/auth-redirect'
+import {
+  studentAppLandingPath,
+  studentAppRedirectTo,
+} from '~/lib/auth-redirect'
 import type { StudentApp } from '~/lib/auth-redirect'
 
 export function StudentLandingSignIn(props: { app: StudentApp }) {
@@ -19,7 +22,10 @@ export function StudentLandingSignIn(props: { app: StudentApp }) {
         <section>
           <h2>Dev test sign-in</h2>
 
-          <DevPasswordSignInForm emailReadOnly={false} />
+          <DevPasswordSignInForm
+            emailReadOnly={false}
+            signedOutClearTo={studentAppLandingPath(props.app)}
+          />
 
           <p>Or sign in with Google (@ofy.org):</p>
         </section>

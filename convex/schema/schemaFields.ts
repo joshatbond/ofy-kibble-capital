@@ -303,6 +303,22 @@ export const payRunsTableFields = {
    */
   stubCount: v.number(),
 }
+/** Historical paycheck allocation written onto the stub at post time. */
+export const paystubDisbursementValidator = v.object({
+  checkingCents: v.number(),
+  savingsCents: v.number(),
+  /** Percent of post-vault remainder to checking (0–100). */
+  checkingPercent: v.number(),
+  /** Percent of post-vault remainder to savings (0–100). */
+  savingsPercent: v.number(),
+  vaultCuts: v.array(
+    v.object({
+      vaultId: v.id('vaults'),
+      name: v.string(),
+      amountCents: v.number(),
+    })
+  ),
+})
 export const paystubsTableFields = {
   organizationId: v.string(),
   payPeriodId: v.id('payPeriods'),
@@ -326,6 +342,12 @@ export const paystubsTableFields = {
   medicareCents: v.number(),
   caSdiCents: v.number(),
   netPayCents: v.number(),
+  /**
+   * Snapshot of checking / savings / on-deposit vault allocation at post time.
+   * Admin reports must read this instead of recomputing from live paySplits.
+   * Optional for stubs posted before this field existed.
+   */
+  disbursement: v.optional(paystubDisbursementValidator),
   /** Cumulative totals after this stub posts (school-year YTD). */
   ytdGrossCents: v.number(),
   ytdTaxableWagesCents: v.number(),
