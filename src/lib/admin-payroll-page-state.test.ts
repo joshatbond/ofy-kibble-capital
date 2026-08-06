@@ -41,6 +41,19 @@ describe('resolveAdminPayrollPageState', () => {
     ).toEqual({ status: 'loading' })
   })
 
+  test('stays loading while page query is pending after context resolves', () => {
+    expect(
+      resolveAdminPayrollPageState({
+        context: {
+          status: 'success',
+          data: { organizationId: 'org_1' },
+        },
+        page: { status: 'pending' },
+        ensureError: null,
+      })
+    ).toEqual({ status: 'loading' })
+  })
+
   test('surfaces context query errors with a user-facing message', () => {
     expect(
       resolveAdminPayrollPageState({

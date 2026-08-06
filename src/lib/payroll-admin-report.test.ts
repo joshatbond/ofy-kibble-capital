@@ -92,10 +92,34 @@ describe('resolvePayRunReportViewState', () => {
   })
 
   test('maps success to ready with the report payload', () => {
-    const report = { studentCount: 0, stubs: [] }
+    const report = {
+      studentCount: 1,
+      stubs: [{ displayName: 'Alpha Kid', netPayCents: 40_000 }],
+      run: { status: 'succeeded' as const },
+    }
     expect(
       resolvePayRunReportViewState({ status: 'success', data: report })
     ).toEqual({ status: 'ready', report })
+  })
+
+  test('maps blocked empty report success without treating it as an error', () => {
+    const report = {
+      studentCount: 0,
+      fundsDispersedCents: 0,
+      stubs: [],
+      run: { status: 'blocked' as const },
+    }
+    const view = resolvePayRunReportViewState({
+      status: 'success',
+      data: report,
+    })
+    expect(view).toEqual({ status: 'ready', report })
+    if (view.status !== 'ready') {
+      expect.unreachable('expected ready report view')
+    }
+    expect(emptyPaystubsMessage(view.report.run.status)).toBe(
+      'No paystubs — this run was blocked.'
+    )
   })
 })
 

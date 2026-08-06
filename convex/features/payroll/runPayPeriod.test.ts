@@ -147,26 +147,120 @@ describe('runPayPeriod', () => {
     })
     expect(stubCount).toBe(1)
   })
+
+  test('blocks then succeeds on the same period after the roster is cleared', async () => {
+    vi.stubEnv('SITE_URL', 'https://app.example.com')
+    vi.stubEnv('DEV_PASSWORD_AUTH', '1')
+    vi.stubEnv('INVITE_DEV_RELAXED', '1')
+
+    const t = initConvexTest()
+    const classroom = await setupDevTeacherClassroom(t)
+    const { teacher, organizationId } = classroom
+
+    const period = await t.mutation(
+      internal.features.payrollTesting.ensureCurrentPayPeriod,
+      { organizationId, nowMs: Date.UTC(2026, 6, 14, 15, 0, 0) }
+    )
+
+    const blocked = await t.mutation(
+      internal.features.payrollTesting.runPayPeriod,
+      {
+        organizationId,
+        payPeriodId: period._id,
+        nowMs: Date.UTC(2026, 6, 14, 15, 30, 0),
+      }
+    )
+    expect(blocked).toMatchObject({
+      status: 'blocked',
+      payPeriodId: period._id,
+      blockReasons: ['No active students on the roster.'],
+    })
+
+    const stillOpen = await teacher.client.query(
+      api.features.payroll.listPayPeriodsForOrganization,
+      { organizationId }
+    )
+    expect(stillOpen).toHaveLength(1)
+    expect(stillOpen[0]).toMatchObject({
+      _id: period._id,
+      status: 'open',
+    })
+
+    await inviteAndAcceptStudent(t, classroom, {
+      email: 'recover-student@ofy.org',
+      displayName: 'Recover Kid',
+      externalStudentId: 2210,
+    })
+
+    const succeeded = await t.mutation(
+      internal.features.payrollTesting.runPayPeriod,
+      {
+        organizationId,
+        payPeriodId: period._id,
+        nowMs: Date.UTC(2026, 6, 14, 16, 0, 0),
+      }
+    )
+    expect(succeeded).toMatchObject({
+      status: 'succeeded',
+      payPeriodId: period._id,
+      stubCount: 1,
+      alreadyCompleted: false,
+    })
+
+    const closed = await teacher.client.query(
+      api.features.payroll.listPayPeriodsForOrganization,
+      { organizationId }
+    )
+    expect(closed).toHaveLength(1)
+    expect(closed[0]).toMatchObject({
+      _id: period._id,
+      status: 'closed',
+    })
+  })
 })
 
 async function setupActiveStudent(t: ConvexTest) {
   const classroom = await setupDevTeacherClassroom(t)
-  const email = 'payrun-student@ofy.org'
+  const invited = await inviteAndAcceptStudent(t, classroom, {
+    email: 'payrun-student@ofy.org',
+    displayName: 'Pay Run Kid',
+    externalStudentId: 2201,
+  })
 
+  return {
+    teacher: classroom.teacher,
+    student: invited.student,
+    organizationId: classroom.organizationId,
+    rosterStudentId: invited.rosterStudentId,
+  }
+}
+
+async function inviteAndAcceptStudent(
+  t: ConvexTest,
+  classroom: Awaited<ReturnType<typeof setupDevTeacherClassroom>>,
+  args: {
+    email: string
+    displayName: string
+    externalStudentId: number
+  }
+): Promise<{
+  rosterStudentId: Id<'rosterStudents'>
+  student: Awaited<ReturnType<typeof asAuthedUser>>
+}> {
   const invited = await classroom.teacher.client.mutation(
     api.features.invitations.inviteStudent,
     {
       organizationId: classroom.organizationId,
-      email,
-      externalStudentId: 2201,
+      email: args.email,
+      externalStudentId: args.externalStudentId,
       grade: 7,
-      displayName: 'Pay Run Kid',
+      displayName: args.displayName,
     }
   )
 
   const student = await asAuthedUser(t, {
-    email,
-    name: 'Pay Run Kid',
+    email: args.email,
+    name: args.displayName,
     studentApp: 'kibble',
   })
 
@@ -185,10 +279,5 @@ async function setupActiveStudent(t: ConvexTest) {
     return roster!._id
   })
 
-  return {
-    teacher: classroom.teacher,
-    student,
-    organizationId: classroom.organizationId,
-    rosterStudentId,
-  }
+  return { rosterStudentId, student }
 }

@@ -233,4 +233,59 @@ describe('updateClassSettingsForOrganization', () => {
       )
     ).toEqual(next)
   })
+
+  test.each([
+    {
+      name: 'biweekly firstPayDate off weekday',
+      paySchedule: {
+        type: 'biweekly' as const,
+        weekday: 5,
+        firstPayDate: '2025-07-15',
+      },
+      message: /firstPayDate.*must fall on weekday/,
+    },
+    {
+      name: 'weekly invalid weekday',
+      paySchedule: {
+        type: 'weekly' as const,
+        weekday: 7,
+      },
+      message: /weekday must be an integer/,
+    },
+    {
+      name: 'semi_monthly wrong day count',
+      paySchedule: {
+        type: 'semi_monthly' as const,
+        daysOfMonth: [15],
+      },
+      message: /exactly two days/,
+    },
+    {
+      name: 'monthly day out of range',
+      paySchedule: {
+        type: 'monthly' as const,
+        dayOfMonth: 32,
+      },
+      message: /between 1 and 31/,
+    },
+  ])(
+    'rejects invalid pay schedule: $name',
+    async ({ paySchedule, message }) => {
+      const t = initConvexTest()
+      const { teacher, organizationId } = await setupDevTeacherClassroom(t)
+
+      await expect(
+        teacher.client.mutation(
+          api.features.settings.updateClassSettingsForOrganization,
+          {
+            organizationId,
+            settings: {
+              ...V1_BASE_SETTINGS,
+              paySchedule,
+            },
+          }
+        )
+      ).rejects.toThrow(message)
+    }
+  )
 })

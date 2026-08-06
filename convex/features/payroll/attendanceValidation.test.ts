@@ -92,7 +92,7 @@ describe('validateAttendanceForPayPeriod', () => {
 
     expect(validation.status).toBe('ready')
     if (validation.status !== 'ready') {
-      return
+      expect.unreachable('expected attendance validation to be ready')
     }
 
     expect(validation.activeStudentCount).toBe(1)

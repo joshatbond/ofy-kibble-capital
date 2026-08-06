@@ -5,9 +5,10 @@ import { toUserError, userError } from './appError'
 
 describe('appError', () => {
   test('userError throws ConvexError with string data', () => {
-    expect(() => userError('Sign in to continue.')).toThrow(ConvexError)
+    expect.assertions(2)
     try {
       userError('Sign in to continue.')
+      expect.unreachable('expected userError to throw')
     } catch (error) {
       expect(error).toBeInstanceOf(ConvexError)
       expect((error as ConvexError<string>).data).toBe('Sign in to continue.')
@@ -15,6 +16,7 @@ describe('appError', () => {
   })
 
   test('toUserError maps known internal messages', () => {
+    expect.assertions(2)
     try {
       toUserError(
         new Error('Could not find a pay date within search horizon.'),
@@ -27,6 +29,7 @@ describe('appError', () => {
           },
         ]
       )
+      expect.unreachable('expected toUserError to throw')
     } catch (error) {
       expect(error).toBeInstanceOf(ConvexError)
       expect((error as ConvexError<string>).data).toBe(
@@ -36,12 +39,15 @@ describe('appError', () => {
   })
 
   test('toUserError passes through short plain Error messages', () => {
+    expect.assertions(2)
     try {
       toUserError(
         new Error('Only an open pay period can be postponed.'),
         'fallback'
       )
+      expect.unreachable('expected toUserError to throw')
     } catch (error) {
+      expect(error).toBeInstanceOf(ConvexError)
       expect((error as ConvexError<string>).data).toBe(
         'Only an open pay period can be postponed.'
       )
@@ -49,6 +55,7 @@ describe('appError', () => {
   })
 
   test('toUserError uses fallback for long or Convex-wrapped messages', () => {
+    expect.assertions(1)
     try {
       toUserError(
         new Error(
@@ -56,6 +63,7 @@ describe('appError', () => {
         ),
         'Could not load the current pay period.'
       )
+      expect.unreachable('expected toUserError to throw')
     } catch (error) {
       expect((error as ConvexError<string>).data).toBe(
         'Could not load the current pay period.'
@@ -63,10 +71,33 @@ describe('appError', () => {
     }
   })
 
+  test('toUserError uses fallback for unknown and non-Error values', () => {
+    const values: Array<unknown> = [
+      'plain string',
+      { foo: 1 },
+      null,
+      undefined,
+      42,
+    ]
+    expect.assertions(values.length)
+    for (const value of values) {
+      try {
+        toUserError(value, 'Could not load payroll.')
+        expect.unreachable('expected toUserError to throw')
+      } catch (error) {
+        expect((error as ConvexError<string>).data).toBe(
+          'Could not load payroll.'
+        )
+      }
+    }
+  })
+
   test('toUserError rethrows existing ConvexError', () => {
     const original = new ConvexError('Keep me.')
+    expect.assertions(1)
     try {
       toUserError(original, 'fallback')
+      expect.unreachable('expected toUserError to throw')
     } catch (error) {
       expect(error).toBe(original)
     }

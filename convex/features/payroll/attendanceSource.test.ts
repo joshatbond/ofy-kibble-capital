@@ -39,8 +39,11 @@ describe('loadStubAttendance', () => {
     })
 
     expect(result.ok).toBe(true)
-    if (!result.ok) {
-      return
+    expect(result).toMatchObject({
+      ok: true,
+    })
+    if (result.ok !== true) {
+      expect.unreachable('expected stub attendance to succeed')
     }
 
     expect(result.records).toHaveLength(2)

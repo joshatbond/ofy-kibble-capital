@@ -32,4 +32,25 @@ describe('userFacingErrorMessage', () => {
       )
     ).toBe('Could not load the current pay period.')
   })
+
+  test('falls back for empty or whitespace ConvexError data', () => {
+    expect(userFacingErrorMessage(new ConvexError(''), 'fallback')).toBe(
+      'fallback'
+    )
+    expect(userFacingErrorMessage(new ConvexError('   '), 'fallback')).toBe(
+      'fallback'
+    )
+    expect(
+      userFacingErrorMessage(new ConvexError({ message: '   ' }), 'fallback')
+    ).toBe('fallback')
+    expect(
+      userFacingErrorMessage(new ConvexError({ message: '' }), 'fallback')
+    ).toBe('fallback')
+  })
+
+  test('falls back for unknown non-Error values', () => {
+    expect(userFacingErrorMessage('raw string', 'fallback')).toBe('fallback')
+    expect(userFacingErrorMessage({ foo: 1 }, 'fallback')).toBe('fallback')
+    expect(userFacingErrorMessage(null, 'fallback')).toBe('fallback')
+  })
 })
