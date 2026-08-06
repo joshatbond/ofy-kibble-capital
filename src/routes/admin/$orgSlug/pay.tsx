@@ -1,7 +1,9 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
+import { useState } from 'react'
 
 import { AdminPayrollPage } from '~/components/admin/payroll-page'
 import { Case, SwitchOn } from '~/components/switch-on'
+import { Button } from '~/components/ui/button'
 import { useAdminPayrollPage } from '~/hooks/use-admin-open-pay-period'
 
 export const Route = createFileRoute('/admin/$orgSlug/pay')({
@@ -10,7 +12,24 @@ export const Route = createFileRoute('/admin/$orgSlug/pay')({
 
 function AdminPayPageRoute() {
   const params = Route.useParams()
-  const payroll = useAdminPayrollPage(params.orgSlug)
+  const [retryKey, setRetryKey] = useState(0)
+
+  return (
+    <AdminPayPageBody
+      key={retryKey}
+      orgSlug={params.orgSlug}
+      onRetry={() => {
+        setRetryKey(value => value + 1)
+      }}
+    />
+  )
+}
+
+function AdminPayPageBody(props: {
+  orgSlug: string
+  onRetry: () => void
+}) {
+  const payroll = useAdminPayrollPage(props.orgSlug)
 
   return (
     <SwitchOn value={payroll}>
@@ -37,9 +56,17 @@ function AdminPayPageRoute() {
           state.status === 'error'}
       >
         {state => (
-          <p className="text-destructive p-8 text-sm font-bold" role="alert">
-            {state.message}
-          </p>
+          <div className="grid gap-4 p-8">
+            <p className="text-destructive text-sm font-bold" role="alert">
+              {state.message}
+            </p>
+
+            <div>
+              <Button type="button" variant="brutal-outline" onClick={props.onRetry}>
+                Retry
+              </Button>
+            </div>
+          </div>
         )}
       </Case>
 

@@ -1,7 +1,10 @@
-import { useMutation, useQuery } from 'convex/react'
+import { useMutation } from 'convex/react'
 import { useEffect, useState } from 'react'
 
 import { api } from '~/convex/_generated/api'
+import { useSafeQuery } from '~/hooks/use-safe-query'
+import { resolveAdminPayrollPageState } from '~/lib/admin-payroll-page-state'
+import type { AdminPayrollPageState } from '~/lib/admin-payroll-page-state'
 import { teacherContextQueryArgs } from '~/lib/admin-route-context'
 import { userFacingErrorMessage } from '~/lib/user-facing-error'
 
@@ -10,24 +13,26 @@ import type { FunctionReturnType } from 'convex/server'
 export function useAdminPayrollPage(
   orgSlug: string | undefined
 ): AdminPayrollPage {
-  const context = useQuery(
+  const context = useSafeQuery(
     api.features.admin.context.getTeacherClassroomContext,
     teacherContextQueryArgs({ orgSlug })
   )
   const ensurePeriod = useMutation(api.features.payroll.ensureCurrentPayPeriod)
-  const page = useQuery(
+  const organizationId =
+    context.status === 'success' && context.data !== null
+      ? context.data.organizationId
+      : null
+  const page = useSafeQuery(
     api.features.payroll.getPayrollAdminPageForOrganization,
-    context === undefined || context === null
-      ? 'skip'
-      : { organizationId: context.organizationId }
+    organizationId === null ? 'skip' : { organizationId }
   )
   const [ensureError, setEnsureError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (context === undefined || context === null) {
+    if (organizationId === null) {
       return
     }
-    if (page === undefined || page !== null) {
+    if (page.status !== 'success' || page.data !== null) {
       return
     }
     if (ensureError !== null) {
@@ -35,7 +40,7 @@ export function useAdminPayrollPage(
     }
 
     let cancelled = false
-    void ensurePeriod({ organizationId: context.organizationId })
+    void ensurePeriod({ organizationId })
       .then(() => {
         if (!cancelled) {
           setEnsureError(null)
@@ -55,29 +60,13 @@ export function useAdminPayrollPage(
     return () => {
       cancelled = true
     }
-  }, [context, page, ensureError, ensurePeriod])
+  }, [organizationId, page, ensureError, ensurePeriod])
 
-  if (context === undefined) {
-    return { status: 'loading' }
-  }
-
-  if (context === null) {
-    return { status: 'unauthorized' }
-  }
-
-  if (ensureError !== null) {
-    return { status: 'error', message: ensureError }
-  }
-
-  if (page === undefined || page === null) {
-    return { status: 'loading' }
-  }
-
-  return {
-    status: 'ready',
-    organizationId: context.organizationId,
+  return resolveAdminPayrollPageState({
+    context,
     page,
-  }
+    ensureError,
+  })
 }
 
 /** @deprecated Prefer useAdminPayrollPage for the redesigned payroll screen. */
@@ -95,15 +84,13 @@ export function useAdminOpenPayPeriod(
   }
 }
 
-type AdminPayrollPage =
-  | { status: 'loading' }
-  | { status: 'unauthorized' }
-  | { status: 'error'; message: string }
-  | {
-      status: 'ready'
-      organizationId: string
-      page: PayrollAdminPageData
-    }
+type PayrollAdminPageData = NonNullable<
+  FunctionReturnType<
+    typeof api.features.payroll.getPayrollAdminPageForOrganization
+  >
+>
+
+type AdminPayrollPage = AdminPayrollPageState<PayrollAdminPageData>
 
 type AdminOpenPayPeriod =
   | { status: 'loading' }
@@ -114,9 +101,3 @@ type AdminOpenPayPeriod =
       organizationId: string
       details: PayrollAdminPageData['current']
     }
-
-type PayrollAdminPageData = NonNullable<
-  FunctionReturnType<
-    typeof api.features.payroll.getPayrollAdminPageForOrganization
-  >
->
