@@ -36,6 +36,7 @@ import { Route as KibbleAbsenceIdRouteImport } from './routes/kibble/absence/$id
 import { Route as AdminOrgSlugStoreRouteImport } from './routes/admin/$orgSlug/store'
 import { Route as AdminOrgSlugSettingsRouteImport } from './routes/admin/$orgSlug/settings'
 import { Route as AdminOrgSlugPosRouteImport } from './routes/admin/$orgSlug/pos'
+import { Route as AdminOrgSlugPayRouteImport } from './routes/admin/$orgSlug/pay'
 import { Route as AdminOrgSlugActivityRouteImport } from './routes/admin/$orgSlug/activity'
 import { Route as AdminOrgSlugAbsencesRouteImport } from './routes/admin/$orgSlug/absences'
 import { Route as PawketSavingsVaultsIndexRouteImport } from './routes/pawket/savings/vaults/index'
@@ -184,6 +185,11 @@ const AdminOrgSlugPosRoute = AdminOrgSlugPosRouteImport.update({
   path: '/$orgSlug/pos',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminOrgSlugPayRoute = AdminOrgSlugPayRouteImport.update({
+  id: '/$orgSlug/pay',
+  path: '/$orgSlug/pay',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminOrgSlugActivityRoute = AdminOrgSlugActivityRouteImport.update({
   id: '/$orgSlug/activity',
   path: '/$orgSlug/activity',
@@ -253,6 +259,7 @@ export interface FileRoutesByFullPath {
   '/pawket/': typeof PawketIndexRoute
   '/admin/$orgSlug/absences': typeof AdminOrgSlugAbsencesRoute
   '/admin/$orgSlug/activity': typeof AdminOrgSlugActivityRoute
+  '/admin/$orgSlug/pay': typeof AdminOrgSlugPayRoute
   '/admin/$orgSlug/pos': typeof AdminOrgSlugPosRoute
   '/admin/$orgSlug/settings': typeof AdminOrgSlugSettingsRoute
   '/admin/$orgSlug/store': typeof AdminOrgSlugStoreRoute
@@ -288,6 +295,7 @@ export interface FileRoutesByTo {
   '/pawket': typeof PawketIndexRoute
   '/admin/$orgSlug/absences': typeof AdminOrgSlugAbsencesRoute
   '/admin/$orgSlug/activity': typeof AdminOrgSlugActivityRoute
+  '/admin/$orgSlug/pay': typeof AdminOrgSlugPayRoute
   '/admin/$orgSlug/pos': typeof AdminOrgSlugPosRoute
   '/admin/$orgSlug/settings': typeof AdminOrgSlugSettingsRoute
   '/admin/$orgSlug/store': typeof AdminOrgSlugStoreRoute
@@ -327,6 +335,7 @@ export interface FileRoutesById {
   '/pawket/': typeof PawketIndexRoute
   '/admin/$orgSlug/absences': typeof AdminOrgSlugAbsencesRoute
   '/admin/$orgSlug/activity': typeof AdminOrgSlugActivityRoute
+  '/admin/$orgSlug/pay': typeof AdminOrgSlugPayRoute
   '/admin/$orgSlug/pos': typeof AdminOrgSlugPosRoute
   '/admin/$orgSlug/settings': typeof AdminOrgSlugSettingsRoute
   '/admin/$orgSlug/store': typeof AdminOrgSlugStoreRoute
@@ -367,6 +376,7 @@ export interface FileRouteTypes {
     | '/pawket/'
     | '/admin/$orgSlug/absences'
     | '/admin/$orgSlug/activity'
+    | '/admin/$orgSlug/pay'
     | '/admin/$orgSlug/pos'
     | '/admin/$orgSlug/settings'
     | '/admin/$orgSlug/store'
@@ -402,6 +412,7 @@ export interface FileRouteTypes {
     | '/pawket'
     | '/admin/$orgSlug/absences'
     | '/admin/$orgSlug/activity'
+    | '/admin/$orgSlug/pay'
     | '/admin/$orgSlug/pos'
     | '/admin/$orgSlug/settings'
     | '/admin/$orgSlug/store'
@@ -440,6 +451,7 @@ export interface FileRouteTypes {
     | '/pawket/'
     | '/admin/$orgSlug/absences'
     | '/admin/$orgSlug/activity'
+    | '/admin/$orgSlug/pay'
     | '/admin/$orgSlug/pos'
     | '/admin/$orgSlug/settings'
     | '/admin/$orgSlug/store'
@@ -662,6 +674,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminOrgSlugPosRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/$orgSlug/pay': {
+      id: '/admin/$orgSlug/pay'
+      path: '/$orgSlug/pay'
+      fullPath: '/admin/$orgSlug/pay'
+      preLoaderRoute: typeof AdminOrgSlugPayRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/$orgSlug/activity': {
       id: '/admin/$orgSlug/activity'
       path: '/$orgSlug/activity'
@@ -733,6 +752,7 @@ interface AdminRouteRouteChildren {
   AdminIndexRoute: typeof AdminIndexRoute
   AdminOrgSlugAbsencesRoute: typeof AdminOrgSlugAbsencesRoute
   AdminOrgSlugActivityRoute: typeof AdminOrgSlugActivityRoute
+  AdminOrgSlugPayRoute: typeof AdminOrgSlugPayRoute
   AdminOrgSlugPosRoute: typeof AdminOrgSlugPosRoute
   AdminOrgSlugSettingsRoute: typeof AdminOrgSlugSettingsRoute
   AdminOrgSlugStoreRoute: typeof AdminOrgSlugStoreRoute
@@ -744,6 +764,7 @@ const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminIndexRoute: AdminIndexRoute,
   AdminOrgSlugAbsencesRoute: AdminOrgSlugAbsencesRoute,
   AdminOrgSlugActivityRoute: AdminOrgSlugActivityRoute,
+  AdminOrgSlugPayRoute: AdminOrgSlugPayRoute,
   AdminOrgSlugPosRoute: AdminOrgSlugPosRoute,
   AdminOrgSlugSettingsRoute: AdminOrgSlugSettingsRoute,
   AdminOrgSlugStoreRoute: AdminOrgSlugStoreRoute,

@@ -42,7 +42,7 @@ export function KibbleLoadingScreen(props: {
    * (auth check, route data, etc.) finishes.
    */
   isReady?: boolean
-  /** Status text rendered under the bar. */
+  /** Status text rendered above the bar. */
   label?: string
   /** Show the "Kibble Capital" wordmark above the icon. Default: true. */
   showWordmark?: boolean
@@ -90,6 +90,10 @@ export function KibbleLoadingScreen(props: {
         <KibbleLoader className="size-24" />
 
         <div className="flex w-full flex-col items-center gap-3">
+          <span className="text-muted-foreground text-[11px] font-semibold tracking-[0.25em] uppercase">
+            {label}
+          </span>
+
           <div
             role="progressbar"
             aria-label={label}
@@ -112,10 +116,6 @@ export function KibbleLoadingScreen(props: {
               }}
             />
           </div>
-
-          <span className="text-muted-foreground text-[11px] font-semibold tracking-[0.25em] uppercase">
-            {label}
-          </span>
         </div>
       </div>
     </div>

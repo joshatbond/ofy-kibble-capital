@@ -179,6 +179,19 @@ describe('nextPayDateOnOrAfter', () => {
       )
     ).toBe('2026-07-28')
   })
+
+  test('biweekly rejects firstPayDate that is not on weekday', () => {
+    expect(() =>
+      nextPayDateOnOrAfter(
+        {
+          type: 'biweekly',
+          weekday: 5,
+          firstPayDate: '2025-07-15',
+        },
+        '2026-07-29'
+      )
+    ).toThrow(/firstPayDate.*must fall on weekday/)
+  })
 })
 
 describe('defaultFirstPayDate', () => {

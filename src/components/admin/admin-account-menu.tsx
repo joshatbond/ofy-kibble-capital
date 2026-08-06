@@ -216,6 +216,8 @@ function adminPathForTab(
       return { to: '/admin/$orgSlug/settings', params }
     case 'absences':
       return { to: '/admin/$orgSlug/absences', params }
+    case 'pay':
+      return { to: '/admin/$orgSlug/pay', params }
     case 'store':
       return { to: '/admin/$orgSlug/store', params }
     default:

@@ -6,17 +6,24 @@ import {
 import { v } from 'convex/values'
 
 import { mutation, query } from '../_generated/server'
-import {
-  payPeriodScheduleTypeValidator,
-  payPeriodStatusValidator,
-} from '../schema/schemaFields'
 
+import { toUserError, userError } from './appError'
 import { requireTeacherForOrg } from './auth/teacher'
 import { getActiveRosterStudentForUser } from './banking/student'
+import {
+  getOpenPayPeriodAdminDetails,
+  getPayPeriodAdminDetails,
+  getPayRunAdminReport,
+  getPayrollAdminPage,
+  payPeriodAdminDetailsValidator,
+  payRunAdminReportValidator,
+  payrollAdminPageValidator,
+} from './payroll/adminStatus'
 import { validateStubAttendanceForPayPeriod } from './payroll/attendanceValidation'
 import {
   ensureCurrentPayPeriodForOrg,
   listPayPeriodsForOrg,
+  payPeriodPublicValidator,
   toPayPeriodPublic,
 } from './payroll/periodStore'
 import { postponePayPeriodRun } from './payroll/postpone'
@@ -30,18 +37,19 @@ import {
   paystubListItemValidator,
 } from './payroll/studentPaystubs'
 
-const payPeriodPublicValidator = v.object({
-  _id: v.id('payPeriods'),
-  organizationId: v.string(),
-  startDate: v.string(),
-  endDate: v.string(),
-  payDate: v.string(),
-  scheduleType: payPeriodScheduleTypeValidator,
-  isTransition: v.boolean(),
-  status: payPeriodStatusValidator,
-  createdAt: v.number(),
-  closedAt: v.optional(v.number()),
-})
+const payScheduleUserErrors = [
+  {
+    pattern: /firstPayDate.*must fall on weekday/i,
+    message:
+      'The biweekly pay schedule is invalid. Open Settings, pick Bi-weekly again, and save.',
+  },
+  {
+    pattern: /search horizon/i,
+    message:
+      'Could not find a valid payday for this classroom schedule. Check Settings, then try again.',
+  },
+] as const
+
 const attendanceValidationValidator = v.union(
   v.object({
     status: v.literal('ready'),
@@ -83,20 +91,24 @@ export const listPayPeriodsForOrganization = query({
   args: { organizationId: v.string() },
   returns: v.array(payPeriodPublicValidator),
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx)
-    if (userId === null) {
-      throw new Error('Not authenticated')
+    try {
+      const userId = await getAuthUserId(ctx)
+      if (userId === null) {
+        userError('Sign in to continue.')
+      }
+
+      await requireTeacherForOrg(
+        ctx,
+        userId,
+        args.organizationId,
+        'organizations:read'
+      )
+
+      const periods = await listPayPeriodsForOrg(ctx, args.organizationId)
+      return periods.map(toPayPeriodPublic)
+    } catch (error) {
+      toUserError(error, 'Could not load pay periods.')
     }
-
-    await requireTeacherForOrg(
-      ctx,
-      userId,
-      args.organizationId,
-      'organizations:read'
-    )
-
-    const periods = await listPayPeriodsForOrg(ctx, args.organizationId)
-    return periods.map(toPayPeriodPublic)
   },
 })
 export const ensureCurrentPayPeriod = mutation({
@@ -106,24 +118,142 @@ export const ensureCurrentPayPeriod = mutation({
   },
   returns: payPeriodPublicValidator,
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx)
-    if (userId === null) {
-      throw new Error('Not authenticated')
+    try {
+      const userId = await getAuthUserId(ctx)
+      if (userId === null) {
+        userError('Sign in to continue.')
+      }
+
+      await requireTeacherForOrg(
+        ctx,
+        userId,
+        args.organizationId,
+        'organizations:update'
+      )
+
+      const period = await ensureCurrentPayPeriodForOrg(ctx, {
+        organizationId: args.organizationId,
+        nowMs: args.nowMs ?? Date.now(),
+      })
+
+      return toPayPeriodPublic(period)
+    } catch (error) {
+      toUserError(error, 'Could not load the current pay period.', [
+        ...payScheduleUserErrors,
+      ])
     }
+  },
+})
+export const getOpenPayPeriodAdminDetailsForOrganization = query({
+  args: {
+    organizationId: v.string(),
+  },
+  returns: v.union(payPeriodAdminDetailsValidator, v.null()),
+  handler: async (ctx, args) => {
+    try {
+      const userId = await getAuthUserId(ctx)
+      if (userId === null) {
+        userError('Sign in to continue.')
+      }
 
-    await requireTeacherForOrg(
-      ctx,
-      userId,
-      args.organizationId,
-      'organizations:update'
-    )
+      await requireTeacherForOrg(
+        ctx,
+        userId,
+        args.organizationId,
+        'organizations:read'
+      )
 
-    const period = await ensureCurrentPayPeriodForOrg(ctx, {
-      organizationId: args.organizationId,
-      nowMs: args.nowMs ?? Date.now(),
-    })
+      return await getOpenPayPeriodAdminDetails(ctx, {
+        organizationId: args.organizationId,
+      })
+    } catch (error) {
+      toUserError(error, 'Could not load pay period details.')
+    }
+  },
+})
+export const getPayrollAdminPageForOrganization = query({
+  args: {
+    organizationId: v.string(),
+  },
+  returns: v.union(payrollAdminPageValidator, v.null()),
+  handler: async (ctx, args) => {
+    try {
+      const userId = await getAuthUserId(ctx)
+      if (userId === null) {
+        userError('Sign in to continue.')
+      }
 
-    return toPayPeriodPublic(period)
+      await requireTeacherForOrg(
+        ctx,
+        userId,
+        args.organizationId,
+        'organizations:read'
+      )
+
+      return await getPayrollAdminPage(ctx, {
+        organizationId: args.organizationId,
+      })
+    } catch (error) {
+      toUserError(error, 'Could not load payroll.')
+    }
+  },
+})
+export const getPayPeriodAdminDetailsForOrganization = query({
+  args: {
+    organizationId: v.string(),
+    payPeriodId: v.id('payPeriods'),
+  },
+  returns: payPeriodAdminDetailsValidator,
+  handler: async (ctx, args) => {
+    try {
+      const userId = await getAuthUserId(ctx)
+      if (userId === null) {
+        userError('Sign in to continue.')
+      }
+
+      await requireTeacherForOrg(
+        ctx,
+        userId,
+        args.organizationId,
+        'organizations:read'
+      )
+
+      return await getPayPeriodAdminDetails(ctx, {
+        organizationId: args.organizationId,
+        payPeriodId: args.payPeriodId,
+      })
+    } catch (error) {
+      toUserError(error, 'Could not load pay period details.')
+    }
+  },
+})
+export const getPayRunAdminReportForOrganization = query({
+  args: {
+    organizationId: v.string(),
+    payRunId: v.id('payRuns'),
+  },
+  returns: payRunAdminReportValidator,
+  handler: async (ctx, args) => {
+    try {
+      const userId = await getAuthUserId(ctx)
+      if (userId === null) {
+        userError('Sign in to continue.')
+      }
+
+      await requireTeacherForOrg(
+        ctx,
+        userId,
+        args.organizationId,
+        'organizations:read'
+      )
+
+      return await getPayRunAdminReport(ctx, {
+        organizationId: args.organizationId,
+        payRunId: args.payRunId,
+      })
+    } catch (error) {
+      toUserError(error, 'Could not load pay run report.')
+    }
   },
 })
 export const validateAttendanceForPayPeriod = query({
@@ -133,34 +263,38 @@ export const validateAttendanceForPayPeriod = query({
   },
   returns: attendanceValidationValidator,
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx)
-    if (userId === null) {
-      throw new Error('Not authenticated')
-    }
+    try {
+      const userId = await getAuthUserId(ctx)
+      if (userId === null) {
+        userError('Sign in to continue.')
+      }
 
-    await requireTeacherForOrg(
-      ctx,
-      userId,
-      args.organizationId,
-      'organizations:read'
-    )
+      await requireTeacherForOrg(
+        ctx,
+        userId,
+        args.organizationId,
+        'organizations:read'
+      )
 
-    const result = await validateStubAttendanceForPayPeriod(ctx, args)
+      const result = await validateStubAttendanceForPayPeriod(ctx, args)
 
-    if (result.status === 'blocked') {
+      if (result.status === 'blocked') {
+        return {
+          status: 'blocked' as const,
+          activeStudentCount: result.activeStudentCount,
+          payPeriodId: result.payPeriod._id,
+          blockReasons: result.blockReasons,
+        }
+      }
+
       return {
-        status: 'blocked' as const,
+        status: 'ready' as const,
         activeStudentCount: result.activeStudentCount,
         payPeriodId: result.payPeriod._id,
-        blockReasons: result.blockReasons,
+        records: result.records,
       }
-    }
-
-    return {
-      status: 'ready' as const,
-      activeStudentCount: result.activeStudentCount,
-      payPeriodId: result.payPeriod._id,
-      records: result.records,
+    } catch (error) {
+      toUserError(error, 'Could not validate attendance for this pay period.')
     }
   },
 })
@@ -172,24 +306,28 @@ export const runPayPeriod = mutation({
   },
   returns: payRunResultValidator,
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx)
-    if (userId === null) {
-      throw new Error('Not authenticated')
+    try {
+      const userId = await getAuthUserId(ctx)
+      if (userId === null) {
+        userError('Sign in to continue.')
+      }
+
+      await requireTeacherForOrg(
+        ctx,
+        userId,
+        args.organizationId,
+        'organizations:update'
+      )
+
+      return await executePayRunForPeriod(ctx, {
+        organizationId: args.organizationId,
+        payPeriodId: args.payPeriodId,
+        triggeredBy: 'manual',
+        nowMs: args.nowMs ?? Date.now(),
+      })
+    } catch (error) {
+      toUserError(error, 'Could not run payroll.')
     }
-
-    await requireTeacherForOrg(
-      ctx,
-      userId,
-      args.organizationId,
-      'organizations:update'
-    )
-
-    return await executePayRunForPeriod(ctx, {
-      organizationId: args.organizationId,
-      payPeriodId: args.payPeriodId,
-      triggeredBy: 'manual',
-      nowMs: args.nowMs ?? Date.now(),
-    })
   },
 })
 export const postponePayPeriod = mutation({
@@ -206,24 +344,28 @@ export const postponePayPeriod = mutation({
     effectivePayDate: v.string(),
   }),
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx)
-    if (userId === null) {
-      throw new Error('Not authenticated')
+    try {
+      const userId = await getAuthUserId(ctx)
+      if (userId === null) {
+        userError('Sign in to continue.')
+      }
+
+      await requireTeacherForOrg(
+        ctx,
+        userId,
+        args.organizationId,
+        'organizations:update'
+      )
+
+      return await postponePayPeriodRun(ctx, {
+        organizationId: args.organizationId,
+        payPeriodId: args.payPeriodId,
+        postponedUntil: args.postponedUntil,
+        nowMs: args.nowMs ?? Date.now(),
+      })
+    } catch (error) {
+      toUserError(error, 'Could not postpone payday.')
     }
-
-    await requireTeacherForOrg(
-      ctx,
-      userId,
-      args.organizationId,
-      'organizations:update'
-    )
-
-    return await postponePayPeriodRun(ctx, {
-      organizationId: args.organizationId,
-      payPeriodId: args.payPeriodId,
-      postponedUntil: args.postponedUntil,
-      nowMs: args.nowMs ?? Date.now(),
-    })
   },
 })
 export const listMyPaystubs = query({
@@ -232,62 +374,74 @@ export const listMyPaystubs = query({
   },
   returns: paginationResultValidator(paystubListItemValidator),
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx)
-    if (userId === null) {
-      throw new Error('Not authenticated')
-    }
+    try {
+      const userId = await getAuthUserId(ctx)
+      if (userId === null) {
+        userError('Sign in to continue.')
+      }
 
-    const roster = await getActiveRosterStudentForUser(ctx, userId)
-    if (roster === null) {
-      return { page: [], isDone: true, continueCursor: '' }
-    }
+      const roster = await getActiveRosterStudentForUser(ctx, userId)
+      if (roster === null) {
+        return { page: [], isDone: true, continueCursor: '' }
+      }
 
-    return await listPaystubsForStudent(ctx, {
-      rosterStudentId: roster._id,
-      paginationOpts: args.paginationOpts,
-    })
+      return await listPaystubsForStudent(ctx, {
+        rosterStudentId: roster._id,
+        paginationOpts: args.paginationOpts,
+      })
+    } catch (error) {
+      toUserError(error, 'Could not load paystubs.')
+    }
   },
 })
 export const countMyUnviewedPaystubs = query({
   args: {},
   returns: v.number(),
   handler: async ctx => {
-    const userId = await getAuthUserId(ctx)
-    if (userId === null) {
-      throw new Error('Not authenticated')
-    }
+    try {
+      const userId = await getAuthUserId(ctx)
+      if (userId === null) {
+        userError('Sign in to continue.')
+      }
 
-    const roster = await getActiveRosterStudentForUser(ctx, userId)
-    if (roster === null) {
-      return 0
-    }
+      const roster = await getActiveRosterStudentForUser(ctx, userId)
+      if (roster === null) {
+        return 0
+      }
 
-    return await countUnviewedPaystubsForStudent(ctx, roster._id)
+      return await countUnviewedPaystubsForStudent(ctx, roster._id)
+    } catch (error) {
+      toUserError(error, 'Could not load unread paystub count.')
+    }
   },
 })
 export const getMyPaystub = query({
   args: { paystubId: v.string() },
   returns: v.union(paystubDetailValidator, v.null()),
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx)
-    if (userId === null) {
-      throw new Error('Not authenticated')
-    }
+    try {
+      const userId = await getAuthUserId(ctx)
+      if (userId === null) {
+        userError('Sign in to continue.')
+      }
 
-    const roster = await getActiveRosterStudentForUser(ctx, userId)
-    if (roster === null) {
-      return null
-    }
+      const roster = await getActiveRosterStudentForUser(ctx, userId)
+      if (roster === null) {
+        return null
+      }
 
-    const paystubId = ctx.db.normalizeId('paystubs', args.paystubId)
-    if (paystubId === null) {
-      return null
-    }
+      const paystubId = ctx.db.normalizeId('paystubs', args.paystubId)
+      if (paystubId === null) {
+        return null
+      }
 
-    return await getPaystubForStudent(ctx, {
-      rosterStudentId: roster._id,
-      paystubId,
-    })
+      return await getPaystubForStudent(ctx, {
+        rosterStudentId: roster._id,
+        paystubId,
+      })
+    } catch (error) {
+      toUserError(error, 'Could not load paystub.')
+    }
   },
 })
 export const markMyPaystubViewed = mutation({
@@ -296,25 +450,29 @@ export const markMyPaystubViewed = mutation({
   },
   returns: v.union(paystubDetailValidator, v.null()),
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx)
-    if (userId === null) {
-      throw new Error('Not authenticated')
-    }
+    try {
+      const userId = await getAuthUserId(ctx)
+      if (userId === null) {
+        userError('Sign in to continue.')
+      }
 
-    const roster = await getActiveRosterStudentForUser(ctx, userId)
-    if (roster === null) {
-      return null
-    }
+      const roster = await getActiveRosterStudentForUser(ctx, userId)
+      if (roster === null) {
+        return null
+      }
 
-    const paystubId = ctx.db.normalizeId('paystubs', args.paystubId)
-    if (paystubId === null) {
-      return null
-    }
+      const paystubId = ctx.db.normalizeId('paystubs', args.paystubId)
+      if (paystubId === null) {
+        return null
+      }
 
-    return await markPaystubViewedForStudent(ctx, {
-      rosterStudentId: roster._id,
-      paystubId,
-      nowMs: Date.now(),
-    })
+      return await markPaystubViewedForStudent(ctx, {
+        rosterStudentId: roster._id,
+        paystubId,
+        nowMs: Date.now(),
+      })
+    } catch (error) {
+      toUserError(error, 'Could not mark paystub viewed.')
+    }
   },
 })

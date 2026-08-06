@@ -1,8 +1,10 @@
 import {
+  V1_BASE_SETTINGS,
   V1_REGION_SETTINGS,
   V1_SCHOOL_SITE_SETTINGS,
 } from '../features/settings/defaults'
 import {
+  assertPaySchedule,
   assertPaydayNoticeLeadDays,
   pickSettingsValues,
 } from '../features/settings/values'
@@ -75,10 +77,64 @@ export async function ensureSchoolSiteSettings(
   })
 }
 
+/**
+ * Repair catalog/classroom pay schedules that cannot produce a payday
+ * (e.g. biweekly weekday ≠ firstPayDate weekday from older seeds).
+ */
+export async function repairInconsistentPaySchedules(
+  ctx: MutationCtx
+): Promise<{ patched: number }> {
+  const canonical = V1_BASE_SETTINGS.paySchedule
+  let patched = 0
+
+  const regionRows = await ctx.db.query('regionSettings').collect()
+  for (const row of regionRows) {
+    if (!isInconsistentPaySchedule(row.paySchedule)) {
+      continue
+    }
+    await ctx.db.patch('regionSettings', row._id, { paySchedule: canonical })
+    patched += 1
+  }
+
+  const siteRows = await ctx.db.query('schoolSiteSettings').collect()
+  for (const row of siteRows) {
+    if (!isInconsistentPaySchedule(row.paySchedule)) {
+      continue
+    }
+    await ctx.db.patch('schoolSiteSettings', row._id, {
+      paySchedule: canonical,
+    })
+    patched += 1
+  }
+
+  const classRows = await ctx.db.query('classSettings').collect()
+  for (const row of classRows) {
+    if (!isInconsistentPaySchedule(row.paySchedule)) {
+      continue
+    }
+    await ctx.db.patch('classSettings', row._id, { paySchedule: canonical })
+    patched += 1
+  }
+
+  return { patched }
+}
+
 /** Product constraints for settings rows written during catalog seed. */
 function assertCatalogSettings(values: SettingsValues): void {
   assertPaydayNoticeLeadDays(values.paydayNoticeLeadDays)
+  assertPaySchedule(values.paySchedule)
   if (values.vaultCap < 1) {
     throw new Error('Vault cap must be at least 1.')
+  }
+}
+
+function isInconsistentPaySchedule(
+  schedule: SettingsValues['paySchedule']
+): boolean {
+  try {
+    assertPaySchedule(schedule)
+    return false
+  } catch {
+    return true
   }
 }

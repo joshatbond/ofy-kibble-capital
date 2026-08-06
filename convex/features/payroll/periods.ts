@@ -1,5 +1,6 @@
 import {
   addDays,
+  assertBiweeklyFirstPayDateMatchesWeekday,
   clampDayOfMonth,
   compareIsoDates,
   daysInMonth,
@@ -95,6 +96,13 @@ export function nextPayDateOnOrAfter(
   schedule: PaySchedule,
   fromIso: string
 ): string {
+  if (schedule.type === 'biweekly') {
+    assertBiweeklyFirstPayDateMatchesWeekday(
+      schedule.firstPayDate,
+      schedule.weekday
+    )
+  }
+
   const from = parseIsoDate(fromIso)
   let cursor = from
 

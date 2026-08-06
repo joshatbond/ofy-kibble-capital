@@ -15,6 +15,7 @@ import {
 import { useState } from 'react'
 
 import { AdminPage } from '~/components/admin/admin-shell'
+import { KibbleLoadingScreen } from '~/components/loading/kibble-loader'
 import { Case, SwitchOn } from '~/components/switch-on'
 import { Button } from '~/components/ui/button'
 import { For } from '~/components/ui/for'
@@ -682,7 +683,7 @@ function RosterStudentCard(props: {
     <article
       className={cn(
         rosterStudentCardVariants({ status: row.status }),
-        'w-full max-w-full min-w-[min(100%,17.5rem)] grow basis-[17.5rem]',
+        'w-full max-w-full min-w-[min(100%,17.5rem)] grow basis-70',
         '@min-[30rem]/roster:w-fit @min-[30rem]/roster:max-w-none @min-[30rem]/roster:grow-0 @min-[30rem]/roster:basis-auto'
       )}
     >
@@ -776,8 +777,7 @@ function PaySplitReadOnly(props: {
         !props.paySplit.isConfigured && 'text-muted-foreground'
       )}
     >
-      Pay Split (%): {props.paySplit.checkingPercent} /{' '}
-      {props.paySplit.savingsPercent}
+      {`Pay Split (%): ${props.paySplit.checkingPercent} / ${props.paySplit.savingsPercent}`}
     </p>
   )
 }

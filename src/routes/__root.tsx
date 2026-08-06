@@ -6,6 +6,7 @@ import {
 } from '@tanstack/react-router'
 import * as React from 'react'
 
+import { Toaster } from '~/components/ui/sonner'
 import { useDocumentTitle } from '~/hooks/use-document-title'
 import { useFavicon } from '~/hooks/use-favicon'
 import { useMobileButtonHaptics } from '~/hooks/use-mobile-button-haptics'
@@ -69,6 +70,8 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 
       <body suppressHydrationWarning>
         {children}
+
+        <Toaster />
 
         <Scripts />
       </body>

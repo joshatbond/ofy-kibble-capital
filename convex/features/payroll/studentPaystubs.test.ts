@@ -30,19 +30,19 @@ describe('student paystub APIs', () => {
       t.query(api.features.payroll.listMyPaystubs, {
         paginationOpts: { numItems: 10, cursor: null },
       })
-    ).rejects.toThrow(/Not authenticated/)
+    ).rejects.toThrow(/Sign in to continue/)
 
     await expect(
       t.query(api.features.payroll.countMyUnviewedPaystubs, {})
-    ).rejects.toThrow(/Not authenticated/)
+    ).rejects.toThrow(/Sign in to continue/)
 
     await expect(
       t.query(api.features.payroll.getMyPaystub, { paystubId })
-    ).rejects.toThrow(/Not authenticated/)
+    ).rejects.toThrow(/Sign in to continue/)
 
     await expect(
       t.mutation(api.features.payroll.markMyPaystubViewed, { paystubId })
-    ).rejects.toThrow(/Not authenticated/)
+    ).rejects.toThrow(/Sign in to continue/)
   })
 
   test('no-active-roster get and mark return null; list and count empty', async () => {

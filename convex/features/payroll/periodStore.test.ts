@@ -1,3 +1,4 @@
+import { ConvexError } from 'convex/values'
 import { describe, expect, test } from 'vitest'
 
 import { api } from '../../_generated/api'
@@ -37,5 +38,42 @@ describe('ensureCurrentPayPeriod', () => {
     )
     expect(listed).toHaveLength(1)
     expect(listed[0]?._id).toBe(first._id)
+  })
+
+  test('maps inconsistent biweekly settings to a user-facing ConvexError', async () => {
+    const t = initConvexTest()
+    const { teacher, organizationId } = await setupDevTeacherClassroom(t)
+
+    await t.run(async ctx => {
+      const settings = await ctx.db
+        .query('classSettings')
+        .withIndex('by_organizationId', q =>
+          q.eq('organizationId', organizationId)
+        )
+        .unique()
+      if (settings === null) {
+        throw new Error('expected classSettings')
+      }
+      await ctx.db.patch('classSettings', settings._id, {
+        paySchedule: {
+          type: 'biweekly',
+          weekday: 5,
+          firstPayDate: '2025-07-15',
+        },
+      })
+    })
+
+    try {
+      await teacher.client.mutation(api.features.payroll.ensureCurrentPayPeriod, {
+        organizationId,
+        nowMs: Date.UTC(2026, 6, 29, 15, 0, 0),
+      })
+      expect.unreachable('expected ensureCurrentPayPeriod to fail')
+    } catch (error) {
+      expect(error).toBeInstanceOf(ConvexError)
+      expect((error as ConvexError<string>).data).toBe(
+        'The biweekly pay schedule is invalid. Open Settings, pick Bi-weekly again, and save.'
+      )
+    }
   })
 })

@@ -22,6 +22,7 @@ Client-first; teachers only (`AdminAuthGate` + Convex teacher membership).
 - `/admin/$orgSlug` — **Student roster** (invites, pay tokens, resend/revoke)
 - `/admin/$orgSlug/settings` — **Settings** (persisted `classSettings` for the organization)
 - `/admin/$orgSlug/absences` — absence calendar + approvals (**wireframe**; slice 7)
+- `/admin/$orgSlug/pay` — **Payroll** (current period, pay-run cards, postpone menu, pay-report dialog)
 - `/admin/$orgSlug/store` — store catalog + POS checkout (**wireframe**; slice 8)
 - `/admin/$orgSlug/pos` — redirects to `store`
 

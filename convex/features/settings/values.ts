@@ -5,6 +5,7 @@ import {
   settingsTableFields,
   weekdayValidator,
 } from '../../schema/schemaFields'
+import { assertBiweeklyFirstPayDateMatchesWeekday } from '../payroll/dates'
 
 import type { Infer } from 'convex/values'
 
@@ -20,6 +21,41 @@ export function assertPaydayNoticeLeadDays(days: number): void {
     throw new Error(
       `Payday notice lead must be between ${PAYDAY_NOTICE_LEAD_DAYS_MIN} and ${PAYDAY_NOTICE_LEAD_DAYS_MAX} calendar days before pay day.`
     )
+  }
+}
+
+/** Product constraints for pay-schedule shapes stored in settings. */
+export function assertPaySchedule(
+  schedule: SettingsValues['paySchedule']
+): void {
+  switch (schedule.type) {
+    case 'weekly':
+      assertWeekday(schedule.weekday)
+      return
+    case 'biweekly': {
+      assertWeekday(schedule.weekday)
+      assertBiweeklyFirstPayDateMatchesWeekday(
+        schedule.firstPayDate,
+        schedule.weekday
+      )
+      return
+    }
+    case 'semi_monthly':
+      if (schedule.daysOfMonth.length !== 2) {
+        throw new Error(
+          'Semi-monthly schedule requires exactly two days of month.'
+        )
+      }
+      return
+    case 'monthly':
+      if (
+        !Number.isInteger(schedule.dayOfMonth) ||
+        schedule.dayOfMonth < 1 ||
+        schedule.dayOfMonth > 31
+      ) {
+        throw new Error('Monthly payday day must be between 1 and 31.')
+      }
+      return
   }
 }
 
@@ -53,6 +89,7 @@ export function assertClassSettings(values: SettingsValues): void {
   }
 
   assertPaydayNoticeLeadDays(values.paydayNoticeLeadDays)
+  assertPaySchedule(values.paySchedule)
 
   if (values.currencyLabel.trim().length === 0) {
     throw new Error('Currency label is required.')
@@ -79,3 +116,11 @@ export function pickSettingsValues(
   }
 }
 export type SettingsValues = Infer<typeof settingsValuesValidator>
+
+function assertWeekday(weekday: number): void {
+  if (!Number.isInteger(weekday) || weekday < 0 || weekday > 6) {
+    throw new Error(
+      'Pay schedule weekday must be an integer from 0 (Sunday) through 6 (Saturday).'
+    )
+  }
+}

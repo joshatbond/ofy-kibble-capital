@@ -11,6 +11,14 @@ export default defineConfig({
           environment: 'edge-runtime',
         },
       },
+      {
+        extends: true,
+        test: {
+          name: 'src-lib',
+          include: ['src/lib/**/*.test.ts'],
+          environment: 'node',
+        },
+      },
     ],
   },
 })

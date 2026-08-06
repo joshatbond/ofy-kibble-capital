@@ -1,12 +1,28 @@
+import { v } from 'convex/values'
+
+import { payPeriodsTableFields } from '../../schema/schemaFields'
 import { resolveEffectiveSettings } from '../settings/effectiveSettings'
 
 import { civilDateInProductTimezone } from './dates'
 import { nextPayDateOnOrAfter, periodBoundsForPayDate } from './periods'
 
 import type { PayPeriodDraft } from './periods'
-import type { Doc, Id } from '../../_generated/dataModel'
+import type { Doc } from '../../_generated/dataModel'
 import type { MutationCtx, QueryCtx } from '../../_generated/server'
+import type { Infer } from 'convex/values'
 
+export const payPeriodPublicValidator = v.object({
+  _id: v.id('payPeriods'),
+  organizationId: payPeriodsTableFields.organizationId,
+  startDate: payPeriodsTableFields.startDate,
+  endDate: payPeriodsTableFields.endDate,
+  payDate: payPeriodsTableFields.payDate,
+  scheduleType: payPeriodsTableFields.scheduleType,
+  isTransition: payPeriodsTableFields.isTransition,
+  status: payPeriodsTableFields.status,
+  createdAt: payPeriodsTableFields.createdAt,
+  closedAt: payPeriodsTableFields.closedAt,
+})
 export function toPayPeriodPublic(period: Doc<'payPeriods'>): PayPeriodPublic {
   return {
     _id: period._id,
@@ -96,15 +112,4 @@ export async function insertPayPeriod(
 
   return period
 }
-export type PayPeriodPublic = {
-  _id: Id<'payPeriods'>
-  organizationId: string
-  startDate: string
-  endDate: string
-  payDate: string
-  scheduleType: Doc<'payPeriods'>['scheduleType']
-  isTransition: boolean
-  status: Doc<'payPeriods'>['status']
-  createdAt: number
-  closedAt?: number
-}
+export type PayPeriodPublic = Infer<typeof payPeriodPublicValidator>

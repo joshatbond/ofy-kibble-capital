@@ -58,6 +58,22 @@ export function isPaydayAutomationClock(nowMs: number): boolean {
 export function weekdayOf(date: CivilDate): number {
   return new Date(Date.UTC(date.year, date.month - 1, date.day, 12)).getUTCDay()
 }
+
+/**
+ * Biweekly schedules require the parity anchor to land on the configured weekday.
+ * Shared by settings validation and pay-date search.
+ */
+export function assertBiweeklyFirstPayDateMatchesWeekday(
+  firstPayDate: string,
+  weekday: number
+): void {
+  const anchor = parseIsoDate(firstPayDate)
+  if (weekdayOf(anchor) !== weekday) {
+    throw new Error(
+      `Biweekly firstPayDate ${firstPayDate} must fall on weekday ${String(weekday)}.`
+    )
+  }
+}
 export function daysInMonth(year: number, month: number): number {
   return new Date(Date.UTC(year, month, 0)).getUTCDate()
 }

@@ -6,10 +6,12 @@ import {
   initConvexTest,
   setupDevTeacherClassroom,
 } from '../../test.setup'
+
 import { V1_BASE_SETTINGS } from './defaults'
 import { mergeSettingsLayers } from './merge'
 import {
   assertClassSettings,
+  assertPaySchedule,
   assertPaydayNoticeLeadDays,
   pickSettingsValues,
 } from './values'
@@ -44,7 +46,7 @@ describe('settings helpers', () => {
         _id: 'ignore-me',
         _creationTime: 123,
         regionId: 'also-ignore',
-      } as SettingsValues & Record<string, unknown>)
+      })
     ).toEqual(V1_BASE_SETTINGS)
   })
 
@@ -86,6 +88,24 @@ describe('settings helpers', () => {
     expect(() => assertPaydayNoticeLeadDays(7)).not.toThrow()
     expect(() => assertPaydayNoticeLeadDays(0)).toThrow(/Payday notice lead/)
     expect(() => assertPaydayNoticeLeadDays(8)).toThrow(/Payday notice lead/)
+  })
+
+  test('assertPaySchedule rejects biweekly firstPayDate off weekday', () => {
+    expect(() =>
+      assertPaySchedule({
+        type: 'biweekly',
+        weekday: 5,
+        firstPayDate: '2025-07-15',
+      })
+    ).toThrow(/firstPayDate.*must fall on weekday/)
+
+    expect(() =>
+      assertPaySchedule({
+        type: 'biweekly',
+        weekday: 2,
+        firstPayDate: '2026-07-14',
+      })
+    ).not.toThrow()
   })
 })
 

@@ -6,6 +6,7 @@ import {
   Settings,
   ShoppingBag,
   Users,
+  Wallet,
 } from 'lucide-react'
 import { useRef } from 'react'
 
@@ -110,7 +111,7 @@ export function AdminPage(props: {
   action?: ReactNode
 }) {
   return (
-    <div className="mx-auto grid max-w-300 gap-8 px-4 py-8 @min-[48rem]/admin:px-10">
+    <div className="mx-auto grid max-w-300 px-4 py-8 @min-[48rem]/admin:px-10">
       <header className="grid gap-2">
         <h1 className="font-heading text-3xl font-black tracking-tight @min-[30rem]/admin:text-5xl">
           {props.title}
@@ -141,7 +142,7 @@ export function AdminPosFab(props: { className?: string }) {
     </button>
   )
 }
-export type AdminNavTab = 'roster' | 'absences' | 'store' | 'settings'
+export type AdminNavTab = 'roster' | 'absences' | 'pay' | 'store' | 'settings'
 function AdminTopBar(props: {
   showAccountMenu: boolean
   accountMenu: AdminAccountMenuProps
@@ -209,6 +210,13 @@ function AdminSidebarNav(props: {
       params: props.navParams,
       icon: CalendarDays,
       label: 'Absences',
+    },
+    {
+      tab: 'pay' as const,
+      to: '/admin/$orgSlug/pay',
+      params: props.navParams,
+      icon: Wallet,
+      label: 'Payroll',
     },
     {
       tab: 'store' as const,
@@ -311,6 +319,13 @@ function AdminBottomNav(props: {
       label: 'Absences',
     },
     {
+      tab: 'pay' as const,
+      to: '/admin/$orgSlug/pay',
+      params: props.navParams,
+      icon: Wallet,
+      label: 'Payroll',
+    },
+    {
       tab: 'store' as const,
       to: '/admin/$orgSlug/store',
       params: props.navParams,
@@ -336,7 +351,7 @@ function AdminBottomNav(props: {
     <nav
       ref={navRef}
       className={cn(
-        'border-ink bg-background relative grid grid-cols-4 gap-1 border-t-2 px-2 pt-2 shadow-[0_-4px_0_0_var(--ink)]',
+        'border-ink bg-background relative grid grid-cols-5 gap-1 border-t-2 px-2 pt-2 shadow-[0_-4px_0_0_var(--ink)]',
         'pb-[max(0.5rem,env(safe-area-inset-bottom))]',
         props.className
       )}
@@ -409,6 +424,10 @@ function useAdminNavTab(): AdminNavTab {
 
   if (pathname.includes('/absences')) {
     return 'absences'
+  }
+
+  if (pathname.includes('/pay')) {
+    return 'pay'
   }
 
   if (pathname.includes('/store') || pathname.includes('/pos')) {

@@ -7,6 +7,7 @@ import { authz } from '../features/auth/authz'
 
 import { applyV1Catalog, ensureOperatorUser } from './catalog'
 import { V1_DEV_CLASSROOM } from './catalogData'
+import { repairInconsistentPaySchedules } from './catalogSettings'
 
 const seedResultValidator = v.object({
   operatorUserId: v.id('users'),
@@ -27,6 +28,13 @@ export const seedV1Catalog = internalMutation({
   returns: seedResultValidator,
   handler: async ctx => {
     return await applyV1Catalog(ctx)
+  },
+})
+export const repairPaySchedules = internalMutation({
+  args: {},
+  returns: v.object({ patched: v.number() }),
+  handler: async ctx => {
+    return await repairInconsistentPaySchedules(ctx)
   },
 })
 export const linkDevTeacherByEmail = internalMutation({
