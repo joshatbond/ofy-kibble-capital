@@ -1,4 +1,5 @@
 import { useQueries } from 'convex/react'
+import { getFunctionName } from 'convex/server'
 import { useMemo } from 'react'
 
 import { normalizeSafeQueryResult } from '~/lib/safe-query'
@@ -18,6 +19,7 @@ export function useSafeQuery<TQuery extends FunctionReference<'query'>>(
 ): SafeQueryResult<TQuery['_returnType']> {
   const skip = args[0] === 'skip'
   const argsKey = JSON.stringify(skip ? {} : (args[0] ?? {}))
+  const queryName = getFunctionName(query)
 
   const queries = useMemo((): RequestForQueries => {
     if (skip) {
@@ -29,7 +31,7 @@ export function useSafeQuery<TQuery extends FunctionReference<'query'>>(
         args: JSON.parse(argsKey) as Record<string, Value>,
       },
     }
-  }, [argsKey, query, skip])
+  }, [argsKey, queryName, skip])
 
   const results = useQueries(queries)
   return normalizeSafeQueryResult<TQuery['_returnType']>(results.query)
