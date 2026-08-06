@@ -764,8 +764,8 @@ describe('getPayRunAdminReportForOrganization', () => {
       'zebra@ofy.org',
     ])
 
-    const alphaLine = report.stubs[0]!
-    const zebraLine = report.stubs[1]!
+    const alphaLine = report.stubs[0]
+    const zebraLine = report.stubs[1]
     expect(alphaLine.rosterStudentId).toBe(alpha.rosterStudentId)
     expect(zebraLine.rosterStudentId).toBe(zebra.rosterStudentId)
 

@@ -149,7 +149,9 @@ describe('repairInconsistentPaySchedules', () => {
       const badSite = siteRows[0]
       expect(region).toBeDefined()
       expect(badSite).toBeDefined()
-      expect(classRow).not.toBeNull()
+      if (classRow === null) {
+        throw new Error('expected classSettings')
+      }
 
       const schoolSiteId = await ctx.db.insert('schoolSites', {
         siteSlug: 'repair-keep-weekly',

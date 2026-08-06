@@ -1,5 +1,5 @@
-import { applyPaycheckPipeline } from '../banking/paycheckPipeline'
 import { userError } from '../appError'
+import { applyPaycheckPipeline } from '../banking/paycheckPipeline'
 import { resolveEffectiveSettings } from '../settings/effectiveSettings'
 
 import { validateStubAttendanceForPayPeriod } from './attendanceValidation'

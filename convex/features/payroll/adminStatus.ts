@@ -18,9 +18,6 @@ import type { Doc, Id } from '../../_generated/dataModel'
 import type { QueryCtx } from '../../_generated/server'
 import type { Infer } from 'convex/values'
 
-/** Deliberate history window for the payroll admin page reactive query. */
-export const PREVIOUS_PAY_RUNS_LIMIT = 25
-
 /** Bound on runs listed for the current (open) period only. */
 const CURRENT_PERIOD_RUNS_LIMIT = 50
 
@@ -49,6 +46,9 @@ const adminPaystubLineValidator = v.object({
   caSdiCents: paystubsTableFields.caSdiCents,
   paySplit: v.array(paySplitShareValidator),
 })
+
+/** Deliberate history window for the payroll admin page reactive query. */
+export const PREVIOUS_PAY_RUNS_LIMIT = 25
 export const payRunAdminSummaryValidator = v.object({
   _id: v.id('payRuns'),
   status: payRunsTableFields.status,
